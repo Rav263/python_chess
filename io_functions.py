@@ -1,3 +1,6 @@
+import gamelogic
+
+
 class Data:
     data = dict()
 
@@ -43,13 +46,19 @@ def print_field(field, data):
     print()
 
 
-def get_turn():
+def get_turn(logic, color, plane):
     line = input("Please enter your turn: ").strip()
     if len(line) != 5:
         print("Wrong format")
-        return get_turn
+        return get_turn(logic, color, plane)
 
     start_pos = (8 - int(line[1]), abs(ord(line[0]) - ord("a")))
     end_pos = (8 - int(line[4]), abs(ord(line[3]) - ord("a")))
 
-    return [start_pos, end_pos]
+    now_turn = gamelogic.Turn(start_pos, end_pos, color)
+
+    if not logic.check_turn(now_turn, plane):
+        print("Wrong turn")
+        return get_turn(logic, color, plane)
+
+    return now_turn

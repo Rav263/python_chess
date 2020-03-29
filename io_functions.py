@@ -26,8 +26,11 @@ class Data:
                     tmp[int(tmp_str[0])] = tmp_str[1]
                 self.data["FIGURES"] = tmp
 
+        file.close()
+
 
 def print_field(field, data):
+    print()
     for i in range(8):
         print(8 - i, end=" |")
 
@@ -37,3 +40,16 @@ def print_field(field, data):
 
     print("  ------------------------")
     print("   a  b  c  d  e  f  g  h")
+    print()
+
+
+def get_turn():
+    line = input("Please enter your turn: ").strip()
+    if len(line) != 5:
+        print("Wrong format")
+        return get_turn
+
+    start_pos = (8 - int(line[1]), abs(ord(line[0]) - ord("a")))
+    end_pos = (8 - int(line[4]), abs(ord(line[3]) - ord("a")))
+
+    return [start_pos, end_pos]

@@ -1,0 +1,24 @@
+# 0 -- empty
+# 10 -- white pawn
+# 11 -- white horse
+# 12 -- white elephant
+# 13 -- white rook
+# 14 -- white king
+# 15 -- white queen
+# 20 -- black pawn
+# 21 -- black horse
+# 22 -- black elephant
+# 23 -- black rook
+# 24 -- black king
+# 25 -- black queen
+
+
+FIELD
+23 21 22 25 24 22 21 23
+20 20 20 20 20 20 20 20
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00
+10 10 10 10 10 10 10 10
+13 11 12 15 14 12 11 13

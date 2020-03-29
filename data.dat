@@ -12,6 +12,20 @@
 # 24 -- black king
 # 25 -- black queen
 
+FIGURES
+0 ..
+10 Pw
+11 Nw
+12 Bw
+13 Rw
+14 Kw
+15 Qw
+20 Pb
+21 Nb
+22 Bb
+23 Rb
+24 Kb
+25 Qb
 
 FIELD
 23 21 22 25 24 22 21 23

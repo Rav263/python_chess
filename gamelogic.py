@@ -95,21 +95,13 @@ class Logic:
         return False
 
     def check_bishop(self, turn, mod_1, mod_2, plate):
-        if mod_1 == mod_2:
+        if abs(mod_1) == abs(mod_2):
             sign_1 = -1 if mod_1 < 0 else 1
+            sign_2 = -sign_1 if mod_1 == -mod_2 else sign_1
 
             for i in range(sign_1, mod_1, sign_1):
-                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1] + i)) != 0:
+                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1] + i * sign_1 * sign_2)) != 0:
                     return False
-            return True
-
-        if mod_1 == -mod_2:
-            sign_1 = -1 if mod_1 < 0 else 1
-
-            for i in range(sign_1, mod_1, sign_1):
-                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1] + i * sign_1)) != 0:
-                    return False
-
             return True
 
         return False

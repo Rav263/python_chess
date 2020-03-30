@@ -1,3 +1,6 @@
+import io_functions
+
+
 class Turn:
     def __init__(self, start_pos, end_pos, color):
         self.start_pos = start_pos
@@ -12,6 +15,17 @@ class Turn:
 class Logic:
     def __init__(self):
         print("Init game logic class")
+
+    def start(self, plate, data):
+        color = 1
+
+        while True:
+            io_functions.print_field(plate.field, data)
+            now_turn = io_functions.get_turn(self, color, plate)
+
+            plate.do_turn(now_turn)
+
+            color = 3 - color
 
     def check_turn(self, turn, plate):
         if (turn.start_pos[0] > 7 or turn.start_pos[0] < 0 or

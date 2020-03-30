@@ -12,15 +12,8 @@ def main():
     logic = gamelogic.Logic()
     # Then we need start game
 
-    color = 1
+    logic.start(plate, data)
 
-    while True:
-        io_functions.print_field(plate.field, data)
-        now_turn = io_functions.get_turn(logic, color, plate)
-
-        plate.do_turn(now_turn)
-
-        color = 3 - color
     # Maybe if it will be in web, we must start game server
     # Or we can create some server with a few people, who play PVP
 

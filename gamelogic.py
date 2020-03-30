@@ -79,12 +79,15 @@ class Logic:
             if turn.end_pos[1] == turn.start_pos[1] and plate.get_map(turn.end_pos) == 0:
                 tmp = turn.start_pos[0] - turn.end_pos[0]
                 if tmp == 1 or (tmp == 2 and turn.start_pos[0] == 6):
-                    return True
+                    if plate.get_type_map(turn.end_pos) == plate.empty_map:
+                        return True
         else:
             if turn.end_pos[1] == turn.start_pos[1]:
                 tmp = turn.end_pos[0] - turn.start_pos[0]
                 if tmp == 1 or (tmp == 2 and turn.start_pos[0] == 1):
-                    return True
+                    if plate.get_type_map(turn.end_pos) == plate.empty_map:
+                        return True
+
         return False
 
     def check_knigth(self, coord_diff_x, coord_diff_y):

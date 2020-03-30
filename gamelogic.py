@@ -1,6 +1,10 @@
 import io_functions
 
 
+def difference(tuple_1, tuple_2):
+    return (tuple_1[0] - tuple_2[0], tuple_1[1] - tuple_2[1])
+
+
 class Turn:
     def __init__(self, start_pos, end_pos, color):
         self.start_pos = start_pos
@@ -43,31 +47,30 @@ class Logic:
         if figure_type == plate.pown:
             return self.check_pown(turn, plate)
 
-        mod_1 = turn.start_pos[0] - turn.end_pos[0]
-        mod_2 = turn.start_pos[1] - turn.end_pos[1]
+        coord_diff = difference(turn.start_pos, turn.end_pos)
 
         # knight
         if figure_type == plate.knight:
-            return self.check_knight(mod_1, mod_2)
+            return self.check_knight(*coord_diff)
 
         # bishop
         if figure_type == plate.bishop:
-            print("BISHOP")
-            return self.check_bishop(turn, mod_1, mod_2, plate)
+            return self.check_bishop(turn, *coord_diff, plate)
 
         # rook
         if figure_type == plate.rook:
-            return self.check_rook(turn, mod_1, mod_2, plate)
+            return self.check_rook(turn, *coord_diff, plate)
 
         # king
         if figure_type == plate.king:
-            if (mod_1 == 1 or mod_1 == 0) and (mod_2 == 1 or mod_2 == 0):
+            if ((coord_diff[0] == 1 or coord_diff[0] == 0) and
+                    (coord_diff[1] == 1 or coord_diff[1] == 0)):
                 return True
 
         # queen
         if figure_type == plate.queen:
-            return (self.check_bishop(turn, mod_1, mod_2, plate) or
-                    self.check_rook(turn, mod_1, mod_2, plate))
+            return (self.check_bishop(turn, *coord_diff, plate) or
+                    self.check_rook(turn, *coord_diff, plate))
 
         return False
 
@@ -84,34 +87,34 @@ class Logic:
                     return True
         return False
 
-    def check_knigth(self, mod_1, mod_2):
-        if abs(mod_1) == 1 and abs(mod_2) == 2:
+    def check_knigth(self, coord_diff_x, coord_diff_y):
+        if abs(coord_diff_x) == 1 and abs(coord_diff_y) == 2:
             return True
 
-        if abs(mod_1) == 2 and abs(mod_2) == 1:
+        if abs(coord_diff_x) == 2 and abs(coord_diff_y) == 1:
             return True
 
         return False
 
-    def check_bishop(self, turn, mod_1, mod_2, plate):
-        if abs(mod_1) == abs(mod_2):
-            sign_1 = -1 if mod_1 < 0 else 1
-            sign_2 = -sign_1 if mod_1 == -mod_2 else sign_1
+    def check_bishop(self, turn, coord_diff_x, coord_diff_y, plate):
+        if abs(coord_diff_x) == abs(coord_diff_y):
+            sign_x = -1 if coord_diff_x < 0 else 1
+            sign_y = -sign_x if coord_diff_x == -coord_diff_y else sign_x
 
-            for i in range(sign_1, mod_1, sign_1):
-                if plate.get_type_map(turn.end_pos + (i, i * sign_1 * sign_2)) != plate.empty_map:
+            for i in range(sign_x, coord_diff_x, sign_x):
+                if plate.get_type_map(turn.end_pos + (i, i * sign_x * sign_y)) != plate.empty_map:
                     return False
             return True
 
         return False
 
-    def check_rook(self, turn, mod_1, mod_2, plate):
-        if (mod_1 == 0 and mod_2 != 0) or (mod_1 != 0 and mod_2 == 0):
-            sign_1 = -1 if mod_1 < 0 else 1 if mod_1 != 0 else 0
-            sign_2 = -1 if mod_2 < 0 else 1 if mod_2 != 0 else 0
+    def check_rook(self, turn, coord_diff_x, coord_diff_y, plate):
+        if (coord_diff_x == 0 and coord_diff_y != 0) or (coord_diff_x != 0 and coord_diff_y == 0):
+            sign_x = -1 if coord_diff_x < 0 else 1 if coord_diff_x != 0 else 0
+            sign_y = -1 if coord_diff_y < 0 else 1 if coord_diff_y != 0 else 0
 
-            for i in range(1, mod_1 + mod_2):
-                if plate.get_type_map(turn.end_pos + (i * sign_1, i * sign_2)) != plate.empty_map:
+            for i in range(1, coord_diff_x + coord_diff_y):
+                if plate.get_type_map(turn.end_pos + (i * sign_x, i * sign_y)) != plate.empty_map:
                     return False
 
             return True

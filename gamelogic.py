@@ -28,45 +28,44 @@ class Logic:
             color = 3 - color
 
     def check_turn(self, turn, plate):
-        if (turn.start_pos[0] > 7 or turn.start_pos[0] < 0 or
-                turn.start_pos[1] > 7 or turn.start_pos[1] < 0 or
-                turn.end_pos[0] > 7 or turn.end_pos[0] < 0 or
-                turn.end_pos[1] > 7 or turn.end_pos[1] < 0):
+        if (not plate.check_pos(turn.start_pos) or not plate.check_pos(turn.end_pos)):
             return False
 
-        if (plate.get_map(turn.start_pos) // 10 != turn.color or
-                plate.get_map(turn.start_pos) == 0 or
-                plate.get_map(turn.end_pos) // 10 == turn.color):
+        if (plate.get_color_map(turn.start_pos) != turn.color or
+                plate.get_type_map(turn.start_pos) == plate.empty_map or
+                plate.get_color_map(turn.end_pos) == turn.color):
             return False
 
         now_figure = plate.get_map(turn.start_pos)
+        figure_type = plate.get_type_figure(now_figure)
 
         # pown
-        if now_figure == 10 or now_figure == 20:
+        if figure_type == plate.pown:
             return self.check_pown(turn, plate)
 
         mod_1 = turn.start_pos[0] - turn.end_pos[0]
         mod_2 = turn.start_pos[1] - turn.end_pos[1]
 
-        # hourse
-        if now_figure == 11 or now_figure == 21:
+        # knight
+        if figure_type == plate.knight:
             return self.check_knight(mod_1, mod_2)
 
-        # elephant
-        if now_figure == 12 or now_figure == 22:
+        # bishop
+        if figure_type == plate.bishop:
+            print("BISHOP")
             return self.check_bishop(turn, mod_1, mod_2, plate)
 
         # rook
-        if now_figure == 13 or now_figure == 23:
+        if figure_type == plate.rook:
             return self.check_rook(turn, mod_1, mod_2, plate)
 
         # king
-        if now_figure == 14 or now_figure == 24:
+        if figure_type == plate.king:
             if (mod_1 == 1 or mod_1 == 0) and (mod_2 == 1 or mod_2 == 0):
                 return True
 
         # queen
-        if now_figure == 15 or now_figure == 25:
+        if figure_type == plate.queen:
             return (self.check_bishop(turn, mod_1, mod_2, plate) or
                     self.check_rook(turn, mod_1, mod_2, plate))
 
@@ -100,7 +99,7 @@ class Logic:
             sign_2 = -sign_1 if mod_1 == -mod_2 else sign_1
 
             for i in range(sign_1, mod_1, sign_1):
-                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1] + i * sign_1 * sign_2)) != 0:
+                if plate.get_type_map(turn.end_pos + (i, i * sign_1 * sign_2)) != plate.empty_map:
                     return False
             return True
 
@@ -112,7 +111,7 @@ class Logic:
             sign_2 = -1 if mod_2 < 0 else 1 if mod_2 != 0 else 0
 
             for i in range(1, mod_1 + mod_2):
-                if plate.get_map((turn.end_pos[0] + i * sign_1, turn.end_pos[1] + i * sign_2)) != 0:
+                if plate.get_type_map(turn.end_pos + (i * sign_1, i * sign_2)) != plate.empty_map:
                     return False
 
             return True

@@ -107,20 +107,12 @@ class Logic:
         return False
 
     def check_rook(self, turn, mod_1, mod_2, plate):
-        if mod_1 == 0 and mod_2 != 0:
-            sign_2 = -1 if mod_2 < 0 else 1
+        if (mod_1 == 0 and mod_2 != 0) or (mod_1 != 0 and mod_2 == 0):
+            sign_1 = -1 if mod_1 < 0 else 1 if mod_1 != 0 else 0
+            sign_2 = -1 if mod_2 < 0 else 1 if mod_2 != 0 else 0
 
-            for i in range(sign_2, mod_2, sign_2):
-                if plate.get_map((turn.end_pos[0], turn.end_pos[1] + i)) != 0:
-                    return False
-
-            return True
-
-        if mod_1 != 0 and mod_2 == 0:
-            sign_1 = -1 if mod_2 < 0 else 1
-
-            for i in range(sign_1, mod_1, sign_1):
-                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1])) != 0:
+            for i in range(1, mod_1 + mod_2):
+                if plate.get_map((turn.end_pos[0] + i * sign_1, turn.end_pos[1] + i * sign_2)) != 0:
                     return False
 
             return True

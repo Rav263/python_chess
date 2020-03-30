@@ -5,6 +5,10 @@ def difference(tuple_1, tuple_2):
     return (tuple_1[0] - tuple_2[0], tuple_1[1] - tuple_2[1])
 
 
+def sum(tuple_1, tuple_2):
+    return (tuple_1[0] + tuple_2[0], tuple_1[1] + tuple_2[1])
+
+
 class Turn:
     def __init__(self, start_pos, end_pos, color):
         self.start_pos = start_pos
@@ -105,7 +109,8 @@ class Logic:
             sign_y = -sign_x if coord_diff_x == -coord_diff_y else sign_x
 
             for i in range(sign_x, coord_diff_x, sign_x):
-                if plate.get_type_map(turn.end_pos + (i, i * sign_x * sign_y)) != plate.empty_map:
+                if (plate.get_type_map(sum(turn.end_pos, (i, i * sign_x * sign_y))) !=
+                        plate.empty_map):
                     return False
             return True
 
@@ -117,7 +122,8 @@ class Logic:
             sign_y = -1 if coord_diff_y < 0 else 1 if coord_diff_y != 0 else 0
 
             for i in range(1, coord_diff_x + coord_diff_y):
-                if plate.get_type_map(turn.end_pos + (i * sign_x, i * sign_y)) != plate.empty_map:
+                if (plate.get_type_map(sum(turn.end_pos, (i * sign_x, i * sign_y))) !=
+                        plate.empty_map):
                     return False
 
             return True

@@ -5,6 +5,8 @@ class Data:
     data = dict()
 
     def __init__(self, file_name):
+        self.field_size = 8
+
         try:
             file = open(file_name, "r")
         except FileNotFoundError:
@@ -17,7 +19,7 @@ class Data:
 
             if i.strip() == "FIELD":
                 tmp = []
-                for j in range(8):
+                for j in range(self.field_size):
                     tmp_str = file.readline()
                     tmp.append([int(i) for i in tmp_str.strip().split()])
                 self.data["FIELD"] = tmp
@@ -29,6 +31,8 @@ class Data:
                     tmp[int(tmp_str[0])] = tmp_str[1]
                 self.data["FIGURES"] = tmp
 
+            if i.strip() == "FIELD_SIZE":
+                self.field_size = int(file.readline().strip())
         file.close()
 
 

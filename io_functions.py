@@ -38,15 +38,19 @@ class Data:
 
 def print_field(field, data):
     print()
-    for i in range(8):
-        print(8 - i, end=" |")
+    for i in range(data.field_size):
+        print(data.field_size - i, end=" |")
 
         for now_fig in field[i]:
             print(data.data["FIGURES"][now_fig], end=" ")
         print()
 
-    print("  ------------------------")
-    print("   a  b  c  d  e  f  g  h")
+    print("  ", end="")
+    for i in range(data.field_size):
+        print("---", end="")
+    print()
+    print("   ", end="")
+    print(*[(chr(ord("a") + i) + " ") for i in range(data.field_size)])
     print()
 
 
@@ -56,8 +60,8 @@ def get_turn(logic, color, plane):
         print("Wrong format")
         return get_turn(logic, color, plane)
 
-    start_pos = (8 - int(line[1]), abs(ord(line[0]) - ord("a")))
-    end_pos = (8 - int(line[4]), abs(ord(line[3]) - ord("a")))
+    start_pos = (plane.field_size - int(line[1]), abs(ord(line[0]) - ord("a")))
+    end_pos = (plane.field_size - int(line[4]), abs(ord(line[3]) - ord("a")))
 
     now_turn = gamelogic.Turn(start_pos, end_pos, color)
 

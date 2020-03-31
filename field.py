@@ -6,6 +6,8 @@ class Field:
     rook = 4
     king = 5
     queen = 6
+    white = 1
+    black = 2
 
     def __init__(self, data):
         print("Init field class")

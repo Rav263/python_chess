@@ -1,6 +1,10 @@
 import io_functions
 import check_turn as check
 import math_functions as mf
+import generate_turns as gt
+
+from collections import defaultdict
+from itertools import product
 
 
 class Turn:
@@ -24,6 +28,15 @@ class Logic:
         while True:
             io_functions.print_field(plate.field, data)
             now_turn = io_functions.get_turn(self, color, plate)
+
+            plate.do_turn(now_turn)
+
+            color = 3 - color
+
+            possible_turns = self.generate_all_possible_turns(plate, color)
+            for now in possible_turns:
+                print("{0}:".format(now), *possible_turns[now])
+                now_turn = Turn(possible_turns[now][0], now, color)
 
             plate.do_turn(now_turn)
 
@@ -71,3 +84,18 @@ class Logic:
                     check.check_rook(turn, *coord_diff, plate))
 
         return False
+
+    def generate_all_possible_turns(self, plate, color):
+        possible_turns = defaultdict(list)
+        # dict key = position of possible turn
+        # dict value = list of positions where from this turn can be done
+
+        for pos in product(range(plate.field_size), repeat=2):
+            if plate.get_color_map(pos) == color:
+                if plate.get_type_map(pos) == plate.pown:
+                    gt.generate_turns_pown(pos, plate, possible_turns)
+
+                if plate.get_type_map(pos) == plate.knight:
+                    gt.generate_turns_knight(pos, plate, possible_turns, color)
+
+        return possible_turns

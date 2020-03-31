@@ -1,13 +1,6 @@
 import io_functions
 import check_turn as check
-
-
-def difference(tuple_1, tuple_2):
-    return (tuple_1[0] - tuple_2[0], tuple_1[1] - tuple_2[1])
-
-
-def sum(tuple_1, tuple_2):
-    return (tuple_1[0] + tuple_2[0], tuple_1[1] + tuple_2[1])
+import math_functions as mf
 
 
 class Turn:
@@ -52,7 +45,7 @@ class Logic:
         if figure_type == plate.pown:
             return check.check_pown(turn, plate)
 
-        coord_diff = difference(turn.start_pos, turn.end_pos)
+        coord_diff = mf.difference(turn.start_pos, turn.end_pos)
 
         # knight
         if figure_type == plate.knight:

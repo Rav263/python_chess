@@ -1,9 +1,4 @@
-def difference(tuple_1, tuple_2):
-    return (tuple_1[0] - tuple_2[0], tuple_1[1] - tuple_2[1])
-
-
-def sum(tuple_1, tuple_2):
-    return (tuple_1[0] + tuple_2[0], tuple_1[1] + tuple_2[1])
+import math_functions as mf
 
 
 def check_pown(turn, plate):
@@ -39,7 +34,7 @@ def check_bishop(turn, coord_diff_x, coord_diff_y, plate):
         sign_y = -sign_x if coord_diff_x == -coord_diff_y else sign_x
 
         for i in range(sign_x, coord_diff_x, sign_x):
-            if (plate.get_type_map(sum(turn.end_pos, (i, i * sign_x * sign_y))) !=
+            if (plate.get_type_map(mf.sum(turn.end_pos, (i, i * sign_x * sign_y))) !=
                     plate.empty_map):
                 return False
         return True
@@ -53,7 +48,7 @@ def check_rook(turn, coord_diff_x, coord_diff_y, plate):
         sign_y = -1 if coord_diff_y < 0 else 1 if coord_diff_y != 0 else 0
 
         for i in range(1, coord_diff_x + coord_diff_y):
-            if (plate.get_type_map(sum(turn.end_pos, (i * sign_x, i * sign_y))) !=
+            if (plate.get_type_map(mf.sum(turn.end_pos, (i * sign_x, i * sign_y))) !=
                     plate.empty_map):
                 return False
 

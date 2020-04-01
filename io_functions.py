@@ -33,7 +33,19 @@ class Data:
 
             if i.strip() == "FIELD_SIZE":
                 self.field_size = int(file.readline().strip())
+
+            if i.strip() == "FIGURES_COST":
+                tmp = dict()
+
+                for j in range(13):
+                    tmp_str = file.readline().split()
+                    tmp[int(tmp_str[0])] = float(tmp_str[1])
+
+                self.data["FIGURES_COST"] = tmp
         file.close()
+
+    def get_figures_costs(self):
+        return self.data["FIGURES_COST"]
 
 
 def print_field(field, data):

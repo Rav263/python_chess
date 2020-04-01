@@ -98,4 +98,16 @@ class Logic:
                 if plate.get_type_map(pos) == plate.knight:
                     gt.generate_turns_knight(pos, plate, possible_turns, color)
 
+                if plate.get_type_map(pos) == plate.rook:
+                    gt.generate_turns_rook(pos, plate, possible_turns, color)
+
+                if plate.get_type_map(pos) == plate.bishop:
+                    gt.generate_turns_bishop(pos, plate, possible_turns, color)
+
+                if plate.get_type_map(pos) == plate.queen:
+                    gt.generate_turns_queen(pos, plate, possible_turns, color)
+
+                if plate.get_type_map(pos) == plate.king:
+                    gt.generate_turns_king(pos, plate, possible_turns, color)
+
         return possible_turns

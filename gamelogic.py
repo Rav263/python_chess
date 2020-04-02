@@ -24,7 +24,7 @@ class Logic:
 
     def start(self, plate, data):
         color = 1
-        figures_cost = data.data["FIGURES_COST"]
+        self.figures_cost = data.data["FIGURES_COST"]
 
         while True:
             io_functions.print_field(plate.field, data)
@@ -34,13 +34,9 @@ class Logic:
 
             color = 3 - color
 
-            possible_turns = self.generate_all_possible_turns(plate, color)
-            print(plate.calculate_plate_cost(color, figures_cost))
-            for now in possible_turns:
-                print("{0}:".format(now), *possible_turns[now])
-                now_turn = Turn(possible_turns[now][0], now, color)
+            print(plate.calculate_plate_cost(color, self.figures_cost))
 
-            plate.do_turn(now_turn)
+            plate.do_turn(self.ai_turn(plate, color, 3)[0])
 
             color = 3 - color
 
@@ -113,3 +109,26 @@ class Logic:
                     gt.generate_turns_king(pos, plate, possible_turns, color)
 
         return possible_turns
+
+    def ai_turn(self, plate, color, alpha, beta, depth):
+        possible_turns = self.generate_all_possible_turns(plate, color)
+
+        best_cost = -10039.0  # sum of all figures cost
+        best_turn = Turn((-1, -1), (-1, -1), 0)
+
+        for end_pos in possible_turns:
+            for start_pos in possible_turns[end_pos]:
+                tmp = plate.do_turn(Turn(start_pos, end_pos, color))
+
+                if depth == 1:
+                    now_cost = plate.calculate_plate_cost(color, self.figures_cost)
+                else:
+                    now_cost = self.ai_turn(plate, 3 - color, depth - 1)[1]
+
+                if now_cost > best_cost:
+                    best_cost = now_cost
+                    best_turn = Turn(start_pos, end_pos, color)
+
+                plate.do_turn(Turn(end_pos, start_pos, color), fig=tmp)
+
+        return (best_turn, best_cost)

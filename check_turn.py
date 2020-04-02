@@ -18,7 +18,7 @@ def check_pown(turn, plate):
     return False
 
 
-def check_knigth(coord_diff_x, coord_diff_y):
+def check_knight(coord_diff_x, coord_diff_y):
     if abs(coord_diff_x) == 1 and abs(coord_diff_y) == 2:
         return True
 

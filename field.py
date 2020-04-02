@@ -17,12 +17,13 @@ class Field:
         self.load_field(data)
         self.field_size = data.field_size
 
-    def do_turn(self, turn):
-        print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
+    def do_turn(self, turn, fig=0):
+        # print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
 
         # move figure
-        self.set_map(turn.end_pos, self.get_map(turn.start_pos))
-        self.set_map(turn.start_pos, 0)
+        tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos))
+        self.set_map(turn.start_pos, fig)
+        return tmp
 
     def load_field(self, data):
         self.field = data.data["FIELD"]
@@ -52,7 +53,9 @@ class Field:
         return True
 
     def set_map(self, pos, value):
+        tmp = self.field[pos[0]][pos[1]]
         self.field[pos[0]][pos[1]] = value
+        return tmp
 
     def calculate_plate_cost(self, color, figures_cost):
         summ = 0

@@ -1,3 +1,6 @@
+from itertools import product
+
+
 class Field:
     empty_map = 0
     pown = 1
@@ -50,3 +53,13 @@ class Field:
 
     def set_map(self, pos, value):
         self.field[pos[0]][pos[1]] = value
+
+    def calculate_plate_cost(self, color, figures_cost):
+        summ = 0
+        for pos in product(range(self.field_size), repeat=2):
+            if self.get_color_map(pos) == color:
+                summ += figures_cost[self.get_map(pos)]
+            else:
+                summ -= figures_cost[self.get_map(pos)]
+
+        return summ

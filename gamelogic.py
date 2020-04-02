@@ -35,7 +35,7 @@ class Logic:
             color = 3 - color
 
             possible_turns = self.generate_all_possible_turns(plate, color)
-            print(self.calculate_plate_cost(plate, color, figures_cost))
+            print(plate.calculate_plate_cost(color, figures_cost))
             for now in possible_turns:
                 print("{0}:".format(now), *possible_turns[now])
                 now_turn = Turn(possible_turns[now][0], now, color)
@@ -113,13 +113,3 @@ class Logic:
                     gt.generate_turns_king(pos, plate, possible_turns, color)
 
         return possible_turns
-
-    def calculate_plate_cost(self, plate, color, figures_cost):
-        summ = 0
-        for pos in product(range(plate.field_size), repeat=2):
-            if plate.get_color_map(pos) == color:
-                summ += figures_cost[plate.get_map(pos)]
-            else:
-                summ -= figures_cost[plate.get_map(pos)]
-
-        return summ

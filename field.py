@@ -58,11 +58,8 @@ class Field:
         return tmp
 
     def calculate_plate_cost(self, color, figures_cost):
-        summ = 0
+        summ = 0  # figures_cost["sum"]
         for pos in product(range(self.field_size), repeat=2):
-            if self.get_color_map(pos) == color:
-                summ += figures_cost[self.get_map(pos)]
-            else:
-                summ -= figures_cost[self.get_map(pos)]
+            summ += figures_cost[self.get_map(pos)]
 
         return summ

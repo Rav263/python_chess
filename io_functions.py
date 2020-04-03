@@ -36,11 +36,14 @@ class Data:
 
             if i.strip() == "FIGURES_COST":
                 tmp = dict()
+                summ = 0
 
                 for j in range(13):
                     tmp_str = file.readline().split()
                     tmp[int(tmp_str[0])] = float(tmp_str[1])
+                    summ += float(tmp_str[1])
 
+                tmp["sum"] = summ / 2
                 self.data["FIGURES_COST"] = tmp
         file.close()
 

@@ -2,7 +2,7 @@ import math_functions as mf
 
 
 def check_pown(turn, plate):
-    if turn.color == 1:
+    if turn.color == plate.white:
         if turn.end_pos[1] == turn.start_pos[1] and plate.get_map(turn.end_pos) == 0:
             tmp = turn.start_pos[0] - turn.end_pos[0]
             if tmp == 1 or (tmp == 2 and turn.start_pos[0] == 6):

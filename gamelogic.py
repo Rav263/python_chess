@@ -35,8 +35,17 @@ class Logic:
             color = 3 - color
 
             print(plate.calculate_plate_cost(color, self.figures_cost))
+            self.depth = [0, 0, 0, 0, 0]
 
-            plate.do_turn(self.ai_turn(plate, color, 3)[0])
+            tmp = self.ai_turn(plate, color, 5, root=True)
+            now_turn = tmp[0]
+            print("depht 5:", self.depth[0])
+            print("depht 4:", self.depth[1])
+            print("depht 3:", self.depth[2])
+            print("depht 2:", self.depth[3])
+            print("depht 1:", self.depth[4])
+            now_turn.print()
+            plate.do_turn(now_turn)
 
             color = 3 - color
 
@@ -110,25 +119,38 @@ class Logic:
 
         return possible_turns
 
-    def ai_turn(self, plate, color, alpha, beta, depth):
+    def ai_turn(self, plate, color, depth, alpha=-10000, beta=10000, root=False):
         possible_turns = self.generate_all_possible_turns(plate, color)
 
-        best_cost = -10039.0  # sum of all figures cost
+        best_cost = -9999 if color == plate.black else 9999
         best_turn = Turn((-1, -1), (-1, -1), 0)
 
         for end_pos in possible_turns:
             for start_pos in possible_turns[end_pos]:
+                self.depth[depth - 1] += 1
                 tmp = plate.do_turn(Turn(start_pos, end_pos, color))
 
                 if depth == 1:
                     now_cost = plate.calculate_plate_cost(color, self.figures_cost)
-                else:
+                elif root:
                     now_cost = self.ai_turn(plate, 3 - color, depth - 1)[1]
-
-                if now_cost > best_cost:
-                    best_cost = now_cost
-                    best_turn = Turn(start_pos, end_pos, color)
+                else:
+                    now_cost = self.ai_turn(plate, 3 - color, depth - 1, alpha, beta)[1]
 
                 plate.do_turn(Turn(end_pos, start_pos, color), fig=tmp)
+
+                if color == plate.black:
+                    if now_cost >= best_cost:
+                        best_cost = now_cost
+                        best_turn = Turn(start_pos, end_pos, color)
+                    alpha = max(alpha, best_cost)
+                else:
+                    if now_cost <= best_cost:
+                        best_cost = now_cost
+                        best_turn = Turn(start_pos, end_pos, color)
+                    beta = min(beta, best_cost)
+
+                if beta <= alpha and not root:
+                    return (best_turn, best_cost)
 
         return (best_turn, best_cost)

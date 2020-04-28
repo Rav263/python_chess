@@ -2,9 +2,12 @@ import io_functions
 import check_turn as check
 import math_functions as mf
 import generate_turns as gt
+from field import Field
+
 
 from collections import defaultdict
 from itertools import product
+from threading import Thread
 
 
 class Turn:
@@ -18,6 +21,25 @@ class Turn:
         print("start pos: ({0}, {1})".format(*self.end_pos))
 
 
+class ThreadRet(Thread):
+    def __init__(self, group=None, target=None, name=None,
+                 args=(), kwargs={}, Verbose=None):
+        Thread.__init__(self, group, target, name, args, kwargs)
+        self._return = None
+
+    def run(self):
+        if self._target is not None:
+            self._return = self._target(*self._args,
+                                        **self._kwargs)
+
+    def join(self):
+        Thread.join(self)
+        return self._return
+
+
+DATA = None
+
+
 class Logic:
     def __init__(self):
         print("Init game logic class")
@@ -26,6 +48,8 @@ class Logic:
         color = 1
         self.figures_cost = data.data["FIGURES_COST"]
 
+        global DATA
+        DATA = data
         while True:
             io_functions.print_field(plate.field, data)
             now_turn = io_functions.get_turn(self, color, plate)
@@ -37,7 +61,7 @@ class Logic:
             print(plate.calculate_plate_cost(color, self.figures_cost))
             self.depth = [0, 0, 0, 0, 0]
 
-            tmp = self.ai_turn(plate, color, 5, root=True)
+            tmp = self.root_ai_turn(plate, color, 5)
             now_turn = tmp[0]
             print("depht 5:", self.depth[0])
             print("depht 4:", self.depth[1])
@@ -119,7 +143,39 @@ class Logic:
 
         return possible_turns
 
-    def ai_turn(self, plate, color, depth, alpha=-10000, beta=10000, root=False):
+    def root_ai_turn(self, plate, color, depth):
+        possible_turns = self.generate_all_possible_turns(plate, color)
+
+        best_cost = -9999 if color == plate.black else 9999
+        best_turn = Turn((-1, -1), (-1, -1), 0)
+
+        threads = []
+
+        for end_pos in possible_turns:
+            for start_pos in possible_turns[end_pos]:
+                self.depth[depth - 1] += 1
+
+                now_plate = Field(None, plate)
+                now_plate.do_turn(Turn(start_pos, end_pos, color))
+
+                threads.append(ThreadRet(target=self.ai_turn,
+                                         args=(now_plate, 3 - color, depth - 1)))
+
+                threads[len(threads) - 1].start()
+
+        counter = 0
+        for end_pos in possible_turns:
+            for start_pos in possible_turns[end_pos]:
+                now_cost = threads[counter].join()[1]
+                counter += 1
+
+                if now_cost >= best_cost:
+                    best_cost = now_cost
+                    best_turn = Turn(start_pos, end_pos, color)
+
+        return (best_turn, best_cost)
+
+    def ai_turn(self, plate, color, depth, alpha=-10000, beta=10000):
         possible_turns = self.generate_all_possible_turns(plate, color)
 
         best_cost = -9999 if color == plate.black else 9999
@@ -132,8 +188,6 @@ class Logic:
 
                 if depth == 1:
                     now_cost = plate.calculate_plate_cost(color, self.figures_cost)
-                elif root:
-                    now_cost = self.ai_turn(plate, 3 - color, depth - 1)[1]
                 else:
                     now_cost = self.ai_turn(plate, 3 - color, depth - 1, alpha, beta)[1]
 
@@ -150,7 +204,7 @@ class Logic:
                         best_turn = Turn(start_pos, end_pos, color)
                     beta = min(beta, best_cost)
 
-                if beta <= alpha and not root:
+                if beta <= alpha:
                     return (best_turn, best_cost)
 
         return (best_turn, best_cost)

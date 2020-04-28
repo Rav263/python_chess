@@ -12,10 +12,14 @@ class Field:
     white = 1
     black = 2
 
-    def __init__(self, data):
-        print("Init field class")
-        self.load_field(data)
-        self.field_size = data.field_size
+    def __init__(self, data, copy=None):
+        if copy is None:
+            print("Init field class")
+            self.load_field(data)
+            self.field_size = data.field_size
+        else:
+            self.field = [x.copy() for x in copy.field]
+            self.field_size = copy.field_size
 
     def do_turn(self, turn, fig=0):
         # print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
@@ -24,6 +28,9 @@ class Field:
         tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos))
         self.set_map(turn.start_pos, fig)
         return tmp
+
+    def copy(self):
+        return Field(None, self)
 
     def load_field(self, data):
         self.field = data.data["FIELD"]

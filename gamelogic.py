@@ -8,6 +8,8 @@ from field import Field
 from collections import defaultdict
 from itertools import product
 from threading import Thread
+# from tqdm import tqdm
+import os
 
 
 class Turn:
@@ -29,15 +31,18 @@ class ThreadRet(Thread):
 
     def run(self):
         if self._target is not None:
+            print("start thread:", self.name)
             self._return = self._target(*self._args,
                                         **self._kwargs)
 
     def join(self):
         Thread.join(self)
+        print("end thread:", self.name)
         return self._return
 
 
-DATA = None
+def get_num_threads():
+    return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
 
 
 class Logic:
@@ -143,35 +148,60 @@ class Logic:
 
         return possible_turns
 
+    def thread_generate(self, plate, color, depth, turns):
+        best_cost = -9999 if color == plate.black else 9999
+        best_turn = Turn((-1, -1), (-1, -1), 0)
+
+        for turn in turns:
+            tmp = plate.do_turn(Turn(turn[0], turn[1], color))
+            now_cost = self.ai_turn(plate, 3 - color, depth - 1)[1]
+
+            plate.do_turn(Turn(turn[1], turn[0], color), fig=tmp)
+
+            if now_cost >= best_cost:
+                best_cost = now_cost
+                best_turn = Turn(turn[0], turn[1], color)
+
+        return (best_turn, best_cost)
+
     def root_ai_turn(self, plate, color, depth):
         possible_turns = self.generate_all_possible_turns(plate, color)
 
         best_cost = -9999 if color == plate.black else 9999
         best_turn = Turn((-1, -1), (-1, -1), 0)
 
+        turns = []
         threads = []
 
         for end_pos in possible_turns:
             for start_pos in possible_turns[end_pos]:
+                turns.append((start_pos, end_pos))
                 self.depth[depth - 1] += 1
 
-                now_plate = Field(None, plate)
-                now_plate.do_turn(Turn(start_pos, end_pos, color))
+        av_threads = get_num_threads()
+        print(av_threads, turns)
 
-                threads.append(ThreadRet(target=self.ai_turn,
-                                         args=(now_plate, 3 - color, depth - 1)))
+        num_of_turns = len(turns) // av_threads + 1
+        num_of_threads = len(turns) // num_of_turns + 1
 
-                threads[len(threads) - 1].start()
+        for i in range(num_of_threads):
+            now_plate = Field(None, plate)
+            start = i * num_of_turns
 
-        counter = 0
-        for end_pos in possible_turns:
-            for start_pos in possible_turns[end_pos]:
-                now_cost = threads[counter].join()[1]
-                counter += 1
+            end = (i + 1) * num_of_turns
+            end = end if end < len(turns) else len(turns) - 1
 
-                if now_cost >= best_cost:
-                    best_cost = now_cost
-                    best_turn = Turn(start_pos, end_pos, color)
+            threads.append(ThreadRet(target=self.thread_generate, name=len(threads),
+                                     args=(now_plate, color, depth, turns[start:end + 1])))
+
+            threads[len(threads) - 1].start()
+
+        for thread in threads:
+            now_turn, now_cost = thread.join()
+
+            if now_cost >= best_cost:
+                best_cost = now_cost
+                best_turn = now_turn
 
         return (best_turn, best_cost)
 

@@ -8,8 +8,11 @@ from field import Field
 from collections import defaultdict
 from itertools import product
 from threading import Thread
+from multiprocessing import Process
+from multiprocessing import Manager
 # from tqdm import tqdm
 import os
+import sys
 
 
 class Turn:
@@ -42,6 +45,9 @@ class ThreadRet(Thread):
 
 
 def get_num_threads():
+    if len(sys.argv) >= 2:
+        return int(sys.argv[1])
+
     return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
 
 
@@ -148,7 +154,7 @@ class Logic:
 
         return possible_turns
 
-    def thread_generate(self, plate, color, depth, turns):
+    def thread_generate(self, plate, color, depth, turns, index, return_dict):
         best_cost = -9999 if color == plate.black else 9999
         best_turn = Turn((-1, -1), (-1, -1), 0)
 
@@ -162,9 +168,12 @@ class Logic:
                 best_cost = now_cost
                 best_turn = Turn(turn[0], turn[1], color)
 
-        return (best_turn, best_cost)
+        return_dict[index] = (best_turn, best_cost)
 
     def root_ai_turn(self, plate, color, depth):
+        manager = Manager()
+        return_dict = manager.dict()
+
         possible_turns = self.generate_all_possible_turns(plate, color)
 
         best_cost = -9999 if color == plate.black else 9999
@@ -191,19 +200,15 @@ class Logic:
             end = (i + 1) * num_of_turns
             end = end if end < len(turns) else len(turns) - 1
 
-            threads.append(ThreadRet(target=self.thread_generate, name=len(threads),
-                                     args=(now_plate, color, depth, turns[start:end + 1])))
+            threads.append(Process(target=self.thread_generate, name=len(threads),
+                                   args=(now_plate, color, depth, turns[start:end + 1], i, return_dict)))
 
             threads[len(threads) - 1].start()
 
         for thread in threads:
-            now_turn, now_cost = thread.join()
+            thread.join()
 
-            if now_cost >= best_cost:
-                best_cost = now_cost
-                best_turn = now_turn
-
-        return (best_turn, best_cost)
+        return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, plate, color, depth, alpha=-10000, beta=10000):
         possible_turns = self.generate_all_possible_turns(plate, color)

@@ -50,6 +50,10 @@ def get_num_threads():
 
 
 class Logic:
+    MAX_COST = 9999
+    MIN_COST = -9999
+    NULL_TURN = Turn((-1, -1), (-1, -1), 0)
+
     def __init__(self):
         print("Init game logic class")
 
@@ -57,8 +61,6 @@ class Logic:
         color = 1
         self.figures_cost = data.data["FIGURES_COST"]
 
-        global DATA
-        DATA = data
         while True:
             io_functions.print_board(board.board, data)
             now_turn = io_functions.get_turn(self, color, board)
@@ -68,16 +70,8 @@ class Logic:
             color = 3 - color
 
             print(board.calculate_board_cost(color, self.figures_cost))
-            self.depth = [0, 0, 0, 0, 0]
 
-            tmp = self.root_ai_turn(board, color, 5)
-            now_turn = tmp[0]
-            print("depht 5:", self.depth[0])
-            print("depht 4:", self.depth[1])
-            print("depht 3:", self.depth[2])
-            print("depht 2:", self.depth[3])
-            print("depht 1:", self.depth[4])
-            now_turn.print()
+            now_turn = self.root_ai_turn(board, color, 5)[0]
             board.do_turn(now_turn)
 
             color = 3 - color
@@ -110,8 +104,8 @@ class Logic:
         return possible_turns
 
     def thread_generate(self, board, color, depth, turns, index, return_dict):
-        best_cost = -9999 if color == board.black else 9999
-        best_turn = Turn((-1, -1), (-1, -1), 0)
+        best_cost = self.MIN_COST if color == board.black else self.MAX_COST
+        best_turn = self.NULL_TURN
 
         for turn in turns:
             tmp = board.do_turn(Turn(turn[0], turn[1], color))
@@ -137,7 +131,6 @@ class Logic:
         for end_pos in possible_turns:
             for start_pos in possible_turns[end_pos]:
                 turns.append((start_pos, end_pos))
-                self.depth[depth - 1] += 1
 
         av_threads = get_num_threads()
         print(av_threads, turns)
@@ -162,15 +155,14 @@ class Logic:
 
         return max(return_dict.values(), key=lambda x: x[1])
 
-    def ai_turn(self, board, color, depth, alpha=-10000, beta=10000):
+    def ai_turn(self, board, color, depth, alpha=MIN_COST, beta=MAX_COST):
         possible_turns = self.generate_all_possible_turns(board, color)
 
-        best_cost = -9999 if color == board.black else 9999
-        best_turn = Turn((-1, -1), (-1, -1), 0)
+        best_cost = self.MIN_COST if color == board.black else self.MAX_COST
+        best_turn = self.NULL_TURN
 
         for end_pos in possible_turns:
             for start_pos in possible_turns[end_pos]:
-                self.depth[depth - 1] += 1
                 tmp = board.do_turn(Turn(start_pos, end_pos, color))
 
                 if depth == 1:

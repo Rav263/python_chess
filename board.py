@@ -3,7 +3,7 @@ from itertools import product
 
 class Board:
     empty_map = 0
-    pown = 1
+    pawn = 1
     knight = 2
     bishop = 3
     rook = 4

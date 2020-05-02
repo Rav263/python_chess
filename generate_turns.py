@@ -6,7 +6,7 @@ from itertools import count
 from itertools import product
 
 
-def generate_turns_pown(pos, board, possible_turns):
+def generate_turns_pawn(pos, board, possible_turns):
     if board.get_color_map(pos) == board.white:
         if pos[0] == 6 and board.get_type_map((pos[0] - 2, pos[1])) == board.empty_map:
             possible_turns[(pos[0] - 2, pos[1])].append(pos)

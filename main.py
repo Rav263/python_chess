@@ -3,7 +3,9 @@
 import field
 import gamelogic
 import io_functions
-
+import ui
+import sys
+from PyQt5.QtWidgets import QApplication
 
 def main():
     # Here we need to init Field and Game logic
@@ -12,8 +14,16 @@ def main():
     logic = gamelogic.Logic()
     # Then we need start game
 
-    logic.start(plate, data)
+    # logic.start(plate, data)
 
+    qss_file = open('styles.qss').read()
+    # QString StyleSheet = QLatin1String(File.readAll());
+
+    app = QApplication(sys.argv)
+    app.setStyleSheet(qss_file);
+    main_window = ui.Main_Window()
+    sys.exit(app.exec_())
+    
     # Maybe if it will be in web, we must start game server
     # Or we can create some server with a few people, who play PVP
 

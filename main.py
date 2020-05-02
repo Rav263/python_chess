@@ -9,7 +9,7 @@ def main():
     # Here we need to init Field and Game logic
     data = Data("data.dat")
     board = Board(data)
-    logic = Logic()
+    logic = Logic(data)
     # Then we need start game
 
     logic.start(board, data)

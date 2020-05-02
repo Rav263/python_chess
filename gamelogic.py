@@ -54,12 +54,12 @@ class Logic:
     MIN_COST = -9999
     NULL_TURN = Turn((-1, -1), (-1, -1), 0)
 
-    def __init__(self):
+    def __init__(self, data):
         print("Init game logic class")
+        self.figures_cost = data.data["FIGURES_COST"]
 
     def start(self, board, data):
         color = 1
-        self.figures_cost = data.data["FIGURES_COST"]
 
         while True:
             io_functions.print_board(board.board, data)

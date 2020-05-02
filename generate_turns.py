@@ -73,7 +73,7 @@ def generate_turns_bishop(pos, board, possible_turns, color):
 
 def generate_turns_queen(pos, board, possible_turns, color):
     generate_turns_rook(pos, board, possible_turns, color)
-    generate_turns_rook(pos, board, possible_turns, color)
+    generate_turns_bishop(pos, board, possible_turns, color)
 
 
 def generate_turns_king(pos, board, possible_turns, color):

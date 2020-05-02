@@ -18,3 +18,28 @@ QPushButton:flat {
 QPushButton:default {
     border-color: navy; /* make the default button prominent */
 }
+
+/* * #board{
+    background-color: images/board.jpg;
+} */
+
+QFrame#border-left {
+    border-image: url(images/left) 0 0 0 0 stretch stretch;
+    /* background-image: url(images/left) no-repeat center center fixed; */
+}
+QFrame#border-right {
+    border-image: url(images/right) 0 0 0 0 stretch stretch;
+    /* background-color: green; */
+}
+QFrame#border-up {
+    border-image: url(images/up) 0 0 0 0 stretch stretch;
+    /* background-color: blue; */
+}
+QFrame#border-down {
+    border-image: url(images/down) 0 0 0 0 stretch stretch;
+    /* background-color: black; */
+}
+
+Board {
+    background-image: url(images/board) 0 0 0 0 stretch stretch;
+}

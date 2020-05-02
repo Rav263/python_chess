@@ -18,7 +18,7 @@ class Board:
             self.load_board(data)
             self.board_size = data.board_size
         else:
-            self.board = [line.copy() for line in self.board]
+            self.board = [line.copy() for line in copy.board]
             self.board_size = copy.board_size
 
     def do_turn(self, turn, fig=0):

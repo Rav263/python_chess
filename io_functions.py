@@ -69,19 +69,23 @@ def print_board(board, data):
     print()
 
 
-def get_turn(logic, color, plane):
-    line = input("Please enter your turn: ").strip()
-    if len(line) != 5:
-        print("Wrong format")
-        return get_turn(logic, color, plane)
+def get_turn(logic, color, board):
+    possible_turns = logic.generate_all_possible_turns(board, color)
 
-    start_pos = (plane.board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
-    end_pos = (plane.board_size - int(line[4]), abs(ord(line[3]) - ord("a")))
+    while True:
+        line = input("Please enter your turn: ").strip()
+        if len(line) != 5:
+            print("Wrong format")
+            return get_turn(logic, color, board)
 
-    now_turn = gamelogic.Turn(start_pos, end_pos, color)
+        start_pos = (board.board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
+        end_pos = (board.board_size - int(line[4]), abs(ord(line[3]) - ord("a")))
 
-    if not logic.check_turn(now_turn, plane):
-        print("Wrong turn")
-        return get_turn(logic, color, plane)
+        now_turn = gamelogic.Turn(start_pos, end_pos, color)
+
+        if end_pos in possible_turns and start_pos in possible_turns[end_pos]:
+            break
+
+        print("Wrong Turn, try again")
 
     return now_turn

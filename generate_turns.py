@@ -8,13 +8,17 @@ from itertools import product
 
 def generate_turns_pawn(pos, board, possible_turns):
     if board.get_color_map(pos) == board.white:
-        if pos[0] == 6 and board.get_type_map((pos[0] - 2, pos[1])) == board.empty_map:
+        if (pos[0] == board.white_pawn_start and
+                board.get_type_map((pos[0] - 2, pos[1])) == board.empty_map):
+
             possible_turns[(pos[0] - 2, pos[1])].append(pos)
 
         if board.get_type_map((pos[0] - 1, pos[1])) == board.empty_map:
             possible_turns[(pos[0] - 1, pos[1])].append(pos)
     else:
-        if pos[0] == 1 and board.get_type_map((pos[0] + 2, pos[1])) == board.empty_map:
+        if (pos[0] == board.black_pawn_start and
+                board.get_type_map((pos[0] + 2, pos[1])) == board.empty_map):
+
             possible_turns[(pos[0] + 2, pos[1])].append(pos)
 
         if board.get_type_map((pos[0] + 1, pos[1])) == board.empty_map:

@@ -11,6 +11,8 @@ class Board:
     queen = 6
     white = 1
     black = 2
+    white_pawn_start = 6
+    black_pawn_start = 1
 
     def __init__(self, data, copy=None):
         if copy is None:

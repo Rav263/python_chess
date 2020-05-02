@@ -1,4 +1,16 @@
 import io_functions
+import generate_turns as gt
+from board import Board
+
+
+from collections import defaultdict
+from itertools import product
+from threading import Thread
+from multiprocessing import Process
+from multiprocessing import Manager
+# from tqdm import tqdm
+import os
+import sys
 
 
 class Turn:
@@ -12,125 +24,166 @@ class Turn:
         print("start pos: ({0}, {1})".format(*self.end_pos))
 
 
-class Logic:
-    def __init__(self):
-        print("Init game logic class")
+class ThreadRet(Thread):
+    def __init__(self, group=None, target=None, name=None,
+                 args=(), kwargs={}, Verbose=None):
+        Thread.__init__(self, group, target, name, args, kwargs)
+        self._return = None
 
-    def start(self, plate, data):
+    def run(self):
+        if self._target is not None:
+            print("start thread:", self.name)
+            self._return = self._target(*self._args,
+                                        **self._kwargs)
+
+    def join(self):
+        Thread.join(self)
+        print("end thread:", self.name)
+        return self._return
+
+
+def get_num_threads():
+    if len(sys.argv) >= 2:
+        return int(sys.argv[1])
+
+    return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
+
+
+class Logic:
+    MAX_COST = 9999
+    MIN_COST = -9999
+    NULL_TURN = Turn((-1, -1), (-1, -1), 0)
+
+    def __init__(self, data):
+        print("Init game logic class")
+        self.figures_cost = data.data["FIGURES_COST"]
+
+    def start(self, board, data):
         color = 1
 
         while True:
-            io_functions.print_field(plate.field, data)
-            now_turn = io_functions.get_turn(self, color, plate)
+            io_functions.print_board(board.board, data)
+            now_turn = io_functions.get_turn(self, color, board)
 
-            plate.do_turn(now_turn)
+            board.do_turn(now_turn)
 
             color = 3 - color
 
-    def check_turn(self, turn, plate):
-        if (turn.start_pos[0] > 7 or turn.start_pos[0] < 0 or
-                turn.start_pos[1] > 7 or turn.start_pos[1] < 0 or
-                turn.end_pos[0] > 7 or turn.end_pos[0] < 0 or
-                turn.end_pos[1] > 7 or turn.end_pos[1] < 0):
-            return False
+            print(board.calculate_board_cost(color, self.figures_cost))
 
-        if (plate.get_map(turn.start_pos) // 10 != turn.color or
-                plate.get_map(turn.start_pos) == 0 or
-                plate.get_map(turn.end_pos) // 10 == turn.color):
-            return False
+            now_turn = self.root_ai_turn(board, color, 5)[0]
+            board.do_turn(now_turn)
 
-        now_figure = plate.get_map(turn.start_pos)
+            color = 3 - color
 
-        # pown
-        if now_figure == 10 or now_figure == 20:
-            return self.check_pown(turn, plate)
+    def generate_all_possible_turns(self, board, color):
+        possible_turns = defaultdict(list)
+        # dict key = position of possible turn
+        # dict value = list of positions where from this turn can be done
 
-        mod_1 = turn.start_pos[0] - turn.end_pos[0]
-        mod_2 = turn.start_pos[1] - turn.end_pos[1]
+        for pos in product(range(board.board_size), repeat=2):
+            if board.get_color_map(pos) == color:
+                if board.get_type_map(pos) == board.pawn:
+                    gt.generate_turns_pawn(pos, board, possible_turns)
 
-        # hourse
-        if now_figure == 11 or now_figure == 21:
-            return self.check_knight(mod_1, mod_2)
+                if board.get_type_map(pos) == board.knight:
+                    gt.generate_turns_knight(pos, board, possible_turns, color)
 
-        # elephant
-        if now_figure == 12 or now_figure == 22:
-            return self.check_bishop(turn, mod_1, mod_2, plate)
+                if board.get_type_map(pos) == board.rook:
+                    gt.generate_turns_rook(pos, board, possible_turns, color)
 
-        # rook
-        if now_figure == 13 or now_figure == 23:
-            return self.check_rook(turn, mod_1, mod_2, plate)
+                if board.get_type_map(pos) == board.bishop:
+                    gt.generate_turns_bishop(pos, board, possible_turns, color)
 
-        # king
-        if now_figure == 14 or now_figure == 24:
-            if (mod_1 == 1 or mod_1 == 0) and (mod_2 == 1 or mod_2 == 0):
-                return True
+                if board.get_type_map(pos) == board.queen:
+                    gt.generate_turns_queen(pos, board, possible_turns, color)
 
-        # queen
-        if now_figure == 15 or now_figure == 25:
-            return (self.check_bishop(turn, mod_1, mod_2, plate) or
-                    self.check_rook(turn, mod_1, mod_2, plate))
+                if board.get_type_map(pos) == board.king:
+                    gt.generate_turns_king(pos, board, possible_turns, color)
 
-        return False
+        return possible_turns
 
-    def check_pown(self, turn, plate):
-        if turn.color == 1:
-            if turn.end_pos[1] == turn.start_pos[1] and plate.get_map(turn.end_pos) == 0:
-                tmp = turn.start_pos[0] - turn.end_pos[0]
-                if tmp == 1 or (tmp == 2 and turn.start_pos[0] == 6):
-                    return True
-        else:
-            if turn.end_pos[1] == turn.start_pos[1]:
-                tmp = turn.end_pos[0] - turn.start_pos[0]
-                if tmp == 1 or (tmp == 2 and turn.start_pos[0] == 1):
-                    return True
-        return False
+    def thread_generate(self, board, color, depth, turns, index, return_dict):
+        best_cost = self.MIN_COST if color == board.black else self.MAX_COST
+        best_turn = self.NULL_TURN
 
-    def check_knigth(self, mod_1, mod_2):
-        if abs(mod_1) == 1 and abs(mod_2) == 2:
-            return True
+        for turn in turns:
+            tmp = board.do_turn(Turn(turn[0], turn[1], color))
+            now_cost = self.ai_turn(board, 3 - color, depth - 1)[1]
 
-        if abs(mod_1) == 2 and abs(mod_2) == 1:
-            return True
+            board.do_turn(Turn(turn[1], turn[0], color), fig=tmp)
 
-        return False
+            if now_cost >= best_cost:
+                best_cost = now_cost
+                best_turn = Turn(turn[0], turn[1], color)
 
-    def check_bishop(self, turn, mod_1, mod_2, plate):
-        if mod_1 == mod_2:
-            sign_1 = -1 if mod_1 < 0 else 1
+        return_dict[index] = (best_turn, best_cost)
 
-            for i in range(sign_1, mod_1, sign_1):
-                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1] + i)) != 0:
-                    return False
-            return True
+    def root_ai_turn(self, board, color, depth):
+        manager = Manager()
+        return_dict = manager.dict()
 
-        if mod_1 == -mod_2:
-            sign_1 = -1 if mod_1 < 0 else 1
+        possible_turns = self.generate_all_possible_turns(board, color)
 
-            for i in range(sign_1, mod_1, sign_1):
-                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1] + i * sign_1)) != 0:
-                    return False
+        turns = []
+        threads = []
 
-            return True
+        for end_pos in possible_turns:
+            for start_pos in possible_turns[end_pos]:
+                turns.append((start_pos, end_pos))
 
-        return False
+        av_threads = get_num_threads()
+        print(av_threads, turns)
 
-    def check_rook(self, turn, mod_1, mod_2, plate):
-        if mod_1 == 0 and mod_2 != 0:
-            sign_2 = -1 if mod_2 < 0 else 1
+        num_of_turns = len(turns) // av_threads + 1
+        num_of_threads = len(turns) // num_of_turns + 1
 
-            for i in range(sign_2, mod_2, sign_2):
-                if plate.get_map((turn.end_pos[0], turn.end_pos[1] + i)) != 0:
-                    return False
+        for i in range(num_of_threads):
+            now_board = Board(None, board)
+            start = i * num_of_turns
 
-            return True
+            end = (i + 1) * num_of_turns
+            end = end if end < len(turns) else len(turns) - 1
 
-        if mod_1 != 0 and mod_2 == 0:
-            sign_1 = -1 if mod_2 < 0 else 1
+            threads.append(Process(target=self.thread_generate, name=len(threads),
+                                   args=(now_board, color, depth, turns[start:end + 1], i, return_dict)))
 
-            for i in range(sign_1, mod_1, sign_1):
-                if plate.get_map((turn.end_pos[0] + i, turn.end_pos[1])) != 0:
-                    return False
+            threads[len(threads) - 1].start()
 
-            return True
+        for thread in threads:
+            thread.join()
 
-        return False
+        return max(return_dict.values(), key=lambda x: x[1])
+
+    def ai_turn(self, board, color, depth, alpha=MIN_COST, beta=MAX_COST):
+        possible_turns = self.generate_all_possible_turns(board, color)
+
+        best_cost = self.MIN_COST if color == board.black else self.MAX_COST
+        best_turn = self.NULL_TURN
+
+        for end_pos in possible_turns:
+            for start_pos in possible_turns[end_pos]:
+                tmp = board.do_turn(Turn(start_pos, end_pos, color))
+
+                if depth == 1:
+                    now_cost = board.calculate_board_cost(color, self.figures_cost)
+                else:
+                    now_cost = self.ai_turn(board, 3 - color, depth - 1, alpha, beta)[1]
+
+                board.do_turn(Turn(end_pos, start_pos, color), fig=tmp)
+
+                if color == board.black:
+                    if now_cost >= best_cost:
+                        best_cost = now_cost
+                        best_turn = Turn(start_pos, end_pos, color)
+                    alpha = max(alpha, best_cost)
+                else:
+                    if now_cost <= best_cost:
+                        best_cost = now_cost
+                        best_turn = Turn(start_pos, end_pos, color)
+                    beta = min(beta, best_cost)
+
+                if beta <= alpha:
+                    return (best_turn, best_cost)
+
+        return (best_turn, best_cost)

@@ -1,23 +1,22 @@
 #! /usr/bin/python3
 
-import field
-import gamelogic
-import io_functions
 import ui
 import sys
 from PyQt5.QtWidgets import QApplication
+from board import Board
+from gamelogic import Logic
+from io_functions import Data
+
 
 def main():
     # Here we need to init Field and Game logic
-    data = io_functions.Data("data.dat")
-    plate = field.Field(data)
-    logic = gamelogic.Logic()
+    data = Data("data.dat")
+    board = Board(data)
+    logic = Logic(data)
     # Then we need start game
 
-    # logic.start(plate, data)
-
     qss_file = open('styles.qss').read()
-    # QString StyleSheet = QLatin1String(File.readAll());
+    # logic.start(board, data)
 
     app = QApplication(sys.argv)
     app.setStyleSheet(qss_file);

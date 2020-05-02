@@ -1,6 +1,4 @@
 import io_functions
-import check_turn as check
-import math_functions as mf
 import generate_turns as gt
 from board import Board
 
@@ -84,49 +82,6 @@ class Logic:
 
             color = 3 - color
 
-    def check_turn(self, turn, board):
-        if (not board.check_pos(turn.start_pos) or not board.check_pos(turn.end_pos)):
-            return False
-
-        if (board.get_color_map(turn.start_pos) != turn.color or
-                board.get_type_map(turn.start_pos) == board.empty_map or
-                board.get_color_map(turn.end_pos) == turn.color):
-            return False
-
-        now_figure = board.get_map(turn.start_pos)
-        figure_type = board.get_type_figure(now_figure)
-
-        # pown
-        if figure_type == board.pown:
-            return check.check_pown(turn, board)
-
-        coord_diff = mf.difference(turn.start_pos, turn.end_pos)
-
-        # knight
-        if figure_type == board.knight:
-            return check.check_knight(*coord_diff)
-
-        # bishop
-        if figure_type == board.bishop:
-            return check.check_bishop(turn, *coord_diff, board)
-
-        # rook
-        if figure_type == board.rook:
-            return check.check_rook(turn, *coord_diff, board)
-
-        # king
-        if figure_type == board.king:
-            if ((coord_diff[0] == 1 or coord_diff[0] == 0) and
-                    (coord_diff[1] == 1 or coord_diff[1] == 0)):
-                return True
-
-        # queen
-        if figure_type == board.queen:
-            return (check.check_bishop(turn, *coord_diff, board) or
-                    check.check_rook(turn, *coord_diff, board))
-
-        return False
-
     def generate_all_possible_turns(self, board, color):
         possible_turns = defaultdict(list)
         # dict key = position of possible turn
@@ -134,8 +89,8 @@ class Logic:
 
         for pos in product(range(board.board_size), repeat=2):
             if board.get_color_map(pos) == color:
-                if board.get_type_map(pos) == board.pown:
-                    gt.generate_turns_pown(pos, board, possible_turns)
+                if board.get_type_map(pos) == board.pawn:
+                    gt.generate_turns_pawn(pos, board, possible_turns)
 
                 if board.get_type_map(pos) == board.knight:
                     gt.generate_turns_knight(pos, board, possible_turns, color)

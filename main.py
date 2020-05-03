@@ -4,12 +4,11 @@ import ui
 import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5 import QtCore
+
 from board import Board
 from gamelogic import Logic
 from io_functions import Data
 
-QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True) #enable highdpi scaling
-QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True) 
 
 def main():
     # Here we need to init Field and Game logic

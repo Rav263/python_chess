@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import (QWidget, QPushButton, 
     QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy)
 from PyQt5 import QtGui
-
+from PyQt5.QtCore import pyqtSignal, QObject
 board_size = 840 // 2
 
 v_width = 840 // 2
@@ -11,10 +11,23 @@ v_height = 66 // 2
 h_width = 66 // 2
 h_height = (840 + 66 + 66) // 2
 
-class Cell(QFrame):
-    def __init__(self):
-        super().__init__()
+class Communicate(QObject):
+    cellPressed = pyqtSignal(int, int) 
 
+
+class Cell(QFrame):
+    def __init__(self, x, y, c):
+        super().__init__()
+        self.c = c
+        self.x = x
+        self.y = y
+
+
+    def mousePressEvent(self, event):
+        print("clicked")
+        self.c.cellPressed.emit(self.x, self.y)
+
+        
 
 
 class Board(QFrame):
@@ -23,13 +36,20 @@ class Board(QFrame):
         self.setMinimumSize(board_size, board_size)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
+        self.c = Communicate()
+        self.c.cellPressed.connect(self.cell_pressed)
+
         cells = QGridLayout()
         cells.setSpacing(0)
-        cells.setContentsMargins(1,1,1,1)
+        cells.setContentsMargins(0,0,0,0)
         for i in range(8):
             for j in range(8):
-                cells.addWidget(Cell(), i, j)
+                cells.addWidget(Cell(i, j, self.c), i, j)
         self.setLayout(cells)
+
+    def cell_pressed(self, x, y):
+        print("gor signal", x, y)
+        
 
 
 class Border(QFrame):

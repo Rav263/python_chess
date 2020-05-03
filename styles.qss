@@ -11,13 +11,6 @@ QPushButton:pressed {
                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
 }
 
-QPushButton:flat {
-    border: none; /* no border for a flat push button */
-}
-
-QPushButton:default {
-    border-color: navy; /* make the default button prominent */
-}
 
 
 QFrame#border-left {
@@ -41,6 +34,13 @@ Board {
     background-image: url(images/board) 0 0 0 0 stretch stretch;
 }
 
+Cell{
+
+}
+Cell:pressed{
+    border: 3px solid green;
+}
+
 Cell:hover {
-    border: 1px solid green;
+    border: 3px solid green;
 }

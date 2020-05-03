@@ -5,7 +5,6 @@ from board import Board
 
 from collections import defaultdict
 from itertools import product
-from threading import Thread
 from multiprocessing import Process
 from multiprocessing import Manager
 # from tqdm import tqdm
@@ -20,24 +19,6 @@ class Turn:
     def print(self):
         print("start pos: ({0}, {1})".format(*self.start_pos))
         print("start pos: ({0}, {1})".format(*self.end_pos))
-
-
-class ThreadRet(Thread):
-    def __init__(self, group=None, target=None, name=None,
-                 args=(), kwargs={}, Verbose=None):
-        Thread.__init__(self, group, target, name, args, kwargs)
-        self._return = None
-
-    def run(self):
-        if self._target is not None:
-            print("start thread:", self.name)
-            self._return = self._target(*self._args,
-                                        **self._kwargs)
-
-    def join(self):
-        Thread.join(self)
-        print("end thread:", self.name)
-        return self._return
 
 
 class Logic:
@@ -135,7 +116,8 @@ class Logic:
             end = end if end < len(turns) else len(turns) - 1
 
             threads.append(Process(target=self.thread_generate, name=len(threads),
-                                   args=(now_board, color, depth, turns[start:end + 1], i, return_dict)))
+                                   args=(now_board, color, depth,
+                                         turns[start:end + 1], i, return_dict)))
 
             threads[len(threads) - 1].start()
 

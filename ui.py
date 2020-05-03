@@ -24,10 +24,13 @@ class Cell(QFrame):
 
 
     def mousePressEvent(self, event):
-        print("clicked")
         self.c.cellPressed.emit(self.x, self.y)
+
+    def press(self):
         self.setStyleSheet("border: 3px solid green")
 
+    def release(self):
+        self.setStyleSheet("border: none")
         
 
 
@@ -44,6 +47,9 @@ class Board(QFrame):
         cells.setSpacing(0)
         cells.setContentsMargins(0,0,0,0)
 
+        self.making_a_move = False
+        self.start = (0, 0)
+
         self.cells_arr = [list() for i  in range(8) ]
         for i in range(8):
             for j in range(8):
@@ -52,9 +58,15 @@ class Board(QFrame):
         self.setLayout(cells)
 
     def cell_pressed(self, x, y):
-        print("got signal", x, y)
-        self.cells_arr[x + 1][y + 1].setStyleSheet("border: 3px solid green")
-        self.cells_arr[x - 1][y - 1].setStyleSheet("border: 3px solid green")
+        if not self.making_a_move:
+            self.start = (x, y)
+            self.cells_arr[x][y].press()
+            self.making_a_move = True
+        else:
+            self.cells_arr[self.start[0]][self.start[1]].release()
+            self.making_a_move = False
+
+
         
 
 

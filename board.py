@@ -1,6 +1,24 @@
 from itertools import product
 
 
+def print_board(board, data):
+    print()
+    for i in range(data.board_size):
+        print(data.board_size - i, end=" |")
+
+        for now_fig in board[i]:
+            print(f"{now_fig:2}", end=" ")
+        print()
+
+    print("  ", end="")
+    for i in range(data.board_size):
+        print("---", end="")
+    print()
+    print("   ", end="")
+    print(*[(chr(ord("a") + i) + " ") for i in range(data.board_size)])
+    print()
+
+
 class Board:
     empty_map = 0
     pawn = 1
@@ -19,9 +37,11 @@ class Board:
             print("Init board class")
             self.load_board(data)
             self.board_size = data.board_size
+            self.data = data
         else:
             self.board = [line.copy() for line in copy.board]
             self.board_size = copy.board_size
+            self.data = copy.data
 
     def do_turn(self, turn, fig=0):
         # print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
@@ -47,9 +67,13 @@ class Board:
         return figure % 10
 
     def get_type_map(self, pos):
+        if not self.check_pos(pos):
+            return -1
         return self.get_map(pos) % 10
 
     def get_color_map(self, pos):
+        if not self.check_pos(pos):
+            return -1
         return self.get_map(pos) // 10
 
     def check_pos(self, pos):

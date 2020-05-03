@@ -26,6 +26,7 @@ class Cell(QFrame):
     def mousePressEvent(self, event):
         print("clicked")
         self.c.cellPressed.emit(self.x, self.y)
+        self.setStyleSheet("border: 3px solid green")
 
         
 
@@ -42,13 +43,18 @@ class Board(QFrame):
         cells = QGridLayout()
         cells.setSpacing(0)
         cells.setContentsMargins(0,0,0,0)
+
+        self.cells_arr = [list() for i  in range(8) ]
         for i in range(8):
             for j in range(8):
-                cells.addWidget(Cell(i, j, self.c), i, j)
+                self.cells_arr[i].append(Cell(i, j, self.c))
+                cells.addWidget(self.cells_arr[i][j], i, j)
         self.setLayout(cells)
 
     def cell_pressed(self, x, y):
-        print("gor signal", x, y)
+        print("got signal", x, y)
+        self.cells_arr[x + 1][y + 1].setStyleSheet("border: 3px solid green")
+        self.cells_arr[x - 1][y - 1].setStyleSheet("border: 3px solid green")
         
 
 

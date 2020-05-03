@@ -14,23 +14,39 @@ h_height = (840 + 66 + 66) // 2
 class Communicate(QObject):
     cellPressed = pyqtSignal(int, int) 
 
+class Figure(QFrame):
+    def __init__(self, type):
+        super().__init__()
+        self.type = type
+        if self.type == 10:
+            self.setStyleSheet("border-image: url(images/merida/wP.png) 0 0 0 0 stretch stretch;")
 
 class Cell(QFrame):
-    def __init__(self, x, y, c):
+    def __init__(self, x, y, type, c):
         super().__init__()
         self.c = c
         self.x = x
         self.y = y
-
+        self.figure = Figure(type)
+        self.setProperty("pressed", "0")
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.figure)
+        self.setLayout(vbox) 
+        vbox.setContentsMargins(4,4,4,4)
+ 
 
     def mousePressEvent(self, event):
         self.c.cellPressed.emit(self.x, self.y)
 
     def press(self):
-        self.setStyleSheet("border: 3px solid green")
+        self.setProperty("pressed", "1")
+        self.setStyle(self.style())
+
+    
 
     def release(self):
-        self.setStyleSheet("border: none")
+        self.setProperty("pressed", "0")
+        self.setStyle(self.style())
         
 
 
@@ -53,7 +69,7 @@ class Board(QFrame):
         self.cells_arr = [list() for i  in range(8) ]
         for i in range(8):
             for j in range(8):
-                self.cells_arr[i].append(Cell(i, j, self.c))
+                self.cells_arr[i].append(Cell(i, j, 10, self.c))
                 cells.addWidget(self.cells_arr[i][j], i, j)
         self.setLayout(cells)
 

@@ -22,7 +22,6 @@ def main():
     app = QApplication(sys.argv)
     screen = app.primaryScreen()
     size = screen.size()
-    print('Size: %d x %d' % (size.width(), size.height()))
     
     app.setStyleSheet(qss_file);
     main_window = ui.Main_Window()

@@ -15,9 +15,18 @@ h_height = (820 + 66 + 66) // 2
 class Board(QFrame):
     def __init__(self):
         super().__init__()
-
+        self.setMinimumSize(board_size, board_size)
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         # def sizeHint(self):
         #     return QSize(board_size, board_size)
+
+class Border(QFrame):
+    def __init__(self, name, width, height):
+        super().__init__()
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setObjectName(name)
+        self.setMaximumSize(width, height)
+        self.setMinimumSize(width, height)
 
 
 class Main_Window(QWidget):
@@ -31,39 +40,11 @@ class Main_Window(QWidget):
         self.setMinimumSize(h_width, h_height)
 
         board = Board()
-        board.setMinimumSize(board_size, board_size)
-        board.setSizePolicy(QSizePolicy.Fixed,
-                            QSizePolicy.Fixed)
-        # board.setPalette(palette)
 
-        border_left = QFrame()
-        border_left.setObjectName("border-left")
-        border_left.setMaximumSize(h_width, h_height)
-        border_left.setMinimumSize(h_width, h_height)
-        border_left.setSizePolicy(QSizePolicy.Fixed,
-                                  QSizePolicy.Fixed)
-
-        border_right = QFrame()
-        border_right.setObjectName("border-right")
-        border_right.setMaximumSize(h_width, h_height)
-        border_right.setMinimumSize(h_width, h_height)
-        border_right.setSizePolicy(QSizePolicy.Fixed,
-                                  QSizePolicy.Fixed)
-
-        border_up = QFrame()
-        border_up.setObjectName("border-up")
-        border_up.setMaximumSize(v_width, v_height)
-        border_up.setMinimumSize(v_width, v_height)
-        border_up.setSizePolicy(QSizePolicy.Fixed,
-                                  QSizePolicy.Fixed)
-        
-
-        border_down = QFrame()
-        border_down.setObjectName("border-down")
-        border_down.setMaximumSize(v_width, v_height)
-        border_down.setMinimumSize(v_width, v_height)
-        border_down.setSizePolicy(QSizePolicy.Fixed,
-                                  QSizePolicy.Fixed)
+        border_left = Border("border-left", h_width, h_height)
+        border_right = Border("border-right", h_width, h_height)
+        border_up = Border("border-up", v_width, v_height)
+        border_down = Border("border-down", v_width, v_height)
 
         vbox = QVBoxLayout()
         vbox.addStretch(1)

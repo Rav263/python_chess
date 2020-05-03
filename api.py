@@ -1,5 +1,6 @@
 from board import Board
 from gamelogic import Logic
+from gamelogic import Turn
 from io_functions import Data
 
 
@@ -7,11 +8,12 @@ from collections import defaultdict
 
 
 class Api:
-    def __init__(self):
+    def __init__(self, difficulty):
         # Here we need to init Field and Game logic
         self.data = Data("data.dat")
         self.board = Board(self.data)
         self.logic = Logic(self.data)
+        self.difficulty = difficulty
         # Then we need start game
 
     def start_cmd(self):
@@ -27,3 +29,26 @@ class Api:
                 turns[start_pos].append(end_pos)
 
         return turns
+
+    def get_map(self, pos):
+        if self.board.check_pos(pos):
+            return self.board.get_map(pos)
+
+        return -1
+
+    def set_map(self, pos, value):
+        if self.board.check_pos(pos):
+            return self.board.set_map(pos, value)
+
+        return -1
+
+    def do_turn(self, start, end):
+        return self.board.do_turn(Turn(start, end, self.board.get_color_map(start)))
+
+    def ai_turn(self, color, turn=True):
+        now_turn = self.logic.root_ai_turn(self.board, color, self.difficulty)[0]
+
+        if turn:
+            self.board.do_turn(now_turn)
+
+        return now_turn

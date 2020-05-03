@@ -8,16 +8,16 @@ from collections import defaultdict
 
 
 class Api:
-    def __init__(self, difficulty):
+    def __init__(self, difficulty, threads):
         # Here we need to init Field and Game logic
         self.data = Data("data.dat")
         self.board = Board(self.data)
-        self.logic = Logic(self.data)
+        self.logic = Logic(self.data, threads)
         self.difficulty = difficulty
         # Then we need start game
 
     def start_cmd(self):
-        self.logic.start(self.board, self.data)
+        self.logic.start(self.board, self.data, self.difficulty)
 
     def get_possible_turns(self, color):
         possible_turns = self.logic.generate_all_possible_turns(self.board, color)

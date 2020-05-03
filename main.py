@@ -4,6 +4,11 @@ from api import Api
 
 
 import sys
+import os
+
+
+def get_num_threads():
+    return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
 
 
 def parse_args():
@@ -16,6 +21,8 @@ def parse_args():
             parsed_args["HELP"] = True
         if arg == "--difficulty":
             parsed_args["DIFFICULTY"] = int(sys.argv[index + 1])
+        if arg == "--threads":
+            parsed_args["THREADS"] = int(sys.argv[index + 1])
 
     return parsed_args
 
@@ -23,7 +30,8 @@ def parse_args():
 def print_help():
     print("------ HELP MESSAGE ------")
     print(" --mode (GUI, CMD)        GUI default, to run in GUI. CMD - to run in text mode")
-    print(" --difficulty (1 - 5)     Set AI difficulty. default 5")
+    print(" --difficulty (2 - 5)     Set AI difficulty. default 5")
+    print(" --threads (num)          Set num of threads. default max")
     print(" --help                   Print this message")
 
 
@@ -38,7 +46,11 @@ def main():
     if "DIFFICULTY" in parsed_args:
         difficulty = parsed_args["DIFFICULTY"]
 
-    api = Api(difficulty)
+    threads = get_num_threads()
+    if "THREADS" in parsed_args:
+        threads = parsed_args["THREADS"]
+
+    api = Api(difficulty, threads)
 
     if "MODE" in parsed_args and parsed_args["MODE"] == "CMD":
         api.start_cmd()

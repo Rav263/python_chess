@@ -9,12 +9,8 @@ from PyQt5 import QtCore
 from api import Api
 
 
+from multiprocessing import cpu_count
 import sys
-import os
-
-
-def get_num_threads():
-    return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
 
 
 def parse_args():
@@ -52,7 +48,7 @@ def main():
     if "DIFFICULTY" in parsed_args:
         difficulty = parsed_args["DIFFICULTY"]
 
-    threads = get_num_threads()
+    threads = cpu_count()
     if "THREADS" in parsed_args:
         threads = parsed_args["THREADS"]
 

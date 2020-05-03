@@ -1,19 +1,11 @@
 #! /usr/bin/python3
 
-from board import Board
-from gamelogic import Logic
-from io_functions import Data
+from api import Api
 
 
 def main():
-    # Here we need to init Field and Game logic
-    data = Data("data.dat")
-    board = Board(data)
-    logic = Logic(data)
-    # Then we need start game
-
-    logic.start(board, data)
-
+    api = Api()
+    api.start_cmd()
     # Maybe if it will be in web, we must start game server
     # Or we can create some server with a few people, who play PVP
 

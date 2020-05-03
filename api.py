@@ -14,6 +14,8 @@ class Api:
         self.board = Board(self.data)
         self.logic = Logic(self.data, threads)
         self.difficulty = difficulty
+        print("difficulty:", difficulty)
+        print("threads:   ", threads)
         # Then we need start game
 
     def start_cmd(self):

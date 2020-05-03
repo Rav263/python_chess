@@ -17,8 +17,6 @@ class Board(QFrame):
         super().__init__()
         self.setMinimumSize(board_size, board_size)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        # def sizeHint(self):
-        #     return QSize(board_size, board_size)
 
 class Border(QFrame):
     def __init__(self, name, width, height):
@@ -37,7 +35,7 @@ class Main_Window(QWidget):
         
         
     def initUI(self):
-        self.setMinimumSize(h_width, h_height)
+        self.setMinimumSize(v_width + 2 * h_width, h_height)
 
         board = Board()
 
@@ -55,6 +53,8 @@ class Main_Window(QWidget):
 
         vbox.setSpacing(0);
         vbox.setContentsMargins(0,0,0,0)
+
+        # vbox.SetMinimumSize(h_height)
         
         hbox = QHBoxLayout()
         hbox.addStretch(1)

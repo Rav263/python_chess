@@ -19,9 +19,6 @@ QPushButton:default {
     border-color: navy; /* make the default button prominent */
 }
 
-/* * #board{
-    background-color: images/board.jpg;
-} */
 
 QFrame#border-left {
     border-image: url(images/left) 0 0 0 0 stretch stretch;
@@ -42,4 +39,8 @@ QFrame#border-down {
 
 Board {
     background-image: url(images/board) 0 0 0 0 stretch stretch;
+}
+
+Cell:hover {
+    border: 1px solid green;
 }

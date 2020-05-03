@@ -3,13 +3,18 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
     QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy)
 from PyQt5 import QtGui
 
-board_size = 820 // 2
+board_size = 840 // 2
 
-v_width = 820 // 2
+v_width = 840 // 2
 v_height = 66 // 2
 
 h_width = 66 // 2
-h_height = (820 + 66 + 66) // 2
+h_height = (840 + 66 + 66) // 2
+
+class Cell(QFrame):
+    def __init__(self):
+        super().__init__()
+
 
 
 class Board(QFrame):
@@ -18,6 +23,15 @@ class Board(QFrame):
         self.setMinimumSize(board_size, board_size)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
+        cells = QGridLayout()
+        cells.setSpacing(0)
+        cells.setContentsMargins(1,1,1,1)
+        for i in range(8):
+            for j in range(8):
+                cells.addWidget(Cell(), i, j)
+        self.setLayout(cells)
+
+
 class Border(QFrame):
     def __init__(self, name, width, height):
         super().__init__()
@@ -25,7 +39,6 @@ class Border(QFrame):
         self.setObjectName(name)
         self.setMaximumSize(width, height)
         self.setMinimumSize(width, height)
-
 
 class Main_Window(QWidget):
     
@@ -50,11 +63,8 @@ class Main_Window(QWidget):
         vbox.addWidget(board)
         vbox.addWidget(border_down)
         vbox.addStretch(1)
-
         vbox.setSpacing(0);
         vbox.setContentsMargins(0,0,0,0)
-
-        # vbox.SetMinimumSize(h_height)
         
         hbox = QHBoxLayout()
         hbox.addStretch(1)
@@ -62,11 +72,8 @@ class Main_Window(QWidget):
         hbox.addLayout(vbox)
         hbox.addWidget(border_right)
         hbox.addStretch(1)
-
         hbox.setSpacing(0)
         hbox.setContentsMargins(0,0,0,0)
-
-        
 
         self.setLayout(hbox)    
         

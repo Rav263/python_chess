@@ -5,12 +5,9 @@ from board import Board
 
 from collections import defaultdict
 from itertools import product
-from threading import Thread
 from multiprocessing import Process
 from multiprocessing import Manager
 # from tqdm import tqdm
-import os
-import sys
 
 
 class Turn:
@@ -24,41 +21,17 @@ class Turn:
         print("start pos: ({0}, {1})".format(*self.end_pos))
 
 
-class ThreadRet(Thread):
-    def __init__(self, group=None, target=None, name=None,
-                 args=(), kwargs={}, Verbose=None):
-        Thread.__init__(self, group, target, name, args, kwargs)
-        self._return = None
-
-    def run(self):
-        if self._target is not None:
-            print("start thread:", self.name)
-            self._return = self._target(*self._args,
-                                        **self._kwargs)
-
-    def join(self):
-        Thread.join(self)
-        print("end thread:", self.name)
-        return self._return
-
-
-def get_num_threads():
-    if len(sys.argv) >= 2:
-        return int(sys.argv[1])
-
-    return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
-
-
 class Logic:
     MAX_COST = 9999
     MIN_COST = -9999
     NULL_TURN = Turn((-1, -1), (-1, -1), 0)
 
-    def __init__(self, data):
+    def __init__(self, data, num_threads):
         print("Init game logic class")
         self.figures_cost = data.data["FIGURES_COST"]
+        self.av_threads = num_threads
 
-    def start(self, board, data):
+    def start(self, board, data, difficulty):
         color = 1
 
         while True:
@@ -71,7 +44,7 @@ class Logic:
 
             print(board.calculate_board_cost(color, self.figures_cost))
 
-            now_turn = self.root_ai_turn(board, color, 5)[0]
+            now_turn = self.root_ai_turn(board, color, difficulty)[0]
             board.do_turn(now_turn)
 
             color = 3 - color
@@ -132,10 +105,7 @@ class Logic:
             for start_pos in possible_turns[end_pos]:
                 turns.append((start_pos, end_pos))
 
-        av_threads = get_num_threads()
-        print(av_threads, turns)
-
-        num_of_turns = len(turns) // av_threads + 1
+        num_of_turns = len(turns) // self.av_threads + 1
         num_of_threads = len(turns) // num_of_turns + 1
 
         for i in range(num_of_threads):
@@ -146,7 +116,8 @@ class Logic:
             end = end if end < len(turns) else len(turns) - 1
 
             threads.append(Process(target=self.thread_generate, name=len(threads),
-                                   args=(now_board, color, depth, turns[start:end + 1], i, return_dict)))
+                                   args=(now_board, color, depth,
+                                         turns[start:end + 1], i, return_dict)))
 
             threads[len(threads) - 1].start()
 

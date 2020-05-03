@@ -1,21 +1,62 @@
 #! /usr/bin/python3
 
-from board import Board
-from gamelogic import Logic
-from io_functions import Data
+from api import Api
+
+
+import sys
+import os
+
+
+def get_num_threads():
+    return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
+
+
+def parse_args():
+    parsed_args = dict()
+
+    for index, arg in enumerate(sys.argv):
+        if arg == "--mode":
+            parsed_args["MODE"] = sys.argv[index + 1]
+        if arg == "--help":
+            parsed_args["HELP"] = True
+        if arg == "--difficulty":
+            parsed_args["DIFFICULTY"] = int(sys.argv[index + 1])
+        if arg == "--threads":
+            parsed_args["THREADS"] = int(sys.argv[index + 1])
+
+    return parsed_args
+
+
+def print_help():
+    print("------ HELP MESSAGE ------")
+    print(" --mode (GUI, CMD)        GUI default, to run in GUI. CMD - to run in text mode")
+    print(" --difficulty (2 - 5)     Set AI difficulty. default 5")
+    print(" --threads (num)          Set num of threads. default max")
+    print(" --help                   Print this message")
 
 
 def main():
-    # Here we need to init Field and Game logic
-    data = Data("data.dat")
-    board = Board(data)
-    logic = Logic(data)
-    # Then we need start game
+    parsed_args = parse_args()
 
-    logic.start(board, data)
+    if "HELP" in parsed_args:
+        print_help()
+        return None
 
-    # Maybe if it will be in web, we must start game server
-    # Or we can create some server with a few people, who play PVP
+    difficulty = 5
+    if "DIFFICULTY" in parsed_args:
+        difficulty = parsed_args["DIFFICULTY"]
+
+    threads = get_num_threads()
+    if "THREADS" in parsed_args:
+        threads = parsed_args["THREADS"]
+
+    api = Api(difficulty, threads)
+
+    if "MODE" in parsed_args and parsed_args["MODE"] == "CMD":
+        api.start_cmd()
+    else:
+        print("Starting GUI")
+        # GUI START CODE HERE
 
 
 if __name__ == "__main__":

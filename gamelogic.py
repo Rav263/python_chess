@@ -42,7 +42,7 @@ class Logic:
 
             color = 3 - color
 
-            print(board.calculate_board_cost(color, self.figures_cost))
+            print(board.calculate_board_cost(self.figures_cost))
 
             now_turn = self.root_ai_turn(board, color, difficulty)[0]
             board.do_turn(now_turn)
@@ -137,7 +137,7 @@ class Logic:
                 tmp = board.do_turn(Turn(start_pos, end_pos, color))
 
                 if depth == 1:
-                    now_cost = board.calculate_board_cost(color, self.figures_cost)
+                    now_cost = board.calculate_board_cost(self.figures_cost)
                 else:
                     now_cost = self.ai_turn(board, 3 - color, depth - 1, alpha, beta)[1]
 

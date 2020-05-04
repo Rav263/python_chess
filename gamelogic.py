@@ -1,27 +1,36 @@
-import io_functions
-import generate_turns as gt
-from board import Board
+"""Class Logic and class Turn module"""
 
 
 from collections import defaultdict
 from itertools import product
 from multiprocessing import Process
 from multiprocessing import Manager
-# from tqdm import tqdm
+
+
+import io_functions
+import generate_turns as gt
+from board import Board
 
 
 class Turn:
+    """Turn class for store chess turn"""
     def __init__(self, start_pos, end_pos, color):
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.color = color
 
     def print(self):
+        """print(self) -> None: prints Turn information"""
         print("start pos: ({0}, {1})".format(*self.start_pos))
-        print("start pos: ({0}, {1})".format(*self.end_pos))
+        print("end pos:   ({0}, {1})".format(*self.end_pos))
+
+    def __str__(self):
+        return ("start pos: ({0}, {1})\n".format(*self.start_pos) +
+                "end pos:   ({0}, {1})".format(*self.end_pos))
 
 
 class Logic:
+    """main Logic class for game logic realisation"""
     MAX_COST = 9999
     MIN_COST = -9999
     NULL_TURN = Turn((-1, -1), (-1, -1), 0)
@@ -32,6 +41,11 @@ class Logic:
         self.av_threads = num_threads
 
     def start(self, board, data, difficulty):
+        """start(self, board, data, difficulty) -> None
+
+        Main game cycle in text mode
+        """
+
         color = 1
 
         while True:
@@ -50,6 +64,17 @@ class Logic:
             color = 3 - color
 
     def generate_all_possible_turns(self, board, color):
+        """generate_all_possible_turns(self, board, color) -> dict
+
+        self  -- class Logic object
+        board -- class Board object
+        color -- color of figures
+
+        returns all possible turns in dict
+        dict key   - end turn position
+        dict value - list of start turn positions
+        """
+
         possible_turns = defaultdict(list)
         # dict key = position of possible turn
         # dict value = list of positions where from this turn can be done
@@ -77,6 +102,18 @@ class Logic:
         return possible_turns
 
     def thread_generate(self, board, color, depth, turns, index, return_dict):
+        """thread_generate(self, board, color, depth, turns, index, return_dict) -> tuple
+
+        self        -- class Logic object
+        board       -- class Board object
+        color       -- figure color for turn
+        depth       -- recursion depth
+        turns       -- list of turns for this process
+        index       -- process index
+        return_dict -- dict for return value
+
+        returns tuple of best_turn and it cost
+        """
         best_cost = self.MIN_COST if color == board.black else self.MAX_COST
         best_turn = self.NULL_TURN
 
@@ -93,6 +130,16 @@ class Logic:
         return_dict[index] = (best_turn, best_cost)
 
     def root_ai_turn(self, board, color, depth):
+        """root_ai_turn(self, board, color, depth) -> tuple
+
+        self  -- class Logic object
+        board -- class Board object
+        color -- color of turn
+        depth -- recursion depth
+
+        return tuple of best_turn and it cost
+        """
+
         manager = Manager()
         return_dict = manager.dict()
 
@@ -127,6 +174,18 @@ class Logic:
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, alpha=MIN_COST, beta=MAX_COST):
+        """root_ai_turn(self, board, color, depth) -> tuple
+
+        self  -- class Logic object
+        board -- class Board object
+        color -- color of turn
+        depth -- recursion depth
+        alpha -- optimization varaible
+        beta  -- the same as alpha
+
+        return tuple of best_turn and it cost
+        """
+
         possible_turns = self.generate_all_possible_turns(board, color)
 
         best_cost = self.MIN_COST if color == board.black else self.MAX_COST

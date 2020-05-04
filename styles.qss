@@ -38,3 +38,52 @@ Cell[pressed="1"]{
 Cell{
     border: 3px solid transparent;
 }
+
+Figure[type="11"]{
+    border-image: url(images/merida/wP.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="12"]{
+    border-image: url(images/merida/wN.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="13"]{
+    border-image: url(images/merida/wB.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="14"]{
+    border-image: url(images/merida/wR.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="15"]{
+    border-image: url(images/merida/wK.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="16"]{
+    border-image: url(images/merida/wQ.png) 0 0 0 0 stretch stretch;
+}
+
+
+Figure[type="21"]{
+    border-image: url(images/merida/bP.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="22"]{
+    border-image: url(images/merida/bN.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="23"]{
+    border-image: url(images/merida/bB.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="24"]{
+    border-image: url(images/merida/bR.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="25"]{
+    border-image: url(images/merida/bK.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="26"]{
+    border-image: url(images/merida/bQ.png) 0 0 0 0 stretch stretch;
+}

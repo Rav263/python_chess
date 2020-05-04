@@ -11,29 +11,35 @@ v_height = 66 // 2
 h_width = 66 // 2
 h_height = (840 + 66 + 66) // 2
 
+def swap(a, b):
+    a, b = b, a
+
 class Communicate(QObject):
     cellPressed = pyqtSignal(int, int) 
 
 class Figure(QFrame):
-    def __init__(self, type):
+    def __init__(self, figure_type):
         super().__init__()
-        self.type = type
-        if self.type == 10:
-            self.setStyleSheet("border-image: url(images/merida/wP.png) 0 0 0 0 stretch stretch;")
+        set_type(figure_type)
+    
+    def set_type(self, figure_type):
+        self.figure_type = figure_type
+        self.setProperty("type", str(figure_type))
+        self.setStyle(self.style())
 
 class Cell(QFrame):
-    def __init__(self, x, y, type, c):
+    def __init__(self, x, y, figure_type, c):
         super().__init__()
         self.c = c
         self.x = x
         self.y = y
-        self.figure = Figure(type)
+        self.figure = Figure(figure_type)
         self.setProperty("pressed", "0")
+
         vbox = QVBoxLayout()
         vbox.addWidget(self.figure)
-        self.setLayout(vbox) 
-        vbox.setContentsMargins(4,4,4,4)
- 
+        self.setLayout(vbox)
+        vbox.setContentsMargins(4, 4, 4, 4)
 
     def mousePressEvent(self, event):
         self.c.cellPressed.emit(self.x, self.y)
@@ -42,8 +48,6 @@ class Cell(QFrame):
         self.setProperty("pressed", "1")
         self.setStyle(self.style())
 
-    
-
     def release(self):
         self.setProperty("pressed", "0")
         self.setStyle(self.style())
@@ -51,7 +55,7 @@ class Cell(QFrame):
 
 
 class Board(QFrame):
-    def __init__(self):
+    def __init__(self, api):
         super().__init__()
         self.setMinimumSize(board_size, board_size)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -61,16 +65,16 @@ class Board(QFrame):
 
         cells = QGridLayout()
         cells.setSpacing(0)
-        cells.setContentsMargins(0,0,0,0)
+        cells.setContentsMargins(0, 0, 0, 0)
 
         self.making_a_move = False
         self.start = (0, 0)
 
         self.cells_arr = [list() for i  in range(8) ]
-        for i in range(8):
-            for j in range(8):
-                self.cells_arr[i].append(Cell(i, j, 10, self.c))
-                cells.addWidget(self.cells_arr[i][j], i, j)
+        for x in range(8):
+            for y in range(8):
+                self.cells_arr[x].append(Cell(x, y, api.get_field((x, y)), self.c))
+                cells.addWidget(self.cells_arr[x][y], x, y)
         self.setLayout(cells)
 
     def cell_pressed(self, x, y):
@@ -81,6 +85,8 @@ class Board(QFrame):
         else:
             self.cells_arr[self.start[0]][self.start[1]].release()
             self.making_a_move = False
+            
+            # self.cells_arr[self.start[0]][self.start[1]], self.cells_arr[x][y] = self.cells_arr[x][y], self.cells_arr[self.start[0]][self.start[1]]
 
 
         
@@ -96,15 +102,11 @@ class Border(QFrame):
 
 class Main_Window(QWidget):
     
-    def __init__(self):
+    def __init__(self, api):
         super().__init__()
-        self.initUI()
-        
-        
-    def initUI(self):
         self.setMinimumSize(v_width + 2 * h_width, h_height)
 
-        board = Board()
+        board = Board(api)
 
         border_left = Border("border-left", h_width, h_height)
         border_right = Border("border-right", h_width, h_height)
@@ -117,8 +119,8 @@ class Main_Window(QWidget):
         vbox.addWidget(board)
         vbox.addWidget(border_down)
         vbox.addStretch(1)
-        vbox.setSpacing(0);
-        vbox.setContentsMargins(0,0,0,0)
+        vbox.setSpacing(0)
+        vbox.setContentsMargins(0, 0, 0, 0)
         
         hbox = QHBoxLayout()
         hbox.addStretch(1)
@@ -127,9 +129,9 @@ class Main_Window(QWidget):
         hbox.addWidget(border_right)
         hbox.addStretch(1)
         hbox.setSpacing(0)
-        hbox.setContentsMargins(0,0,0,0)
+        hbox.setContentsMargins(0, 0, 0, 0)
 
-        self.setLayout(hbox)    
+        self.setLayout(hbox)   
         
         
         self.setWindowTitle('Chess')    

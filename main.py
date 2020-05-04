@@ -65,8 +65,9 @@ def main():
         size = screen.size()
     
         app.setStyleSheet(qss_file);
-        main_window = ui.Main_Window()
+        main_window = ui.Main_Window(api)
         sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     print("Hello, this is python chess game")

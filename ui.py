@@ -20,7 +20,7 @@ class Communicate(QObject):
 class Figure(QFrame):
     def __init__(self, figure_type):
         super().__init__()
-        set_type(figure_type)
+        self.set_type(figure_type)
     
     def set_type(self, figure_type):
         self.figure_type = figure_type
@@ -85,8 +85,9 @@ class Board(QFrame):
         else:
             self.cells_arr[self.start[0]][self.start[1]].release()
             self.making_a_move = False
-            
-            # self.cells_arr[self.start[0]][self.start[1]], self.cells_arr[x][y] = self.cells_arr[x][y], self.cells_arr[self.start[0]][self.start[1]]
+            fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.figure_type
+            self.cells_arr[x][y].figure.set_type(fig_type)
+            self.cells_arr[self.start[0]][self.start[1]].figure.set_type(0)
 
 
         

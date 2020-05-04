@@ -1,7 +1,12 @@
+"""Modeue for IO functions"""
+import sys
+
+
 import gamelogic
 
 
 class Data:
+    """Class Data for load config file and get info from it"""
     data = dict()
 
     def __init__(self, file_name):
@@ -11,7 +16,7 @@ class Data:
             file = open(file_name, "r")
         except FileNotFoundError:
             print("ERROR:: data file not found")
-            exit(1)
+            sys.exit(1)
 
         for i in file:
             if len(i.strip()) == 0 or i.strip()[0] == '#':
@@ -48,10 +53,19 @@ class Data:
         file.close()
 
     def get_figures_costs(self):
+        """get_figures_costs(self) -> dict"""
         return self.data["FIGURES_COST"]
+
+    def get_board_size(self):
+        """get_board_size(self) -> Int"""
+        return self.data["BOARD_SIZE"]
 
 
 def print_board(board, data):
+    """print_board(board, data) -> None
+
+    prints boards in console
+    """
     print()
     for i in range(data.board_size):
         print(data.board_size - i, end=" |")
@@ -70,6 +84,10 @@ def print_board(board, data):
 
 
 def get_turn(logic, color, board):
+    """get_turn(logic, color, board) -> Turn
+
+    Get turn from user
+    """
     possible_turns = logic.generate_all_possible_turns(board, color)
 
     while True:

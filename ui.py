@@ -57,6 +57,7 @@ class Cell(QFrame):
 class Board(QFrame):
     def __init__(self, api):
         super().__init__()
+        self.api = api
         self.setMinimumSize(board_size, board_size)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
@@ -69,11 +70,12 @@ class Board(QFrame):
 
         self.making_a_move = False
         self.start = (0, 0)
+        
 
         self.cells_arr = [list() for i  in range(8) ]
         for x in range(8):
             for y in range(8):
-                self.cells_arr[x].append(Cell(x, y, api.get_field((x, y)), self.c))
+                self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.c))
                 cells.addWidget(self.cells_arr[x][y], x, y)
         self.setLayout(cells)
 
@@ -82,15 +84,18 @@ class Board(QFrame):
             self.start = (x, y)
             self.cells_arr[x][y].press()
             self.making_a_move = True
+            for field in self.possible_moves[(x, y)]:
+                self.cells_arr[field[0]][field[1]].press()
         else:
+
             self.cells_arr[self.start[0]][self.start[1]].release()
             self.making_a_move = False
             fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.figure_type
             self.cells_arr[x][y].figure.set_type(fig_type)
             self.cells_arr[self.start[0]][self.start[1]].figure.set_type(0)
 
-
-        
+    def upd_possible_moves(self, color):
+        self.possible_moves = self.api.get_possible_turns(color)
 
 
 class Border(QFrame):
@@ -108,6 +113,7 @@ class Main_Window(QWidget):
         self.setMinimumSize(v_width + 2 * h_width, h_height)
 
         board = Board(api)
+        board.upd_possible_moves(1)
 
         border_left = Border("border-left", h_width, h_height)
         border_right = Border("border-right", h_width, h_height)

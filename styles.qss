@@ -14,20 +14,20 @@ QPushButton:pressed {
 
 
 QFrame#border-left {
-    border-image: url(images/left) 0 0 0 0 stretch stretch;
+    border-image: url(images/left.jpg) 0 0 0 0 stretch stretch;
 }
 QFrame#border-right {
-    border-image: url(images/right) 0 0 0 0 stretch stretch;
+    border-image: url(images/right.jpg) 0 0 0 0 stretch stretch;
 }
 QFrame#border-up {
-    border-image: url(images/up) 0 0 0 0 stretch stretch;
+    border-image: url(images/up.jpg) 0 0 0 0 stretch stretch;
 }
 QFrame#border-down {
-    border-image: url(images/down) 0 0 0 0 stretch stretch;
+    border-image: url(images/down.jpg) 0 0 0 0 stretch stretch;
 }
 
-Board {
-    background-image: url(images/board) 0 0 0 0 stretch stretch;
+GuiBoard {
+    background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
 }
 
 

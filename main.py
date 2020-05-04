@@ -1,10 +1,6 @@
 #! /usr/bin/python3
 
-import ui
-import sys
-from PyQt5.QtWidgets import QApplication
-from PyQt5 import QtCore
-
+from ui import Gui
 
 from api import Api
 
@@ -44,7 +40,7 @@ def main():
         print_help()
         return None
 
-    difficulty = 5
+    difficulty = 2
     if "DIFFICULTY" in parsed_args:
         difficulty = parsed_args["DIFFICULTY"]
 
@@ -59,15 +55,9 @@ def main():
     else:
         print("Starting GUI")
         # GUI START CODE HERE
-        qss_file = open('styles.qss').read()
-        app = QApplication(sys.argv)
-        screen = app.primaryScreen()
-        size = screen.size()
-    
-        app.setStyleSheet(qss_file);
-        main_window = ui.Main_Window(api)
-        sys.exit(app.exec_())
-
+        gui = Gui(api)
+        gui.start()
+        
 
 if __name__ == "__main__":
     print("Hello, this is python chess game")

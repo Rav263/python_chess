@@ -13,7 +13,6 @@ class Api:
         self.data = Data("data.dat")
         self.board = Board(self.data)
         self.logic = Logic(self.data, threads)
-        difficulty = 2
         self.difficulty = difficulty
         print("difficulty:", difficulty)
         print("threads:   ", threads)

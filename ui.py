@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import (QWidget, QPushButton, 
+from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, 
     QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy)
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject
@@ -15,6 +15,16 @@ h_height = (840 + 66 + 66) // 2
 def swap(a, b):
     a, b = b, a
 
+class  Gui():
+    def __init__(self, api):
+        qss_file = open('styles.qss').read()
+        self.app = QApplication(sys.argv)
+        self.app.setStyleSheet(qss_file)
+        self.main_window = Main_Window(api)
+    
+    def start(self):
+        sys.exit(self.app.exec_())
+
 class Communicate(QObject):
     cellPressed = pyqtSignal(int, int) 
 
@@ -29,9 +39,9 @@ class Figure(QFrame):
         self.setStyle(self.style())
 
 class Cell(QFrame):
-    def __init__(self, x, y, figure_type, c):
+    def __init__(self, x, y, figure_type, comm):
         super().__init__()
-        self.c = c
+        self.comm = comm
         self.x = x
         self.y = y
         self.figure = Figure(figure_type)
@@ -43,7 +53,7 @@ class Cell(QFrame):
         vbox.setContentsMargins(4, 4, 4, 4)
 
     def mousePressEvent(self, event):
-        self.c.cellPressed.emit(self.x, self.y)
+        self.comm.cellPressed.emit(self.x, self.y)
 
     def press(self):
         self.setProperty("pressed", "1")
@@ -55,16 +65,16 @@ class Cell(QFrame):
         
 
 
-class Board(QFrame):
+class GuiBoard(QFrame):
     def __init__(self, api):
         super().__init__()
-        self.color = 1
+        self.color = api.board.white
         self.api = api
         self.setMinimumSize(board_size, board_size)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        self.c = Communicate()
-        self.c.cellPressed.connect(self.cell_pressed)
+        self.comm = Communicate()
+        self.comm.cellPressed.connect(self.cell_pressed)
 
         cells = QGridLayout()
         cells.setSpacing(0)
@@ -77,7 +87,7 @@ class Board(QFrame):
         self.cells_arr = [list() for i  in range(8) ]
         for x in range(8):
             for y in range(8):
-                self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.c))
+                self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.comm))
                 cells.addWidget(self.cells_arr[x][y], x, y)
         self.setLayout(cells)
 
@@ -133,7 +143,7 @@ class Main_Window(QWidget):
         super().__init__()
         self.setMinimumSize(v_width + 2 * h_width, h_height)
 
-        self.board = Board(api)
+        self.board = GuiBoard(api)
         self.board.upd_possible_moves(1)
 
         border_left = Border("border-left", h_width, h_height)
@@ -164,17 +174,3 @@ class Main_Window(QWidget):
         
         self.setWindowTitle('Chess')
         self.show()
-
-    #     start_game()
-
-    # def start_game(self):
-
-    #     while True:
-    #         print(self.board.color)
-    #         if (self.board.color == 2):
-                
-    #             self.board.upd_board()
-    #             self.board.change_color()
-
-
-          

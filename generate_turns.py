@@ -1,12 +1,23 @@
-import math_functions as mf
-
+"""Module with functions to generate turns"""
 from itertools import permutations
 from itertools import islice
 from itertools import count
 from itertools import product
 
 
+import math_functions as mf
+
+
 def generate_turns_pawn(pos, board, possible_turns):
+    """generate_turns_pawn(pos, board, possible_turns) -> None
+
+    pos   -- figure position
+    board -- class Board object
+    possible_turns -- dict with key - end turn pos, value - list of start turn pos
+
+    Adds all turns for pawn in dict
+    """
+
     if board.get_color_map(pos) == board.white:
         if (pos[0] == board.white_pawn_start and
                 board.get_type_map((pos[0] - 2, pos[1])) == board.empty_map):
@@ -43,6 +54,16 @@ def generate_turns_pawn(pos, board, possible_turns):
 
 
 def generate_turns_knight(pos, board, possible_turns, color):
+    """generate_turns_knight(pos, board, possible_turns, color) -> None
+
+    pos             -- figure position
+    board           -- class Board object
+    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
+    color           -- figure color
+
+    Adds all turns for pawn in dict
+    """
+
     possible_diffs = [(x, y) for x, y in permutations([1, 2, -1, -2], 2) if abs(x) != abs(y)]
 
     for diff in possible_diffs:
@@ -52,29 +73,48 @@ def generate_turns_knight(pos, board, possible_turns, color):
 
 
 def generate_turns_rook(pos, board, possible_turns, color):
+    """generate_turns_rook(pos, board, possible_turns, color) -> None
+
+    pos             -- figure position
+    board           -- class Board object
+    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
+    color           -- figure color
+
+    Adds all turns for pawn in dict
+    """
+
     possible_diffs = [-1, 1]
 
     for diff in possible_diffs:
-        for x in islice(count(pos[0] + diff, diff), board.board_size):
-            if not board.check_pos((x, pos[1])):
+        for x_coord in islice(count(pos[0] + diff, diff), board.board_size):
+            if not board.check_pos((x_coord, pos[1])):
                 break
-            if board.get_type_map((x, pos[1])) != board.empty_map:
-                if board.get_color_map((x, pos[1])) != color:
-                    possible_turns[(x, pos[1])].append(pos)
+            if board.get_type_map((x_coord, pos[1])) != board.empty_map:
+                if board.get_color_map((x_coord, pos[1])) != color:
+                    possible_turns[(x_coord, pos[1])].append(pos)
                 break
-            possible_turns[(x, pos[1])].append(pos)
+            possible_turns[(x_coord, pos[1])].append(pos)
 
-        for y in islice(count(pos[1] + diff, diff), board.board_size):
-            if not board.check_pos((pos[0], y)):
+        for y_coord in islice(count(pos[1] + diff, diff), board.board_size):
+            if not board.check_pos((pos[0], y_coord)):
                 break
-            if board.get_type_map((pos[0], y)) != board.empty_map:
-                if board.get_color_map((pos[0], y)) != color:
-                    possible_turns[(pos[0], y)].append(pos)
+            if board.get_type_map((pos[0], y_coord)) != board.empty_map:
+                if board.get_color_map((pos[0], y_coord)) != color:
+                    possible_turns[(pos[0], y_coord)].append(pos)
                 break
-            possible_turns[(pos[0], y)].append(pos)
+            possible_turns[(pos[0], y_coord)].append(pos)
 
 
 def generate_turns_bishop(pos, board, possible_turns, color):
+    """generate_turns_bishop(pos, board, possible_turns, color) -> None
+
+    pos             -- figure position
+    board           -- class Board object
+    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
+    color           -- figure color
+
+    Adds all turns for pawn in dict
+    """
     possible_diffs = product([-1, 1], repeat=2)
 
     for diff_x, diff_y in possible_diffs:
@@ -93,11 +133,29 @@ def generate_turns_bishop(pos, board, possible_turns, color):
 
 
 def generate_turns_queen(pos, board, possible_turns, color):
+    """generate_turns_queen(pos, board, possible_turns, color) -> None
+
+    pos             -- figure position
+    board           -- class Board object
+    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
+    color           -- figure color
+
+    Adds all turns for pawn in dict
+    """
     generate_turns_rook(pos, board, possible_turns, color)
     generate_turns_bishop(pos, board, possible_turns, color)
 
 
 def generate_turns_king(pos, board, possible_turns, color):
+    """generate_turns_king(pos, board, possible_turns, color) -> None
+
+    pos             -- figure position
+    board           -- class Board object
+    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
+    color           -- figure color
+
+    Adds all turns for pawn in dict
+    """
     possible_diffs = product([1, -1, 0], repeat=2)
 
     for diff in possible_diffs:

@@ -67,7 +67,7 @@ def generate_turns_knight(pos, board, possible_turns, color):
     possible_diffs = [(x, y) for x, y in permutations([1, 2, -1, -2], 2) if abs(x) != abs(y)]
 
     for diff in possible_diffs:
-        turn_end = mf.sum(pos, diff)
+        turn_end = mf.tuple_sum(pos, diff)
         if board.check_pos(turn_end) and board.get_color_map(turn_end) != color:
             possible_turns[turn_end].append(pos)
 
@@ -119,7 +119,7 @@ def generate_turns_bishop(pos, board, possible_turns, color):
 
     for diff_x, diff_y in possible_diffs:
         for i in range(1, board.board_size):
-            turn_end = mf.sum(pos, (diff_x * i, diff_y * i))
+            turn_end = mf.tuple_sum(pos, (diff_x * i, diff_y * i))
 
             if not board.check_pos(turn_end):
                 break
@@ -159,7 +159,7 @@ def generate_turns_king(pos, board, possible_turns, color):
     possible_diffs = product([1, -1, 0], repeat=2)
 
     for diff in possible_diffs:
-        turn_end = mf.sum(pos, diff)
+        turn_end = mf.tuple_sum(pos, diff)
 
         if board.check_pos(turn_end) and board.get_color_map(turn_end) != color:
             possible_turns[turn_end].append(pos)

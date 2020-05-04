@@ -87,12 +87,17 @@ class Board(QFrame):
             for field in self.possible_moves[(x, y)]:
                 self.cells_arr[field[0]][field[1]].press()
         else:
+            
+                self.cells_arr[self.start[0]][self.start[1]].release()
 
-            self.cells_arr[self.start[0]][self.start[1]].release()
-            self.making_a_move = False
-            fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.figure_type
-            self.cells_arr[x][y].figure.set_type(fig_type)
-            self.cells_arr[self.start[0]][self.start[1]].figure.set_type(0)
+                self.making_a_move = False
+                for field in self.possible_moves[self.start]:
+                    self.cells_arr[field[0]][field[1]].release()
+                    
+                if ((x, y) in self.possible_moves[self.start]):
+                    fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.figure_type
+                    self.cells_arr[x][y].figure.set_type(fig_type)
+                    self.cells_arr[self.start[0]][self.start[1]].figure.set_type(0)
 
     def upd_possible_moves(self, color):
         self.possible_moves = self.api.get_possible_turns(color)

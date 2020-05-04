@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
     QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy)
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject
+
 board_size = 840 // 2
 
 v_width = 840 // 2
@@ -57,6 +58,7 @@ class Cell(QFrame):
 class Board(QFrame):
     def __init__(self, api):
         super().__init__()
+        self.color = 1
         self.api = api
         self.setMinimumSize(board_size, board_size)
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -67,7 +69,7 @@ class Board(QFrame):
         cells = QGridLayout()
         cells.setSpacing(0)
         cells.setContentsMargins(0, 0, 0, 0)
-
+        
         self.making_a_move = False
         self.start = (0, 0)
         
@@ -87,21 +89,35 @@ class Board(QFrame):
             for field in self.possible_moves[(x, y)]:
                 self.cells_arr[field[0]][field[1]].press()
         else:
-            
-                self.cells_arr[self.start[0]][self.start[1]].release()
+            self.cells_arr[self.start[0]][self.start[1]].release()
+            self.making_a_move = False
+            for field in self.possible_moves[self.start]:
+                self.cells_arr[field[0]][field[1]].release()
 
-                self.making_a_move = False
-                for field in self.possible_moves[self.start]:
-                    self.cells_arr[field[0]][field[1]].release()
-                    
-                if ((x, y) in self.possible_moves[self.start]):
-                    fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.figure_type
-                    self.cells_arr[x][y].figure.set_type(fig_type)
-                    self.cells_arr[self.start[0]][self.start[1]].figure.set_type(0)
+            if ((x, y) in self.possible_moves[self.start]):
+                fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.figure_type
+                self.cells_arr[x][y].figure.set_type(fig_type)
+                self.cells_arr[self.start[0]][self.start[1]].figure.set_type(0)
 
+                self.api.do_turn(self.start, (x, y))
+                self.change_color()
+                self.upd_board()
+
+    def upd_board(self):
+        print("ai is going to make a turn")
+        self.api.ai_turn(self.color)
+        print("ai made a turn")
+        for x in range(8):
+            for y in range(8):
+                self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
+        self.change_color()
+        self.upd_possible_moves(self.color)
+    
     def upd_possible_moves(self, color):
         self.possible_moves = self.api.get_possible_turns(color)
 
+    def change_color(self):
+        self.color = 3 - self.color
 
 class Border(QFrame):
     def __init__(self, name, width, height):
@@ -117,8 +133,8 @@ class Main_Window(QWidget):
         super().__init__()
         self.setMinimumSize(v_width + 2 * h_width, h_height)
 
-        board = Board(api)
-        board.upd_possible_moves(1)
+        self.board = Board(api)
+        self.board.upd_possible_moves(1)
 
         border_left = Border("border-left", h_width, h_height)
         border_right = Border("border-right", h_width, h_height)
@@ -128,7 +144,7 @@ class Main_Window(QWidget):
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(border_up)
-        vbox.addWidget(board)
+        vbox.addWidget(self.board)
         vbox.addWidget(border_down)
         vbox.addStretch(1)
         vbox.setSpacing(0)
@@ -143,8 +159,22 @@ class Main_Window(QWidget):
         hbox.setSpacing(0)
         hbox.setContentsMargins(0, 0, 0, 0)
 
-        self.setLayout(hbox)   
+        self.setLayout(hbox)
         
         
-        self.setWindowTitle('Chess')    
+        self.setWindowTitle('Chess')
         self.show()
+
+    #     start_game()
+
+    # def start_game(self):
+
+    #     while True:
+    #         print(self.board.color)
+    #         if (self.board.color == 2):
+                
+    #             self.board.upd_board()
+    #             self.board.change_color()
+
+
+          

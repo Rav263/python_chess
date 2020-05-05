@@ -30,7 +30,8 @@ class  Gui():
         sys.exit(self.app.exec_())
 
 class Communicate(QObject):
-    cellPressed = pyqtSignal(int, int) 
+    cellPressed = pyqtSignal(int, int)
+    cellReleased = pyqtSignal(int, int)
 
 class Figure(QFrame):
     def __init__(self, figure_type):
@@ -62,6 +63,9 @@ class Cell(QFrame):
     def mousePressEvent(self, event):
         self.comm.cellPressed.emit(self.x, self.y)
 
+    def mouseReleaseEvent(self, event):
+        self.comm.cellReleased.emit(self.x, self.y)
+
     def press(self):
         self.setProperty("pressed", "1")
         self.setStyle(self.style())
@@ -83,23 +87,27 @@ class GuiBoard(QFrame):
 
         self.comm = Communicate()
         self.comm.cellPressed.connect(self.cell_pressed)
-        
-        self.updBoard.connect(self.upd_board)
+        self.comm.cellReleased.connect(self.cell_released)
 
         cells = QGridLayout()
         cells.setSpacing(0)
         cells.setContentsMargins(0, 0, 0, 0)
         
         self.making_a_move = False
+        self.ai_do_turn = False
         self.start = (0, 0)
         
-
         self.cells_arr = [list() for i  in range(8) ]
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.comm))
                 cells.addWidget(self.cells_arr[x][y], x, y)
         self.setLayout(cells)
+
+    def cell_released(self, x, y):
+        if self.ai_do_turn:
+            self.upd_board()
+            self.ai_do_turn = False
 
     def cell_pressed(self, x, y):
         if not self.making_a_move:
@@ -118,9 +126,8 @@ class GuiBoard(QFrame):
                 self.api.do_turn(self.start, (x, y))
                 self.make_turn(self.start, (x, y))
                 self.change_color()
-                self.updBoard.emit()
-                
-    
+                self.ai_do_turn = True
+
     def make_turn(self, start, stop):
         self.cells_arr[start[0]][start[1]].figure.set_type(0)
         self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))

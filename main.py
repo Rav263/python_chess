@@ -1,5 +1,7 @@
 #! /usr/bin/python3
 
+from ui import Gui
+
 from api import Api
 
 
@@ -53,7 +55,9 @@ def main():
     else:
         print("Starting GUI")
         # GUI START CODE HERE
-
+        gui = Gui(api)
+        gui.start()
+        
 
 if __name__ == "__main__":
     print("Hello, this is python chess game")

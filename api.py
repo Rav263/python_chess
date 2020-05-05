@@ -32,13 +32,13 @@ class Api:
 
         return turns
 
-    def get_map(self, pos):
+    def get_field(self, pos):
         if self.board.check_pos(pos):
             return self.board.get_map(pos)
 
         return -1
 
-    def set_map(self, pos, value):
+    def set_field(self, pos, value):
         if self.board.check_pos(pos):
             return self.board.set_map(pos, value)
 

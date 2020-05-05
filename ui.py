@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton,
     QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy)
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject
-
+import time
+import threading
 
 board_size = 840 // 2
 
@@ -12,6 +13,8 @@ v_height = 66 // 2
 
 h_width = 66 // 2
 h_height = (840 + 66 + 66) // 2
+
+lock = threading.Lock()
 
 def swap(a, b):
     a, b = b, a
@@ -37,7 +40,10 @@ class Figure(QFrame):
     def set_type(self, figure_type):
         self.figure_type = figure_type
         self.setProperty("type", str(figure_type))
-        self.setStyle(self.style())
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.ensurePolished()
+
 
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm):
@@ -67,6 +73,7 @@ class Cell(QFrame):
 
 
 class GuiBoard(QFrame):
+    updBoard = pyqtSignal()
     def __init__(self, api):
         super().__init__()
         self.color = api.board.white
@@ -76,6 +83,8 @@ class GuiBoard(QFrame):
 
         self.comm = Communicate()
         self.comm.cellPressed.connect(self.cell_pressed)
+        
+        self.updBoard.connect(self.upd_board)
 
         cells = QGridLayout()
         cells.setSpacing(0)
@@ -109,7 +118,8 @@ class GuiBoard(QFrame):
                 self.api.do_turn(self.start, (x, y))
                 self.make_turn(self.start, (x, y))
                 self.change_color()
-                self.upd_board()
+                self.updBoard.emit()
+                
     
     def make_turn(self, start, stop):
         self.cells_arr[start[0]][start[1]].figure.set_type(0)

@@ -13,8 +13,15 @@ class Board:
     queen = 6
     white = 1
     black = 2
+
     white_pawn_start = 6
     black_pawn_start = 1
+
+    white_king_movement = False
+    black_king_movement = False
+
+    white_rook_movement = (False, False)
+    black_rook_movement = (False, False)
 
     def __init__(self, data, copy=None):
         if copy is None:
@@ -26,6 +33,17 @@ class Board:
             self.board = [line.copy() for line in copy.board]
             self.board_size = copy.board_size
             self.data = copy.data
+
+    def get_king_pos(self, color):
+        """get_king_pos(self, color) -> tuple
+
+        Returns king position with the same color
+        """
+
+        for pos in product(range(self.board_size), repeat=2):
+            if self.get_type_map(pos) == self.king and self.get_color_map(pos) == color:
+                return pos
+        return (-1, -1)
 
     def do_turn(self, turn, fig=0):
         """do_turn(self, turn, fig) -> figure

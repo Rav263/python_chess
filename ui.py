@@ -106,22 +106,21 @@ class GuiBoard(QFrame):
                 self.cells_arr[field[0]][field[1]].release()
 
             if ((x, y) in self.possible_moves[self.start]):
-                fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.figure_type
-                self.cells_arr[x][y].figure.set_type(fig_type)
-                self.cells_arr[self.start[0]][self.start[1]].figure.set_type(0)
-
                 self.api.do_turn(self.start, (x, y))
+                self.make_turn(self.start, (x, y))
                 self.change_color()
                 self.upd_board()
+    
+    def make_turn(self, start, stop):
+        self.cells_arr[start[0]][start[1]].figure.set_type(0)
+        self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
+
 
     def upd_board(self):
         print("ai is going to make a turn")
-        self.api.ai_turn(self.color)
+        turn = self.api.ai_turn(self.color)
         print("ai made a turn")
-        for x in range(8):
-            for y in range(8):
-                if (self.cells_arr[x][y].figure.figure_type != self.api.get_field((x, y))):
-                    self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
+        self.make_turn(turn.start_pos, turn.end_pos)
         self.change_color()
         self.upd_possible_moves(self.color)
     

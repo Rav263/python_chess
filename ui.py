@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton,
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject
 
+
 board_size = 840 // 2
 
 v_width = 840 // 2
@@ -119,7 +120,8 @@ class GuiBoard(QFrame):
         print("ai made a turn")
         for x in range(8):
             for y in range(8):
-                self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
+                if (self.cells_arr[x][y].figure.figure_type != self.api.get_field((x, y))):
+                    self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
         self.change_color()
         self.upd_possible_moves(self.color)
     
@@ -144,7 +146,7 @@ class Main_Window(QWidget):
         self.setMinimumSize(v_width + 2 * h_width, h_height)
 
         self.board = GuiBoard(api)
-        self.board.upd_possible_moves(1)
+        self.board.upd_possible_moves(self.board.color)
 
         border_left = Border("border-left", h_width, h_height)
         border_right = Border("border-right", h_width, h_height)

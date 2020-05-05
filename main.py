@@ -40,7 +40,7 @@ def main():
         print_help()
         return None
 
-    difficulty = 2
+    difficulty = 5
     if "DIFFICULTY" in parsed_args:
         difficulty = parsed_args["DIFFICULTY"]
 

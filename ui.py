@@ -97,7 +97,7 @@ class GuiBoard(QFrame):
         self.ai_do_turn = False
         self.start = (0, 0)
         
-        self.cells_arr = [list() for i  in range(8) ]
+        self.cells_arr = [list() for i  in range(8)]
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.comm))
@@ -147,6 +147,24 @@ class GuiBoard(QFrame):
     def change_color(self):
         self.color = 3 - self.color
 
+class MainMenu(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.setMaximumSize(v_width, v_width)
+        self.setMinimumSize(v_width, v_width)
+        self.start_game = QPushButton("Start Game")
+
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addWidget(self.start_game)
+        vbox.addStretch(1)
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addLayout(vbox)
+        hbox.addStretch(1)
+        self.setLayout(hbox)
+
 class Border(QFrame):
     def __init__(self, name, width, height):
         super().__init__()
@@ -155,15 +173,9 @@ class Border(QFrame):
         self.setMaximumSize(width, height)
         self.setMinimumSize(width, height)
 
-class Main_Window(QWidget):
-    
-    def __init__(self, api):
+class MainContainer(QFrame):
+    def __init__(self, inside):
         super().__init__()
-        self.setMinimumSize(v_width + 2 * h_width, h_height)
-
-        self.board = GuiBoard(api)
-        self.board.upd_possible_moves(self.board.color)
-
         border_left = Border("border-left", h_width, h_height)
         border_right = Border("border-right", h_width, h_height)
         border_up = Border("border-up", v_width, v_height)
@@ -172,7 +184,7 @@ class Main_Window(QWidget):
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(border_up)
-        vbox.addWidget(self.board)
+        vbox.addWidget(inside)
         vbox.addWidget(border_down)
         vbox.addStretch(1)
         vbox.setSpacing(0)
@@ -186,9 +198,35 @@ class Main_Window(QWidget):
         hbox.addStretch(1)
         hbox.setSpacing(0)
         hbox.setContentsMargins(0, 0, 0, 0)
-
         self.setLayout(hbox)
-        
+
+class Main_Window(QWidget):
+    
+    def __init__(self, api):
+        super().__init__()
+        self.setMinimumSize(v_width + 2 * h_width, h_height)
+
+        self.board = GuiBoard(api)
+        self.menu = MainMenu()
+        self.board.upd_possible_moves(self.board.color)
+
+        self.game_board = MainContainer(self.board)
+        self.main_menu = MainContainer(self.menu)
+        self.game_board.hide()
+
+        self.menu.start_game.clicked.connect(self.start_game)
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.game_board)
+        hbox.addWidget(self.main_menu)
+        hbox.setSpacing(0)
+        hbox.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(hbox)
+
         
         self.setWindowTitle('Chess')
         self.show()
+    
+    def start_game(self):
+        self.main_menu.hide()
+        self.game_board.show()
+

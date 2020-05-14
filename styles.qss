@@ -30,6 +30,9 @@ GuiBoard {
     background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
 }
 
+MainMenu{
+    background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
+}
 
 Cell[pressed="1"]{
     border: 3px solid green;

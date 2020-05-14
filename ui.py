@@ -41,10 +41,7 @@ class Figure(QFrame):
     def set_type(self, figure_type):
         self.figure_type = figure_type
         self.setProperty("type", str(figure_type))
-        self.style().unpolish(self)
-        self.style().polish(self)
-        self.ensurePolished()
-
+        self.setStyle(self.style())
 
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm):
@@ -110,23 +107,24 @@ class GuiBoard(QFrame):
             self.ai_do_turn = False
 
     def cell_pressed(self, x, y):
-        if not self.making_a_move:
-            self.start = (x, y)
-            self.cells_arr[x][y].press()
-            self.making_a_move = True
-            for field in self.possible_moves[(x, y)]:
-                self.cells_arr[field[0]][field[1]].press()
-        else:
-            self.cells_arr[self.start[0]][self.start[1]].release()
-            self.making_a_move = False
-            for field in self.possible_moves[self.start]:
-                self.cells_arr[field[0]][field[1]].release()
+        if not self.ai_do_turn:
+            if not self.making_a_move:
+                self.start = (x, y)
+                self.cells_arr[x][y].press()
+                self.making_a_move = True
+                for field in self.possible_moves[(x, y)]:
+                    self.cells_arr[field[0]][field[1]].press()
+            else:
+                self.cells_arr[self.start[0]][self.start[1]].release()
+                self.making_a_move = False
+                for field in self.possible_moves[self.start]:
+                    self.cells_arr[field[0]][field[1]].release()
 
-            if ((x, y) in self.possible_moves[self.start]):
-                self.api.do_turn(self.start, (x, y))
-                self.make_turn(self.start, (x, y))
-                self.change_color()
-                self.ai_do_turn = True
+                if ((x, y) in self.possible_moves[self.start]):
+                    self.api.do_turn(self.start, (x, y))
+                    self.make_turn(self.start, (x, y))
+                    self.change_color()
+                    self.ai_do_turn = True
 
     def make_turn(self, start, stop):
         self.cells_arr[start[0]][start[1]].figure.set_type(0)

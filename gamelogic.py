@@ -1,5 +1,7 @@
 """Class Logic and class Turn module"""
-
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+# pylint: disable=arguments-out-of-order
 
 from collections import defaultdict
 from itertools import product
@@ -48,6 +50,8 @@ class Logic:
 
         color = 1
 
+        print(self.generate_all_possible_turns(board, color))
+
         while True:
             io_functions.print_board(board.board, data)
             now_turn = io_functions.get_turn(self, color, board)
@@ -63,7 +67,7 @@ class Logic:
 
             color = 3 - color
 
-    def generate_all_possible_turns(self, board, color):
+    def generate_all_possible_turns(self, board, color, check_check=True):
         """generate_all_possible_turns(self, board, color) -> dict
 
         self  -- class Logic object
@@ -75,7 +79,12 @@ class Logic:
         dict value - list of start turn positions
         """
 
+        if check_check:
+            opponent_turns = (
+                self.generate_all_possible_turns(board, 3 - color, check_check=False))
+
         possible_turns = defaultdict(list)
+
         # dict key = position of possible turn
         # dict value = list of positions where from this turn can be done
 
@@ -98,6 +107,10 @@ class Logic:
 
                 if board.get_type_map(pos) == board.king:
                     gt.generate_turns_king(pos, board, possible_turns, color)
+        if check_check:
+            king_pos = board.get_king_pos(color)
+            possible_turns = gt.remove_not_possible_turns(board, king_pos,
+                                                          possible_turns, opponent_turns)
 
         return possible_turns
 

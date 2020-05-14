@@ -3,9 +3,142 @@ from itertools import permutations
 from itertools import islice
 from itertools import count
 from itertools import product
+from collections import defaultdict
 
 
 import math_functions as mf
+
+
+def transform_turns_dict(possible_turns):
+    """transform_turns_dict(possible_turns) -> defaultdict"""
+    turns = defaultdict(list)
+
+    for end_pos in possible_turns:
+        for start_pos in possible_turns[end_pos]:
+            turns[start_pos].append(end_pos)
+
+    return turns
+
+
+def remove_not_important_turns(turns, important_start_positions):
+    """remove_not_important_turns(turns, important_start_positions) -> defaultdict"""
+    important_turns = defaultdict(list)
+
+    for start_position in important_start_positions:
+        important_turns[start_position] = turns[start_position]
+
+    return important_turns
+
+
+def normalize_tuple(tuple_1):
+    """normalize_tuple(tuple_1) -> tuple
+
+    returns normalized tuple
+    """
+    if tuple_1[0] != 0:
+        return ((tuple_1[0] // abs(tuple_1[0]), tuple_1[1] // abs(tuple_1[0])), abs(tuple_1[0]))
+    return ((tuple_1[0] // abs(tuple_1[1]), tuple_1[1] // abs(tuple_1[1])), abs(tuple_1[1]))
+
+
+def remove_not_possible_turns(board, king_pos, turns, opponent_turns):
+    """remove_not_possible_turns(board, king_pos, turns, opponent_turns) -> defaultdict(list)"""
+    if king_pos not in opponent_turns:
+        return turns
+
+    start_positions = opponent_turns[king_pos]
+    opponent_start_turns = transform_turns_dict(opponent_turns)
+    start_turns = transform_turns_dict(turns)
+
+    important_turns = remove_not_important_turns(opponent_start_turns, start_positions)
+
+    possible_turns = defaultdict(list)
+
+    for end_turn in start_turns[king_pos]:
+        if end_turn not in opponent_turns:
+            possible_turns[end_turn].append(king_pos)
+
+    if len(important_turns) == 1:
+        positions_for_block = positions_for_turns_block(board, [*important_turns], king_pos)
+
+        for pos_for_block in positions_for_block:
+            if pos_for_block in turns:
+                for start_pos in turns[pos_for_block]:
+                    if start_pos not in opponent_turns:
+                        possible_turns[pos_for_block].append(start_pos)
+                    else:
+                        for opp_start_pos in opponent_start_turns[start_pos]:
+                            if check_king_on_fire(board, opp_start_pos, king_pos, start_pos):
+                                possible_turns[pos_for_block].append(start_pos)
+
+    return possible_turns
+
+
+def check_diff(board, diff, start_map_type):
+    """check_diff(board, diff, start_map_type) -> bool
+
+    returns True if diff is possible for this figure type
+    """
+    if start_map_type == board.queen:
+        return abs(diff[0]) == abs(diff[1]) or 0 in diff
+
+    if start_map_type == board.bishop:
+        return abs(diff[0]) == abs(diff[1])
+
+    if start_map_type == board.rook:
+        return 0 in diff
+
+    return False
+
+
+def check_king_on_fire(board, start_pos, king_pos, now_figure_pos):
+    """check_king_on_fire(board, start_pos, king_pos) -> bool
+
+    returns True if king on fire
+    """
+    start_map_type = board.get_type_map(start_pos)
+
+    if start_map_type in (board.queen, board.rook, board.bishop):
+        diff = mf.difference(king_pos, start_pos)
+
+        if not check_diff(board, diff, start_map_type):
+            return False
+
+        norm_diff, rang = normalize_tuple(diff)
+        print(diff, norm_diff, rang)
+
+        for i in range(rang):
+            now_pos = mf.tuple_sum(start_pos, mf.mul(norm_diff, i))
+            if now_pos == now_figure_pos:
+                continue
+            if board.get_type_map(now_pos) != board.empty_map:
+                return False
+        return True
+    return False
+
+
+def positions_for_turns_block(board, list_of_start_pos, king_pos):
+    """positions_for_turns_block(board, list_of_start_pos, king_pos) -> list
+
+    returns list of turns for blocking
+    """
+    start_pos = list_of_start_pos[0]
+
+    positions_for_block = list()
+
+    start_map_type = board.get_type_map(start_pos)
+
+    if start_map_type in (board.queen, board.rook, board.bishop):
+        diff = mf.difference(king_pos, start_pos)
+        norm_diff, rang = normalize_tuple(diff)
+        print(diff, norm_diff, rang)
+
+        for i in range(rang):
+            positions_for_block.append(mf.tuple_sum(start_pos, mf.mul(norm_diff, i)))
+
+    elif start_map_type in (board.pawn, board.knight):
+        positions_for_block.append(start_pos)
+
+    return positions_for_block
 
 
 def generate_turns_pawn(pos, board, possible_turns):

@@ -106,7 +106,11 @@ class Logic:
                     gt.generate_turns_queen(pos, board, possible_turns, color)
 
                 if board.get_type_map(pos) == board.king:
-                    gt.generate_turns_king(pos, board, possible_turns, color)
+                    if check_check:
+                        gt.generate_turns_king(pos, board, possible_turns, color, opponent_turns)
+                    else:
+                        gt.generate_turns_king(pos, board, possible_turns, color)
+
         if check_check:
             king_pos = board.get_king_pos(color)
             possible_turns = gt.remove_not_possible_turns(board, king_pos,

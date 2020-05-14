@@ -279,13 +279,14 @@ def generate_turns_queen(pos, board, possible_turns, color):
     generate_turns_bishop(pos, board, possible_turns, color)
 
 
-def generate_turns_king(pos, board, possible_turns, color):
+def generate_turns_king(pos, board, possible_turns, color, opponent_turns=defaultdict(list)):
     """generate_turns_king(pos, board, possible_turns, color) -> None
 
     pos             -- figure position
     board           -- class Board object
     possible_turns  -- dict with key - end turn pos, value - list of start turn pos
     color           -- figure color
+    opponent_turns  -- opponent possible turns
 
     Adds all turns for pawn in dict
     """
@@ -294,5 +295,6 @@ def generate_turns_king(pos, board, possible_turns, color):
     for diff in possible_diffs:
         turn_end = mf.tuple_sum(pos, diff)
 
-        if board.check_pos(turn_end) and board.get_color_map(turn_end) != color:
+        if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color and
+                turn_end not in opponent_turns):
             possible_turns[turn_end].append(pos)

@@ -1,10 +1,11 @@
 #! /usr/bin/python3
-
-from api import Api
-
+"""Main python_chess module file"""
+# pylint: disable=missing-function-docstring
 
 import sys
 import os
+
+from api import Api
 
 
 def get_num_threads():
@@ -57,6 +58,8 @@ def main():
     else:
         print("Starting GUI")
         # GUI START CODE HERE
+
+    return None
 
 
 if __name__ == "__main__":

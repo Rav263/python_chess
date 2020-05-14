@@ -152,16 +152,39 @@ class MainMenu(QFrame):
         self.setMaximumSize(v_width, v_width)
         self.setMinimumSize(v_width, v_width)
         self.start_game = QPushButton("Start Game")
-
+        self.difficulty2 = QPushButton("2")
+        self.difficulty3 = QPushButton("3")
+        self.difficulty4 = QPushButton("4")
+        self.difficulty5 = QPushButton("5")
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(self.start_game)
+        vbox.addWidget(self.difficulty2)
+        vbox.addWidget(self.difficulty3)
+        vbox.addWidget(self.difficulty4)
+        vbox.addWidget(self.difficulty5)
         vbox.addStretch(1)
+
         hbox = QHBoxLayout()
         hbox.addStretch(1)
         hbox.addLayout(vbox)
         hbox.addStretch(1)
         self.setLayout(hbox)
+
+        self.start_game.clicked.connect(self.choose_difficulty)
+
+        self.difficulty2.hide()
+        self.difficulty3.hide()
+        self.difficulty4.hide()
+        self.difficulty5.hide()
+
+    def choose_difficulty(self):
+        self.start_game.hide()
+        self.difficulty2.show()
+        self.difficulty3.show()
+        self.difficulty4.show()
+        self.difficulty5.show()
+
 
 class Border(QFrame):
     def __init__(self, name, width, height):
@@ -203,7 +226,7 @@ class Main_Window(QWidget):
     def __init__(self, api):
         super().__init__()
         self.setMinimumSize(v_width + 2 * h_width, h_height)
-
+        self.api = api
         self.board = GuiBoard(api)
         self.menu = MainMenu()
         self.board.upd_possible_moves(self.board.color)
@@ -212,7 +235,7 @@ class Main_Window(QWidget):
         self.main_menu = MainContainer(self.menu)
         self.game_board.hide()
 
-        self.menu.start_game.clicked.connect(self.start_game)
+        
         hbox = QHBoxLayout()
         hbox.addWidget(self.game_board)
         hbox.addWidget(self.main_menu)
@@ -220,11 +243,32 @@ class Main_Window(QWidget):
         hbox.setContentsMargins(0, 0, 0, 0)
         self.setLayout(hbox)
 
-        
+        self.menu.difficulty2.clicked.connect(self.start_game2)
+        self.menu.difficulty3.clicked.connect(self.start_game3)
+        self.menu.difficulty4.clicked.connect(self.start_game4)
+        self.menu.difficulty5.clicked.connect(self.start_game5)
         self.setWindowTitle('Chess')
         self.show()
-    
-    def start_game(self):
+
+    def start_game2(self):
+        self.api.difficulty = 2
         self.main_menu.hide()
         self.game_board.show()
+    
+    def start_game3(self):
+        self.api.difficulty = 3
+        self.main_menu.hide()
+        self.game_board.show()
+    
+    def start_game4(self):
+        self.api.difficulty = 4
+        self.main_menu.hide()
+        self.game_board.show()
+    
+    def start_game5(self):
+        self.api.difficulty = 5
+        self.main_menu.hide()
+        self.game_board.show()
+    
+
 

@@ -9,7 +9,7 @@ from gamelogic import Turn
 
 class Stockfish:
     """Class to use stockfish"""
-    def __init__(self, threads_num):
+    def __init__(self, threads_num, difficulty):
         self.process = subprocess.Popen(["./stockfish"], shell=False, stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE, stderr=None)
 
@@ -23,6 +23,7 @@ class Stockfish:
         self.process.stdin.flush()
         self.history = []
         self.do_command("setoption name threads value " + str(threads_num))
+        self.do_command("setoption name Skill Level value " + str(difficulty))
 
     def read_output(self):
         """reading output from external process"""
@@ -30,6 +31,7 @@ class Stockfish:
             now_line = self.process.stdout.readline()
             decoded_line = now_line.decode("utf-8")
             if "bestmove" in decoded_line:
+                print(decoded_line)
                 self.process_queu.put(decoded_line.split()[1])
 
     def do_turn(self, turn, board_size):

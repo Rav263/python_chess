@@ -1,4 +1,6 @@
 """Module with functions to generate turns"""
+# pylint: disable=too-many-nested-blocks
+
 from itertools import permutations
 from itertools import islice
 from itertools import count
@@ -104,7 +106,6 @@ def check_king_on_fire(board, start_pos, king_pos, now_figure_pos):
             return False
 
         norm_diff, rang = normalize_tuple(diff)
-        print(diff, norm_diff, rang)
 
         for i in range(rang):
             now_pos = mf.tuple_sum(start_pos, mf.mul(norm_diff, i))
@@ -130,7 +131,6 @@ def positions_for_turns_block(board, list_of_start_pos, king_pos):
     if start_map_type in (board.queen, board.rook, board.bishop):
         diff = mf.difference(king_pos, start_pos)
         norm_diff, rang = normalize_tuple(diff)
-        print(diff, norm_diff, rang)
 
         for i in range(rang):
             positions_for_block.append(mf.tuple_sum(start_pos, mf.mul(norm_diff, i)))
@@ -279,7 +279,7 @@ def generate_turns_queen(pos, board, possible_turns, color):
     generate_turns_bishop(pos, board, possible_turns, color)
 
 
-def generate_turns_king(pos, board, possible_turns, color, opponent_turns=defaultdict(list)):
+def generate_turns_king(pos, board, possible_turns, color, opponent_turns):
     """generate_turns_king(pos, board, possible_turns, color) -> None
 
     pos             -- figure position

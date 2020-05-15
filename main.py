@@ -6,6 +6,7 @@ import sys
 import os
 
 from api import Api
+import stockfish
 
 
 def get_num_threads():
@@ -53,8 +54,14 @@ def main():
 
     api = Api(difficulty, threads)
 
-    if "MODE" in parsed_args and parsed_args["MODE"] == "CMD":
-        api.start_cmd()
+    if "MODE" in parsed_args:
+        if parsed_args["MODE"] == "CMD":
+            api.start_cmd()
+        elif parsed_args["MODE"] == "AI":
+            stockfish.main(api, threads)
+        else:
+            print("Starting GUI")
+            # GUI START CODE HERE
     else:
         print("Starting GUI")
         # GUI START CODE HERE

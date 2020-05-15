@@ -50,8 +50,6 @@ class Logic:
 
         color = 1
 
-        print(self.generate_all_possible_turns(board, color))
-
         while True:
             io_functions.print_board(board.board, data)
             now_turn = io_functions.get_turn(self, color, board)
@@ -109,7 +107,7 @@ class Logic:
                     if check_check:
                         gt.generate_turns_king(pos, board, possible_turns, color, opponent_turns)
                     else:
-                        gt.generate_turns_king(pos, board, possible_turns, color)
+                        gt.generate_turns_king(pos, board, possible_turns, color, defaultdict(list))
 
         if check_check:
             king_pos = board.get_king_pos(color)

@@ -309,11 +309,13 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
 
     Adds all turns for pawn in dict
     """
+    start_opponent_turns = transform_turns_dict(opponent_turns_for_king)
+
     possible_diffs = product([1, -1, 0], repeat=2)
 
     for diff in possible_diffs:
         turn_end = mf.tuple_sum(pos, diff)
 
         if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color and
-                turn_end not in (opponent_turns, opponent_turns_for_king)):
+                turn_end not in opponent_turns and turn_end not in start_opponent_turns):
             possible_turns[turn_end].append(pos)

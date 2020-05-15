@@ -78,43 +78,46 @@ class Logic:
         """
 
         if check_check:
-            opponent_turns = (
+            opponent_turns, opponent_turns_for_king = (
                 self.generate_all_possible_turns(board, 3 - color, check_check=False))
 
         possible_turns = defaultdict(list)
-
+        turns_for_king = defaultdict(list)
         # dict key = position of possible turn
         # dict value = list of positions where from this turn can be done
 
         for pos in product(range(board.board_size), repeat=2):
             if board.get_color_map(pos) == color:
                 if board.get_type_map(pos) == board.pawn:
-                    gt.generate_turns_pawn(pos, board, possible_turns)
+                    gt.generate_turns_pawn(pos, board, possible_turns, turns_for_king)
 
                 if board.get_type_map(pos) == board.knight:
-                    gt.generate_turns_knight(pos, board, possible_turns, color)
+                    gt.generate_turns_knight(pos, board, possible_turns, color, turns_for_king)
 
                 if board.get_type_map(pos) == board.rook:
-                    gt.generate_turns_rook(pos, board, possible_turns, color)
+                    gt.generate_turns_rook(pos, board, possible_turns, color, turns_for_king)
 
                 if board.get_type_map(pos) == board.bishop:
-                    gt.generate_turns_bishop(pos, board, possible_turns, color)
+                    gt.generate_turns_bishop(pos, board, possible_turns, color, turns_for_king)
 
                 if board.get_type_map(pos) == board.queen:
-                    gt.generate_turns_queen(pos, board, possible_turns, color)
+                    gt.generate_turns_queen(pos, board, possible_turns, color, turns_for_king)
 
                 if board.get_type_map(pos) == board.king:
                     if check_check:
-                        gt.generate_turns_king(pos, board, possible_turns, color, opponent_turns)
+                        gt.generate_turns_king(pos, board, possible_turns, color,
+                                               opponent_turns, opponent_turns_for_king)
                     else:
-                        gt.generate_turns_king(pos, board, possible_turns, color, defaultdict(list))
+                        gt.generate_turns_king(pos, board, possible_turns, color,
+                                               defaultdict(list), defaultdict(list))
 
         if check_check:
             king_pos = board.get_king_pos(color)
             possible_turns = gt.remove_not_possible_turns(board, king_pos,
                                                           possible_turns, opponent_turns)
+            return possible_turns
 
-        return possible_turns
+        return (possible_turns, turns_for_king)
 
     def thread_generate(self, board, color, depth, turns, index, return_dict):
         """thread_generate(self, board, color, depth, turns, index, return_dict) -> tuple

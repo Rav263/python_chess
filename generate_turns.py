@@ -1,5 +1,7 @@
 """Module with functions to generate turns"""
 # pylint: disable=too-many-nested-blocks
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-branches
 
 from itertools import permutations
 from itertools import islice
@@ -141,7 +143,7 @@ def positions_for_turns_block(board, list_of_start_pos, king_pos):
     return positions_for_block
 
 
-def generate_turns_pawn(pos, board, possible_turns):
+def generate_turns_pawn(pos, board, possible_turns, turns_for_king):
     """generate_turns_pawn(pos, board, possible_turns) -> None
 
     pos   -- figure position
@@ -160,13 +162,17 @@ def generate_turns_pawn(pos, board, possible_turns):
         if board.get_type_map((pos[0] - 1, pos[1])) == board.empty_map:
             possible_turns[(pos[0] - 1, pos[1])].append(pos)
 
-        if (board.get_type_map((pos[0] - 1, pos[1] - 1)) > board.empty_map and
-                board.get_color_map((pos[0] - 1, pos[1] - 1)) != board.white):
-            possible_turns[(pos[0] - 1, pos[1] - 1)].append(pos)
+        if board.get_type_map((pos[0] - 1, pos[1] - 1)) > board.empty_map:
+            if board.get_color_map((pos[0] - 1, pos[1] - 1)) != board.white:
+                possible_turns[(pos[0] - 1, pos[1] - 1)].append(pos)
+            else:
+                turns_for_king[(pos[0] - 1, pos[1] - 1)].append(pos)
 
-        if (board.get_type_map((pos[0] - 1, pos[1] + 1)) > board.empty_map and
-                board.get_color_map((pos[0] - 1, pos[1] + 1)) != board.white):
-            possible_turns[(pos[0] - 1, pos[1] + 1)].append(pos)
+        if board.get_type_map((pos[0] - 1, pos[1] + 1)) > board.empty_map:
+            if board.get_color_map((pos[0] - 1, pos[1] + 1)) != board.white:
+                possible_turns[(pos[0] - 1, pos[1] + 1)].append(pos)
+            else:
+                turns_for_king[(pos[0] - 1, pos[1] + 1)].append(pos)
 
     else:
         if (pos[0] == board.black_pawn_start and
@@ -177,16 +183,20 @@ def generate_turns_pawn(pos, board, possible_turns):
         if board.get_type_map((pos[0] + 1, pos[1])) == board.empty_map:
             possible_turns[(pos[0] + 1, pos[1])].append(pos)
 
-        if (board.get_type_map((pos[0] + 1, pos[1] - 1)) > board.empty_map and
-                board.get_color_map((pos[0] + 1, pos[1] - 1)) != board.black):
-            possible_turns[(pos[0] + 1, pos[1] - 1)].append(pos)
+        if board.get_type_map((pos[0] + 1, pos[1] - 1)) > board.empty_map:
+            if board.get_color_map((pos[0] + 1, pos[1] - 1)) != board.black:
+                possible_turns[(pos[0] + 1, pos[1] - 1)].append(pos)
+            else:
+                turns_for_king[(pos[0] + 1, pos[1] - 1)].append(pos)
 
-        if (board.get_type_map((pos[0] + 1, pos[1] + 1)) > board.empty_map and
-                board.get_color_map((pos[0] + 1, pos[1] + 1)) != board.black):
-            possible_turns[(pos[0] + 1, pos[1] + 1)].append(pos)
+        if board.get_type_map((pos[0] + 1, pos[1] + 1)) > board.empty_map:
+            if board.get_color_map((pos[0] + 1, pos[1] + 1)) != board.black:
+                possible_turns[(pos[0] + 1, pos[1] + 1)].append(pos)
+            else:
+                turns_for_king[(pos[0] + 1, pos[1] + 1)].append(pos)
 
 
-def generate_turns_knight(pos, board, possible_turns, color):
+def generate_turns_knight(pos, board, possible_turns, color, turns_for_king):
     """generate_turns_knight(pos, board, possible_turns, color) -> None
 
     pos             -- figure position
@@ -201,11 +211,14 @@ def generate_turns_knight(pos, board, possible_turns, color):
 
     for diff in possible_diffs:
         turn_end = mf.tuple_sum(pos, diff)
-        if board.check_pos(turn_end) and board.get_color_map(turn_end) != color:
-            possible_turns[turn_end].append(pos)
+        if board.check_pos(turn_end):
+            if board.get_color_map(turn_end) != color:
+                possible_turns[turn_end].append(pos)
+            else:
+                turns_for_king[turn_end].append(pos)
 
 
-def generate_turns_rook(pos, board, possible_turns, color):
+def generate_turns_rook(pos, board, possible_turns, color, turns_for_king):
     """generate_turns_rook(pos, board, possible_turns, color) -> None
 
     pos             -- figure position
@@ -225,6 +238,8 @@ def generate_turns_rook(pos, board, possible_turns, color):
             if board.get_type_map((x_coord, pos[1])) != board.empty_map:
                 if board.get_color_map((x_coord, pos[1])) != color:
                     possible_turns[(x_coord, pos[1])].append(pos)
+                else:
+                    turns_for_king[(x_coord, pos[1])].append(pos)
                 break
             possible_turns[(x_coord, pos[1])].append(pos)
 
@@ -234,11 +249,13 @@ def generate_turns_rook(pos, board, possible_turns, color):
             if board.get_type_map((pos[0], y_coord)) != board.empty_map:
                 if board.get_color_map((pos[0], y_coord)) != color:
                     possible_turns[(pos[0], y_coord)].append(pos)
+                else:
+                    turns_for_king[(pos[0], y_coord)].append(pos)
                 break
             possible_turns[(pos[0], y_coord)].append(pos)
 
 
-def generate_turns_bishop(pos, board, possible_turns, color):
+def generate_turns_bishop(pos, board, possible_turns, color, turns_for_king):
     """generate_turns_bishop(pos, board, possible_turns, color) -> None
 
     pos             -- figure position
@@ -260,12 +277,14 @@ def generate_turns_bishop(pos, board, possible_turns, color):
             if board.get_type_map(turn_end) != board.empty_map:
                 if board.get_color_map(turn_end) != color:
                     possible_turns[turn_end].append(pos)
+                else:
+                    turns_for_king[turn_end].append(pos)
                 break
 
             possible_turns[turn_end].append(pos)
 
 
-def generate_turns_queen(pos, board, possible_turns, color):
+def generate_turns_queen(pos, board, possible_turns, color, turns_for_king):
     """generate_turns_queen(pos, board, possible_turns, color) -> None
 
     pos             -- figure position
@@ -275,11 +294,11 @@ def generate_turns_queen(pos, board, possible_turns, color):
 
     Adds all turns for pawn in dict
     """
-    generate_turns_rook(pos, board, possible_turns, color)
-    generate_turns_bishop(pos, board, possible_turns, color)
+    generate_turns_rook(pos, board, possible_turns, color, turns_for_king)
+    generate_turns_bishop(pos, board, possible_turns, color, turns_for_king)
 
 
-def generate_turns_king(pos, board, possible_turns, color, opponent_turns):
+def generate_turns_king(pos, board, possible_turns, color, opponent_turns, opponent_turns_for_king):
     """generate_turns_king(pos, board, possible_turns, color) -> None
 
     pos             -- figure position
@@ -296,5 +315,5 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns):
         turn_end = mf.tuple_sum(pos, diff)
 
         if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color and
-                turn_end not in opponent_turns):
+                turn_end not in (opponent_turns, opponent_turns_for_king)):
             possible_turns[turn_end].append(pos)

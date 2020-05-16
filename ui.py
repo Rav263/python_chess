@@ -44,14 +44,17 @@ class Figure(QFrame):
         self.setStyle(self.style())
 
 class Cell(QFrame):
-    def __init__(self, x, y, figure_type, comm):
+    def __init__(self, x, y, figure_type, comm, color):
         super().__init__()
         self.comm = comm
         self.x = x
         self.y = y
         self.figure = Figure(figure_type)
         self.setProperty("pressed", "0")
-
+        if color == 1:
+            self.setProperty("color", "white")
+        else:
+            self.setProperty("color", "black")
         vbox = QVBoxLayout()
         vbox.addWidget(self.figure)
         self.setLayout(vbox)
@@ -95,10 +98,14 @@ class GuiBoard(QFrame):
         self.start = (0, 0)
         
         self.cells_arr = [list() for i  in range(8)]
+        cell_color = 1
         for x in range(8):
             for y in range(8):
-                self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.comm))
+                self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.comm, cell_color))
                 cells.addWidget(self.cells_arr[x][y], x, y)
+                cell_color *= -1
+            cell_color *= -1
+                
         self.setLayout(cells)
 
     def cell_released(self, x, y):
@@ -204,18 +211,18 @@ class MainContainer(QFrame):
 
         vbox = QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addWidget(border_up)
+        # vbox.addWidget(border_up)
         vbox.addWidget(inside)
-        vbox.addWidget(border_down)
+        # vbox.addWidget(border_down)
         vbox.addStretch(1)
         vbox.setSpacing(0)
         vbox.setContentsMargins(0, 0, 0, 0)
         
         hbox = QHBoxLayout()
         hbox.addStretch(1)
-        hbox.addWidget(border_left)
+        # hbox.addWidget(border_left)
         hbox.addLayout(vbox)
-        hbox.addWidget(border_right)
+        # hbox.addWidget(border_right)
         hbox.addStretch(1)
         hbox.setSpacing(0)
         hbox.setContentsMargins(0, 0, 0, 0)

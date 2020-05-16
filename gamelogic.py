@@ -113,7 +113,7 @@ class Logic:
 
         if check_check:
             king_pos = board.get_king_pos(color)
-            possible_turns = gt.remove_not_possible_turns(board, king_pos,
+            possible_turns = gt.remove_not_possible_turns(board, king_pos, color,
                                                           possible_turns, opponent_turns)
             return possible_turns
 

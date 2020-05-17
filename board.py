@@ -32,6 +32,11 @@ class Board:
             self.board_size = copy.board_size
             self.data = copy.data
 
+    def __str__(self):
+        return (f"king flags: {self.king_movement}\n" +
+                f"rook flags: {self.rook_movement}\n" +
+                f"castling flags: {self.castling}")
+
     def get_king_pos(self, color):
         """get_king_pos(self, color) -> tuple
 

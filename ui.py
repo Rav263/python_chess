@@ -43,6 +43,9 @@ class Figure(QFrame):
         self.setProperty("type", str(figure_type))
         self.setStyle(self.style())
 
+    def get_type(self):
+        return self.figure_type
+
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm, color):
         super().__init__()
@@ -68,6 +71,10 @@ class Cell(QFrame):
 
     def press(self):
         self.setProperty("pressed", "yes")
+        self.setStyle(self.style())
+
+    def beat(self):
+        self.setProperty("pressed", "beat")
         self.setStyle(self.style())
 
     def release(self):
@@ -120,12 +127,19 @@ class GuiBoard(QFrame):
                 self.cells_arr[x][y].press()
                 self.making_a_move = True
                 for field in self.possible_moves[(x, y)]:
-                    self.cells_arr[field[0]][field[1]].figure.set_type("possible")
+                    if not self.cells_arr[field[0]][field[1]].figure.get_type():
+                        self.cells_arr[field[0]][field[1]].figure.set_type("possible")
+                    else:
+                        self.cells_arr[field[0]][field[1]].beat()
+
             else:
                 self.cells_arr[self.start[0]][self.start[1]].release()
                 self.making_a_move = False
                 for field in self.possible_moves[self.start]:
-                    self.cells_arr[field[0]][field[1]].figure.set_type(0)
+                    if self.cells_arr[field[0]][field[1]].figure.get_type() == "possible":
+                        self.cells_arr[field[0]][field[1]].figure.set_type(0)
+                    else:
+                        self.cells_arr[field[0]][field[1]].release()
 
                 if ((x, y) in self.possible_moves[self.start]):
                     self.api.do_turn(self.start, (x, y))

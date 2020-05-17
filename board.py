@@ -17,11 +17,9 @@ class Board:
     white_pawn_start = 6
     black_pawn_start = 1
 
-    white_king_movement = False
-    black_king_movement = False
-
-    white_rook_movement = (False, False)
-    black_rook_movement = (False, False)
+    king_movement = ["костыль", False, False]
+    rook_movement = ["костыль", [False, False], [False, False]]
+    castling = ["костыль", False, False]
 
     def __init__(self, data, copy=None):
         if copy is None:
@@ -45,6 +43,34 @@ class Board:
                 return pos
         return (-1, -1)
 
+    def set_movement_flags(self, start_pos):
+        color = self.get_color_map(start_pos)
+        fig_type = self.get_type_map(start_pos)
+
+        flags = dict()
+
+        if fig_type == self.king and not self.king_movement[color]:
+            self.king_movement[color] = True
+            flags["king"] = color
+        if fig_type == self.rook:
+            if start_pos[1] == 0 and not self.rook_movement[color][0]:
+                self.rook_movement[color][0] = True
+                flags["left rook"] = color
+            if start_pos[1] == self.board_size - 1 and not self.rook_movement[color][1]:
+                self.rook_movement[color][1] = True
+                flags["right rook"] = color
+
+        return flags
+
+    def un_set_movement_flags(self, flags):
+        for flag in flags:
+            if flag == "king":
+                self.king_movement[flags[flag]] = False
+            if flag == "left rook":
+                self.rook_movement[flags[flag]][0] = False
+            if flag == "right rook":
+                self.rook_movement[flags[flag]][1] = False
+
     def do_turn(self, turn, fig=0):
         """do_turn(self, turn, fig) -> figure
 
@@ -56,9 +82,32 @@ class Board:
         """
         # print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
         # move figure
-        tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos), pawn=turn.pawn)
-        self.set_map(turn.start_pos, fig)
-        return tmp
+        if turn.castling:
+            self.castling[turn.color] = True
+            tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos[:2]))
+            self.set_map((turn.start_pos[0], turn.start_pos[1]), fig)
+            self.set_map(turn.start_pos[3], self.get_map(turn.start_pos[2]))
+            self.set_map(turn.start_pos[2], 0)
+            flags = dict()
+        else:
+            flags = self.set_movement_flags(turn.start_pos)
+            tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos), pawn=turn.pawn)
+            self.set_map(turn.start_pos, fig)
+        return (tmp, flags)
+
+    def un_do_turn(self, turn, fig, flags):
+        if turn.castling:
+            self.castling[turn.color] = False
+            self.set_map(turn.start_pos[:2], self.get_map(turn.end_pos))
+            self.set_map(turn.end_pos, 0)
+            self.set_map(turn.start_pos[2], self.get_map(turn.start_pos[3]))
+            self.set_map(turn.start_pos[3], 0)
+        else:
+            self.un_set_movement_flags(flags)
+            self.set_map(turn.start_pos, self.get_map(turn.end_pos))
+            if turn.pawn:
+                self.set_map(turn.start_pos, self.pawn + 10*turn.color)
+            self.set_map(turn.end_pos, fig)
 
     def copy(self):
         """copy(self) -> copyed Board object"""

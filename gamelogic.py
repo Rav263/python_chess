@@ -16,11 +16,12 @@ from board import Board
 
 class Turn:
     """Turn class for store chess turn"""
-    def __init__(self, start_pos, end_pos, color, pawn=0):
+    def __init__(self, start_pos, end_pos, color, pawn=0, castling=False):
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.color = color
         self.pawn = pawn
+        self.castling = castling
 
     def print(self):
         """print(self) -> None: prints Turn information"""
@@ -139,14 +140,16 @@ class Logic:
         for turn in turns:
             if len(turn[0]) == 3:
                 now_turn = Turn((turn[0][0], turn[0][1]), turn[1], color, pawn=turn[0][2])
+            elif len(turn[0]) == 4:
+                now_turn = Turn(turn[0], turn[1], color, castling=True)
             else:
                 now_turn = Turn(turn[0], turn[1], color)
 
-            tmp = board.do_turn(now_turn)
+            tmp, flags = board.do_turn(now_turn)
 
             now_cost = self.ai_turn(board, 3 - color, depth - 1)[1]
 
-            board.do_turn(Turn(turn[1], turn[0], color), fig=tmp)
+            board.un_do_turn(now_turn, tmp, flags)
 
             if now_cost >= best_cost:
                 best_cost = now_cost
@@ -220,17 +223,19 @@ class Logic:
             for start_pos in possible_turns[end_pos]:
                 if len(start_pos) == 3:
                     now_turn = Turn((start_pos[0], start_pos[1]), end_pos, color, start_pos[2])
+                elif len(start_pos) == 4:
+                    now_turn = Turn(start_pos, end_pos, color, castling=True)
                 else:
                     now_turn = Turn(start_pos, end_pos, color)
 
-                tmp = board.do_turn(now_turn)
+                tmp, flags = board.do_turn(now_turn)
 
                 if depth == 1:
                     now_cost = board.calculate_board_cost(self.figures_cost)
                 else:
                     now_cost = self.ai_turn(board, 3 - color, depth - 1, alpha, beta)[1]
 
-                board.do_turn(Turn(end_pos, start_pos, color), fig=tmp)
+                board.un_do_turn(now_turn, tmp, flags)
 
                 if color == board.black:
                     if now_cost >= best_cost:

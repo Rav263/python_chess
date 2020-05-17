@@ -451,3 +451,24 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
                     possible_turns[turn_end].append(pos)
             else:
                 possible_turns[turn_end].append(pos)
+
+    # check castling
+
+    positions = [1, 2, 3]
+    if board.castling[color]:
+        return None
+
+    if not board.king_movement[color] and not board.rook_movement[color][0]:
+        for x_coord in positions:
+            if board.get_type_map((pos[0], x_coord)) != board.empty_map:
+                break
+        else:
+            possible_turns[(pos[0], 2)].append((*pos, (pos[0], 0), (pos[0], 3)))
+
+    positions = [5, 6]
+    if not board.king_movement[color] and not board.rook_movement[color][1]:
+        for x_coord in positions:
+            if board.get_type_map((pos[0], x_coord)) != board.empty_map:
+                break
+        else:
+            possible_turns[(pos[0], 6)].append((*pos, (pos[0], 7), (pos[0], 5)))

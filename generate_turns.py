@@ -34,14 +34,18 @@ def process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
     if board.get_type_map(turn_end) != board.empty_map:
         if board.get_color_map(turn_end) != color and fig_pos == (-1, -1):
             return (True, fig_pos)
+
         if board.get_color_map(turn_end) != color and fig_pos != (-1, -1):
             tmp_list.append(turn_end)
+
             if board.get_type_map(turn_end) in good_figs:
                 beating_figures.append(turn_end)
+
                 if board.get_type_map(fig_pos) in good_figs:
                     possible_turns[fig_pos].extend(tmp_list)
                 else:
                     bad_figs.append(fig_pos)
+
             return (True, fig_pos)
         if fig_pos == (-1, -1):
             fig_pos = turn_end
@@ -141,7 +145,8 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
         start_turns[start_turn] = good_turns[start_turn]
 
     for start_turn in bad_figures:
-        start_turns.pop(start_turn)
+        if start_turn in start_turns:
+            start_turns.pop(start_turn)
 
     turns = transform_turns_dict(start_turns)
     if king_pos not in opponent_turns:
@@ -434,7 +439,6 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
 
     Adds all turns for pawn in dict
     """
-    start_opponent_turns = transform_turns_dict(opponent_turns_for_king)
 
     possible_diffs = product([1, -1, 0], repeat=2)
 
@@ -443,6 +447,11 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
 
         if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color and
                 turn_end not in opponent_turns):
+
+            if turn_end not in opponent_turns_for_king:
+                possible_turns[turn_end].append(pos)
+
+            """
             if turn_end in start_opponent_turns:
                 for now_pos in start_opponent_turns[turn_end]:
                     if now_pos in opponent_turns:
@@ -451,24 +460,34 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
                     possible_turns[turn_end].append(pos)
             else:
                 possible_turns[turn_end].append(pos)
-
+            """
     # check castling
 
     positions = [1, 2, 3]
+
+    if (pos[0] != 7 and color == board.white) or (pos[0] != 0 and color == board.black):
+        return None
+
     if board.castling[color]:
         return None
 
-    if not board.king_movement[color] and not board.rook_movement[color][0]:
-        for x_coord in positions:
-            if board.get_type_map((pos[0], x_coord)) != board.empty_map:
-                break
-        else:
-            possible_turns[(pos[0], 2)].append((*pos, (pos[0], 0), (pos[0], 3)))
+    left_rook, right_rook = (pos[0], 0), (pos[0], 7)
 
+    if not board.king_movement[color] and not board.rook_movement[color][0]:
+        if (board.get_type_map(left_rook) == board.rook and
+                board.get_color_map(left_rook) == color):
+            for x_coord in positions:
+                if board.get_type_map((pos[0], x_coord)) != board.empty_map:
+                    break
+            else:
+                possible_turns[(pos[0], 2)].append((*pos, (pos[0], 0), (pos[0], 3)))
     positions = [5, 6]
     if not board.king_movement[color] and not board.rook_movement[color][1]:
-        for x_coord in positions:
-            if board.get_type_map((pos[0], x_coord)) != board.empty_map:
-                break
-        else:
-            possible_turns[(pos[0], 6)].append((*pos, (pos[0], 7), (pos[0], 5)))
+        if (board.get_type_map(right_rook) == board.rook and
+                board.get_color_map(right_rook) == color):
+
+            for x_coord in positions:
+                if board.get_type_map((pos[0], x_coord)) != board.empty_map:
+                    break
+            else:
+                possible_turns[(pos[0], 6)].append((*pos, (pos[0], 7), (pos[0], 5)))

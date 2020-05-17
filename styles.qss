@@ -43,6 +43,15 @@ Cell[color="white"][pressed="yes"]{
     background-color: #e6ccab;
 }
 
+Cell[color="black"][pressed="beat"]{
+    border: 3px solid red;
+    background-color: #9a561b;
+}
+Cell[color="white"][pressed="beat"]{
+    border: 3px solid red;
+    background-color: #e6ccab;
+}
+
 Cell[color="black"]{
     background-color: #9a561b;
 }

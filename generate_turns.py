@@ -240,6 +240,13 @@ def positions_for_turns_block(board, list_of_start_pos, king_pos):
     return positions_for_block
 
 
+def add_pawn_transformation(start_pos, end_pos, possible_turns, color):
+    possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 2))
+    possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 3))
+    possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 4))
+    possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 6))
+
+
 def generate_turns_pawn(pos, board, possible_turns, turns_for_king):
     """generate_turns_pawn(pos, board, possible_turns) -> None
 
@@ -253,21 +260,31 @@ def generate_turns_pawn(pos, board, possible_turns, turns_for_king):
     if board.get_color_map(pos) == board.white:
         if (pos[0] == board.white_pawn_start and
                 board.get_type_map((pos[0] - 2, pos[1])) == board.empty_map):
-
             possible_turns[(pos[0] - 2, pos[1])].append(pos)
 
         if board.get_type_map((pos[0] - 1, pos[1])) == board.empty_map:
-            possible_turns[(pos[0] - 1, pos[1])].append(pos)
+            if not pos[0] - 1:
+                add_pawn_transformation(pos, (pos[0] - 1, pos[1]), possible_turns, board.white)
+            else:
+                possible_turns[(pos[0] - 1, pos[1])].append(pos)
 
         if board.get_type_map((pos[0] - 1, pos[1] - 1)) > board.empty_map:
             if board.get_color_map((pos[0] - 1, pos[1] - 1)) != board.white:
-                possible_turns[(pos[0] - 1, pos[1] - 1)].append(pos)
+                if not pos[0] - 1:
+                    add_pawn_transformation(pos, (pos[0] - 1, pos[1] - 1),
+                                            possible_turns, board.white)
+                else:
+                    possible_turns[(pos[0] - 1, pos[1] - 1)].append(pos)
             else:
                 turns_for_king[(pos[0] - 1, pos[1] - 1)].append(pos)
 
         if board.get_type_map((pos[0] - 1, pos[1] + 1)) > board.empty_map:
             if board.get_color_map((pos[0] - 1, pos[1] + 1)) != board.white:
-                possible_turns[(pos[0] - 1, pos[1] + 1)].append(pos)
+                if not pos[0] - 1:
+                    add_pawn_transformation(pos, (pos[0] - 1, pos[1] + 1),
+                                            possible_turns, board.white)
+                else:
+                    possible_turns[(pos[0] - 1, pos[1] + 1)].append(pos)
             else:
                 turns_for_king[(pos[0] - 1, pos[1] + 1)].append(pos)
 
@@ -278,17 +295,28 @@ def generate_turns_pawn(pos, board, possible_turns, turns_for_king):
             possible_turns[(pos[0] + 2, pos[1])].append(pos)
 
         if board.get_type_map((pos[0] + 1, pos[1])) == board.empty_map:
-            possible_turns[(pos[0] + 1, pos[1])].append(pos)
+            if pos[0] + 1 == board.board_size - 1:
+                add_pawn_transformation(pos, (pos[0] + 1, pos[1]), possible_turns, board.black)
+            else:
+                possible_turns[(pos[0] + 1, pos[1])].append(pos)
 
         if board.get_type_map((pos[0] + 1, pos[1] - 1)) > board.empty_map:
             if board.get_color_map((pos[0] + 1, pos[1] - 1)) != board.black:
-                possible_turns[(pos[0] + 1, pos[1] - 1)].append(pos)
+                if pos[0] + 1 == board.board_size - 1:
+                    add_pawn_transformation(pos, (pos[0] + 1, pos[1] - 1),
+                                            possible_turns, board.black)
+                else:
+                    possible_turns[(pos[0] + 1, pos[1] - 1)].append(pos)
             else:
                 turns_for_king[(pos[0] + 1, pos[1] - 1)].append(pos)
 
         if board.get_type_map((pos[0] + 1, pos[1] + 1)) > board.empty_map:
             if board.get_color_map((pos[0] + 1, pos[1] + 1)) != board.black:
-                possible_turns[(pos[0] + 1, pos[1] + 1)].append(pos)
+                if pos[0] + 1 == board.board_size - 1:
+                    add_pawn_transformation(pos, (pos[0] + 1, pos[1] + 1),
+                                            possible_turns, board.black)
+                else:
+                    possible_turns[(pos[0] + 1, pos[1] + 1)].append(pos)
             else:
                 turns_for_king[(pos[0] + 1, pos[1] + 1)].append(pos)
 

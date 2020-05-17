@@ -56,8 +56,7 @@ class Board:
         """
         # print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
         # move figure
-
-        tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos))
+        tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos), pawn=turn.pawn)
         self.set_map(turn.start_pos, fig)
         return tmp
 
@@ -116,10 +115,10 @@ class Board:
 
         return True
 
-    def set_map(self, pos, value):
+    def set_map(self, pos, value, pawn=0):
         """set_map(self, pos, value) -> Int(figure on position)"""
         tmp = self.board[pos[0]][pos[1]]
-        self.board[pos[0]][pos[1]] = value
+        self.board[pos[0]][pos[1]] = pawn if pawn else value
         return tmp
 
     def calculate_board_cost(self, figures_cost):

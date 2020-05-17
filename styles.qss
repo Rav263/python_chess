@@ -26,18 +26,30 @@ QFrame#border-down {
     border-image: url(images/down.jpg) 0 0 0 0 stretch stretch;
 }
 
-GuiBoard {
+/* GuiBoard {
+    background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
+} */
+
+MainMenu{
     background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
 }
 
-
-Cell[pressed="1"]{
+Cell[color="black"][pressed="1"]{
     border: 3px solid green;
+    background-color: #9a561b;
+}
+Cell[color="white"][pressed="1"]{
+    border: 3px solid green;
+    background-color: #e6ccab;
 }
 
-Cell{
-    border: 3px solid transparent;
+Cell[color="black"]{
+    background-color: #9a561b;
 }
+Cell[color="white"]{
+    background-color: #e6ccab;
+}
+
 
 Figure[type="11"]{
     border-image: url(images/merida/wP.png) 0 0 0 0 stretch stretch;

@@ -92,17 +92,37 @@ def get_turn(logic, color, board):
 
     while True:
         line = input("Please enter your turn: ").strip()
-        if len(line) != 5:
+        if len(line) not in (4, 5):
             print("Wrong format")
-            return get_turn(logic, color, board)
+            continue
 
         start_pos = (board.board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
-        end_pos = (board.board_size - int(line[4]), abs(ord(line[3]) - ord("a")))
+        end_pos = (board.board_size - int(line[3]), abs(ord(line[2]) - ord("a")))
 
-        now_turn = gamelogic.Turn(start_pos, end_pos, color)
+        if len(line) == 5:
+            figure = line[4]
+            fig_num = 0
+            if figure == "Q":
+                fig_num = board.queen
+            elif figure == "K":
+                fig_num = board.knight
+            elif figure == "R":
+                fig_num = board.rook
+            elif figure == "B":
+                fig_num = board.bishop
+            else:
+                continue
 
-        if end_pos in possible_turns and start_pos in possible_turns[end_pos]:
-            break
+            now_turn = gamelogic.Turn(start_pos, end_pos, color, pawn=(color*10+fig_num))
+
+            if end_pos in possible_turns:
+                if (*start_pos, now_turn.pawn) in possible_turns[end_pos]:
+                    break
+        else:
+            now_turn = gamelogic.Turn(start_pos, end_pos, color)
+
+            if end_pos in possible_turns and start_pos in possible_turns[end_pos]:
+                break
 
         print("Wrong Turn, try again")
 

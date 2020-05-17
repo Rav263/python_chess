@@ -50,7 +50,7 @@ class Cell(QFrame):
         self.x = x
         self.y = y
         self.figure = Figure(figure_type)
-        self.setProperty("pressed", "0")
+        self.setProperty("pressed", "NO")
         if color == 1:
             self.setProperty("color", "white")
         else:
@@ -67,11 +67,11 @@ class Cell(QFrame):
         self.comm.cellReleased.emit(self.x, self.y)
 
     def press(self):
-        self.setProperty("pressed", "1")
+        self.setProperty("pressed", "yes")
         self.setStyle(self.style())
 
     def release(self):
-        self.setProperty("pressed", "0")
+        self.setProperty("pressed", "no")
         self.setStyle(self.style())
         
 
@@ -120,12 +120,12 @@ class GuiBoard(QFrame):
                 self.cells_arr[x][y].press()
                 self.making_a_move = True
                 for field in self.possible_moves[(x, y)]:
-                    self.cells_arr[field[0]][field[1]].press()
+                    self.cells_arr[field[0]][field[1]].figure.set_type("possible")
             else:
                 self.cells_arr[self.start[0]][self.start[1]].release()
                 self.making_a_move = False
                 for field in self.possible_moves[self.start]:
-                    self.cells_arr[field[0]][field[1]].release()
+                    self.cells_arr[field[0]][field[1]].figure.set_type(0)
 
                 if ((x, y) in self.possible_moves[self.start]):
                     self.api.do_turn(self.start, (x, y))

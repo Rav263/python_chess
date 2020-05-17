@@ -34,11 +34,11 @@ MainMenu{
     background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
 }
 
-Cell[color="black"][pressed="1"]{
+Cell[color="black"][pressed="yes"]{
     border: 3px solid green;
     background-color: #9a561b;
 }
-Cell[color="white"][pressed="1"]{
+Cell[color="white"][pressed="yes"]{
     border: 3px solid green;
     background-color: #e6ccab;
 }
@@ -50,6 +50,11 @@ Cell[color="white"]{
     background-color: #e6ccab;
 }
 
+Figure[type="possible"]{
+    background-image: url(images/green_dot.png) 0 0 0 0 fixed fixed;
+    background-repeat:no-repeat;
+    background-position:center center;
+}
 
 Figure[type="11"]{
     border-image: url(images/merida/wP.png) 0 0 0 0 stretch stretch;

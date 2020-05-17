@@ -36,18 +36,18 @@ MainMenu{
 
 Cell[color="black"][pressed="1"]{
     border: 3px solid green;
-    background-color: brown;
+    background-color: #9a561b;
 }
 Cell[color="white"][pressed="1"]{
     border: 3px solid green;
-    background-color: white;
+    background-color: #e6ccab;
 }
 
 Cell[color="black"]{
-    background-color: brown;
+    background-color: #9a561b;
 }
 Cell[color="white"]{
-    background-color: white;
+    background-color: #e6ccab;
 }
 
 

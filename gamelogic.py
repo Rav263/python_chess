@@ -16,10 +16,11 @@ from board import Board
 
 class Turn:
     """Turn class for store chess turn"""
-    def __init__(self, start_pos, end_pos, color):
+    def __init__(self, start_pos, end_pos, color, pawn=0):
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.color = color
+        self.pawn = pawn
 
     def print(self):
         """print(self) -> None: prints Turn information"""
@@ -136,14 +137,20 @@ class Logic:
         best_turn = self.NULL_TURN
 
         for turn in turns:
-            tmp = board.do_turn(Turn(turn[0], turn[1], color))
+            if len(turn[0]) == 3:
+                now_turn = Turn((turn[0][0], turn[0][1]), turn[1], color, pawn=turn[0][2])
+            else:
+                now_turn = Turn(turn[0], turn[1], color)
+
+            tmp = board.do_turn(now_turn)
+
             now_cost = self.ai_turn(board, 3 - color, depth - 1)[1]
 
             board.do_turn(Turn(turn[1], turn[0], color), fig=tmp)
 
             if now_cost >= best_cost:
                 best_cost = now_cost
-                best_turn = Turn(turn[0], turn[1], color)
+                best_turn = now_turn
 
         return_dict[index] = (best_turn, best_cost)
 
@@ -211,7 +218,12 @@ class Logic:
 
         for end_pos in possible_turns:
             for start_pos in possible_turns[end_pos]:
-                tmp = board.do_turn(Turn(start_pos, end_pos, color))
+                if len(start_pos) == 3:
+                    now_turn = Turn((start_pos[0], start_pos[1]), end_pos, color, start_pos[2])
+                else:
+                    now_turn = Turn(start_pos, end_pos, color)
+
+                tmp = board.do_turn(now_turn)
 
                 if depth == 1:
                     now_cost = board.calculate_board_cost(self.figures_cost)
@@ -223,12 +235,12 @@ class Logic:
                 if color == board.black:
                     if now_cost >= best_cost:
                         best_cost = now_cost
-                        best_turn = Turn(start_pos, end_pos, color)
+                        best_turn = now_turn
                     alpha = max(alpha, best_cost)
                 else:
                     if now_cost <= best_cost:
                         best_cost = now_cost
-                        best_turn = Turn(start_pos, end_pos, color)
+                        best_turn = now_turn
                     beta = min(beta, best_cost)
 
                 if beta <= alpha:

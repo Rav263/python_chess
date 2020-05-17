@@ -98,13 +98,13 @@ class GuiBoard(QFrame):
         self.start = (0, 0)
         
         self.cells_arr = [list() for i  in range(8)]
-        cell_color = 1
+        cell_color = api.board.white
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.comm, cell_color))
                 cells.addWidget(self.cells_arr[x][y], x, y)
-                cell_color *= -1
-            cell_color *= -1
+                cell_color = 3 - cell_color
+            cell_color = 3 - cell_color
                 
         self.setLayout(cells)
 

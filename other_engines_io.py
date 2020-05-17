@@ -43,17 +43,49 @@ class Stockfish:
 
         self.do_command("position startpos moves " + " ".join(self.history))
 
-    def get_turn(self, board_size, color):
+    def check_diff(self, start_pos, end_pos):
+        return abs(start_pos[1] - end_pos[1]) > 1
+    
+    def get_turn(self, board, color):
         """get_turn(self, board, color) -> Turn"""
         while self.process_queu.empty():
             pass
 
-        now_turn = self.process_queu.get()
+        board_size = board.board_size
 
-        start_pos = (board_size - int(now_turn[1]), abs(ord(now_turn[0]) - ord("a")))
-        end_pos = (board_size - int(now_turn[3]), abs(ord(now_turn[2]) - ord("a")))
+        line = self.process_queu.get()
 
-        return Turn(start_pos, end_pos, color)
+        start_pos = (board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
+        end_pos = (board_size - int(line[3]), abs(ord(line[2]) - ord("a")))
+        
+        if len(line) == 5:
+            figure = line[4]
+            fig_num = 0
+            if figure == "q":
+                fig_num = board.queen
+            elif figure == "k":
+                fig_num = board.knight
+            elif figure == "r":
+                fig_num = board.rook
+            elif figure == "b":
+                fig_num = board.bishop
+            else:
+                print('BAD TURN')
+            now_turn = Turn(start_pos, end_pos, color, pawn=(color*10+fig_num))
+
+        else:
+            if board.get_king_pos(color) == start_pos and self.check_diff(start_pos, end_pos):
+                print(start_pos, end_pos)
+                if start_pos[1] > end_pos[1]:
+                    start_pos = (*start_pos, (start_pos[0], 0), (start_pos[0], 3))
+                else:
+                    start_pos = (*start_pos, (start_pos[0], 7), (start_pos[0], 5))
+
+                now_turn = Turn(start_pos, end_pos, color, castling=True)
+            else:
+                now_turn = Turn(start_pos, end_pos, color)
+
+        return now_turn
 
     def do_command(self, command):
         """do_command(self, command) -> None"""

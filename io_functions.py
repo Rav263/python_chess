@@ -83,6 +83,10 @@ def print_board(board, data):
     print()
 
 
+def check_diff(start_pos, end_pos):
+    return abs(start_pos[1] - end_pos[1]) > 1
+
+
 def get_turn(logic, color, board):
     """get_turn(logic, color, board) -> Turn
 
@@ -119,7 +123,17 @@ def get_turn(logic, color, board):
                 if (*start_pos, now_turn.pawn) in possible_turns[end_pos]:
                     break
         else:
-            now_turn = gamelogic.Turn(start_pos, end_pos, color)
+            if board.get_king_pos(color) == start_pos and check_diff(start_pos, end_pos):
+                print(start_pos, end_pos)
+                if start_pos[1] > end_pos[1]:
+                    start_pos = (*start_pos, (start_pos[0], 0), (start_pos[0], 3))
+                else:
+                    start_pos = (*start_pos, (start_pos[0], 7), (start_pos[0], 5))
+
+                print(start_pos, possible_turns[end_pos])
+                now_turn = gamelogic.Turn(start_pos, end_pos, color, castling=True)
+            else:
+                now_turn = gamelogic.Turn(start_pos, end_pos, color)
 
             if end_pos in possible_turns and start_pos in possible_turns[end_pos]:
                 break

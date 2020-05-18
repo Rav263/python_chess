@@ -30,7 +30,13 @@ class Turn:
 
     def __str__(self):
         return ("start pos: ({0}, {1})\n".format(*self.start_pos) +
-                "end pos:   ({0}, {1})".format(*self.end_pos))
+                "end pos:   ({0}, {1})\n".format(*self.end_pos) +
+                f"color:      {self.color}")
+
+    def __eq__(self, second):
+        return (self.start_pos == self.start_pos and self.end_pos == second.end_pos and
+                self.color == second.color and self.pawn == second.pawn and
+                self.castling == second.castling)
 
 
 class Logic:
@@ -56,6 +62,10 @@ class Logic:
             io_functions.print_board(board.board, data)
             now_turn = io_functions.get_turn(self, color, board)
 
+            if now_turn == self.NULL_TURN:
+                print("CHECK MATE! YOU LOSE!")
+                break
+
             board.do_turn(now_turn)
 
             color = 3 - color
@@ -63,6 +73,11 @@ class Logic:
             print(board.calculate_board_cost(self.figures_cost))
 
             now_turn = self.root_ai_turn(board, color, difficulty)[0]
+
+            if now_turn == self.NULL_TURN:
+                print("CHECK MATE! YOU WIN!")
+                break
+
             board.do_turn(now_turn)
 
             color = 3 - color
@@ -172,7 +187,7 @@ class Logic:
         return_dict = manager.dict()
 
         possible_turns = self.generate_all_possible_turns(board, color)
-
+        
         turns = []
         threads = []
 
@@ -182,6 +197,9 @@ class Logic:
 
         num_of_turns = len(turns) // self.av_threads + 1
         num_of_threads = len(turns) // num_of_turns + 1
+
+        if len(turns) < self.av_threads:
+            num_of_threads = 1
 
         for i in range(num_of_threads):
             now_board = Board(None, board)
@@ -198,7 +216,6 @@ class Logic:
 
         for thread in threads:
             thread.join()
-
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, alpha=MIN_COST, beta=MAX_COST):

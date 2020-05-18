@@ -44,6 +44,7 @@ class Logic:
     MAX_COST = 9999
     MIN_COST = -9999
     NULL_TURN = Turn((-1, -1), (-1, -1), 0)
+    turn_history = list()
 
     def __init__(self, data, num_threads):
         print("Init game logic class")
@@ -81,6 +82,14 @@ class Logic:
             board.do_turn(now_turn)
 
             color = 3 - color
+
+    def add_turn_to_history(self, now_turn):
+        """adds turn for history"""
+        self.turn_history.append(now_turn)
+
+    def get_turn_from_history(self, index):
+        """returns turn from history"""
+        return self.turn_history[index]
 
     def generate_all_possible_turns(self, board, color, check_check=True):
         """generate_all_possible_turns(self, board, color) -> dict
@@ -191,7 +200,7 @@ class Logic:
         return_dict = manager.dict()
 
         possible_turns = self.generate_all_possible_turns(board, color)
-        
+
         turns = []
         threads = []
 

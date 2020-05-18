@@ -31,7 +31,7 @@ class Api:
 
         for end_pos in possible_turns:
             for start_pos in possible_turns[end_pos]:
-                turns[start_pos].append(end_pos)
+                turns[start_pos[:2]].append(end_pos[:2])
 
         return turns
 
@@ -57,6 +57,8 @@ class Api:
         castling -- flag if turn is castling
         """
 
+        color = self.board.get_color_map(start)
+
         if self.turn_index != len(self.logic.turn_history):
             self.logic.turn_history = self.logic.turn_history[:self.turn_index]
 
@@ -66,7 +68,7 @@ class Api:
             else:
                 start = (*start, (start[0], 7), (start[0], 5))
 
-        now_turn = Turn(start, end, self.board.get_color_map(start), pawn, castling)
+        now_turn = Turn(start, end, color, color * 10 + pawn, castling)
         tmp, flags = self.board.do_turn(now_turn)
 
         self.logic.add_turn_to_history((now_turn, tmp, flags))

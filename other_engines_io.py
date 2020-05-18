@@ -32,12 +32,28 @@ class Stockfish:
             decoded_line = now_line.decode("utf-8")
             if "bestmove" in decoded_line:
                 print(decoded_line)
-                self.process_queu.put(decoded_line.split()[1])
+                try:
+                    self.process_queu.put(decoded_line.split()[1])
+                except NameError:
+                    break
+
+    def end_game(self):
+        del(self.process_queu)
+        self.stockfish_thread.join()
 
     def do_turn(self, turn, board_size):
         """do_turn(self, turn, board_size) -> None"""
         start_pos = chr(turn.start_pos[1] + ord('a')) + str(board_size - turn.start_pos[0])
         end_pos = chr(turn.end_pos[1] + ord('a')) + str(board_size - turn.end_pos[0])
+        
+        if turn.pawn % 10 == 2:
+            end_pos += "n"
+        elif turn.pawn % 10 == 3:
+            end_pos += "b"
+        elif turn.pawn % 10 == 4:
+            end_pos += "r"
+        elif turn.pawn % 10 == 6:
+            end_pos += "q"
 
         self.history.append(start_pos + end_pos)
 
@@ -54,6 +70,8 @@ class Stockfish:
         board_size = board.board_size
 
         line = self.process_queu.get()
+        if line == "(none)":
+            return Turn((-1, -1), (-1, -1), 0)
 
         start_pos = (board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
         end_pos = (board_size - int(line[3]), abs(ord(line[2]) - ord("a")))
@@ -63,7 +81,7 @@ class Stockfish:
             fig_num = 0
             if figure == "q":
                 fig_num = board.queen
-            elif figure == "k":
+            elif figure == "n":
                 fig_num = board.knight
             elif figure == "r":
                 fig_num = board.rook

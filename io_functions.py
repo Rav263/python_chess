@@ -29,13 +29,22 @@ class Data:
                     tmp.append([int(i) for i in tmp_str.strip().split()])
                 self.data["BOARD"] = tmp
 
+            if i.strip() == "BOARD_DEBUG":
+                tmp = []
+                for j in range(self.board_size):
+                    tmp_str = file.readline()
+                    tmp.append([self.data["FIGURES_DEBUG"][i] for i in tmp_str.strip().split()])
+                self.data["BOARD"] = tmp
+
             if i.strip() == "FIGURES":
                 tmp = dict()
+                debug_tmp = dict()
                 for j in range(13):
                     tmp_str = file.readline().split()
                     tmp[int(tmp_str[0])] = tmp_str[1]
+                    debug_tmp[tmp_str[1]] = int(tmp_str[0])
                 self.data["FIGURES"] = tmp
-
+                self.data["FIGURES_DEBUG"] = debug_tmp
             if i.strip() == "BOARD_SIZE":
                 self.board_size = int(file.readline().strip())
 
@@ -93,6 +102,9 @@ def get_turn(logic, color, board):
     Get turn from user
     """
     possible_turns = logic.generate_all_possible_turns(board, color)
+
+    if len(possible_turns) == 0:
+        return logic.NULL_TURN
 
     while True:
         line = input("Please enter your turn: ").strip()

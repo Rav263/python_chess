@@ -165,10 +165,14 @@ class Logic:
             now_cost = self.ai_turn(board, 3 - color, depth - 1)[1]
 
             board.un_do_turn(now_turn, tmp, flags)
-
-            if now_cost >= best_cost:
-                best_cost = now_cost
-                best_turn = now_turn
+            if color == board.black:
+                if now_cost >= best_cost:
+                    best_cost = now_cost
+                    best_turn = now_turn
+            else:
+                if now_cost <= best_cost:
+                    best_cost = now_cost
+                    best_turn = now_turn
 
         return_dict[index] = (best_turn, best_cost)
 
@@ -216,7 +220,9 @@ class Logic:
 
         for thread in threads:
             thread.join()
-        return max(return_dict.values(), key=lambda x: x[1])
+        if color == board.black:
+            return max(return_dict.values(), key=lambda x: x[1])
+        return min(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, alpha=MIN_COST, beta=MAX_COST):
         """root_ai_turn(self, board, color, depth) -> tuple

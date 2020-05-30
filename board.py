@@ -94,6 +94,12 @@ class Board:
             self.set_map(turn.start_pos[3], self.get_map(turn.start_pos[2]))
             self.set_map(turn.start_pos[2], 0)
             flags = dict()
+        elif turn.passant:
+            diff = turn.end_pos[1] - turn.start_pos[1]
+            tmp = self.set_map((turn.start_pos[0], turn.start_pos[1] + diff), 0)
+            flags = self.set_movement_flags(turn.start_pos)
+            self.set_map(turn.end_pos, self.get_map(turn.start_pos), pawn=turn.pawn)
+            self.set_map(turn.start_pos, 0)
         else:
             flags = self.set_movement_flags(turn.start_pos)
             tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos), pawn=turn.pawn)
@@ -107,6 +113,12 @@ class Board:
             self.set_map(turn.end_pos, 0)
             self.set_map(turn.start_pos[2], self.get_map(turn.start_pos[3]))
             self.set_map(turn.start_pos[3], 0)
+        elif turn.passant:
+            self.un_set_movement_flags(flags)
+            diff = turn.end_pos[1] - turn.start_pos[1]
+            self.set_map((turn.start_pos[0], turn.start_pos[1] + diff), fig)
+            self.set_map(turn.start_pos, self.get_map(turn.end_pos))
+            self.set_map(turn.end_pos, 0)
         else:
             self.un_set_movement_flags(flags)
             self.set_map(turn.start_pos, self.get_map(turn.end_pos))

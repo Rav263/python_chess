@@ -16,12 +16,13 @@ from board import Board
 
 class Turn:
     """Turn class for store chess turn"""
-    def __init__(self, start_pos, end_pos, color, pawn=0, castling=False):
+    def __init__(self, start_pos, end_pos, color, pawn=0, castling=False, passant=False):
         self.start_pos = start_pos
         self.end_pos = end_pos
         self.color = color
         self.pawn = pawn
         self.castling = castling
+        self.passant = passant
 
     def print(self):
         """print(self) -> None: prints Turn information"""
@@ -58,29 +59,30 @@ class Logic:
         """
 
         color = 1
-
+        last_turn = self.NULL_TURN
         while True:
             io_functions.print_board(board.board, data)
-            now_turn = io_functions.get_turn(self, color, board)
-
+            now_turn = io_functions.get_turn(self, color, board, last_turn)
+            print(now_turn)
             if now_turn == self.NULL_TURN:
                 print("CHECK MATE! YOU LOSE!")
                 break
 
             board.do_turn(now_turn)
+            last_turn = now_turn
 
             color = 3 - color
 
             print(board.calculate_board_cost(self.figures_cost))
 
-            now_turn = self.root_ai_turn(board, color, difficulty)[0]
+            now_turn = self.root_ai_turn(board, color, difficulty, last_turn)[0]
 
             if now_turn == self.NULL_TURN:
                 print("CHECK MATE! YOU WIN!")
                 break
 
             board.do_turn(now_turn)
-
+            last_turn = now_turn
             color = 3 - color
 
     def add_turn_to_history(self, now_turn):
@@ -91,7 +93,7 @@ class Logic:
         """returns turn from history"""
         return self.turn_history[index]
 
-    def generate_all_possible_turns(self, board, color, check_check=True):
+    def generate_all_possible_turns(self, board, color, last_turn, check_check=True):
         """generate_all_possible_turns(self, board, color) -> dict
 
         self  -- class Logic object
@@ -105,7 +107,8 @@ class Logic:
 
         if check_check:
             opponent_turns, opponent_turns_for_king = (
-                self.generate_all_possible_turns(board, 3 - color, check_check=False))
+                self.generate_all_possible_turns(board, 3 - color, self.NULL_TURN,
+                                                 check_check=False))
 
         possible_turns = defaultdict(list)
         turns_for_king = defaultdict(list)
@@ -136,6 +139,7 @@ class Logic:
                     else:
                         gt.generate_turns_king(pos, board, possible_turns, color,
                                                defaultdict(list), defaultdict(list))
+        gt.check_de_passant(board, possible_turns, last_turn, color)
 
         if check_check:
             king_pos = board.get_king_pos(color)
@@ -163,15 +167,17 @@ class Logic:
 
         for turn in turns:
             if len(turn[0]) == 3:
-                now_turn = Turn((turn[0][0], turn[0][1]), turn[1], color, pawn=turn[0][2])
+                now_turn = Turn(turn[0][:2], turn[1], color, pawn=turn[0][2])
             elif len(turn[0]) == 4:
                 now_turn = Turn(turn[0], turn[1], color, castling=True)
+            elif len(turn[1]) == 3:
+                now_turn = Turn(turn[0], turn[1][:2], color, passant=True)
             else:
                 now_turn = Turn(turn[0], turn[1], color)
 
             tmp, flags = board.do_turn(now_turn)
 
-            now_cost = self.ai_turn(board, 3 - color, depth - 1)[1]
+            now_cost = self.ai_turn(board, 3 - color, depth - 1, now_turn)[1]
 
             board.un_do_turn(now_turn, tmp, flags)
             if color == board.black:
@@ -185,7 +191,7 @@ class Logic:
 
         return_dict[index] = (best_turn, best_cost)
 
-    def root_ai_turn(self, board, color, depth):
+    def root_ai_turn(self, board, color, depth, last_turn):
         """root_ai_turn(self, board, color, depth) -> tuple
 
         self  -- class Logic object
@@ -199,7 +205,7 @@ class Logic:
         manager = Manager()
         return_dict = manager.dict()
 
-        possible_turns = self.generate_all_possible_turns(board, color)
+        possible_turns = self.generate_all_possible_turns(board, color, last_turn)
 
         turns = []
         threads = []
@@ -233,7 +239,7 @@ class Logic:
             return max(return_dict.values(), key=lambda x: x[1])
         return min(return_dict.values(), key=lambda x: x[1])
 
-    def ai_turn(self, board, color, depth, alpha=MIN_COST, beta=MAX_COST):
+    def ai_turn(self, board, color, depth, last_turn, alpha=MIN_COST, beta=MAX_COST):
         """root_ai_turn(self, board, color, depth) -> tuple
 
         self  -- class Logic object
@@ -246,7 +252,7 @@ class Logic:
         return tuple of best_turn and it cost
         """
 
-        possible_turns = self.generate_all_possible_turns(board, color)
+        possible_turns = self.generate_all_possible_turns(board, color, last_turn)
 
         best_cost = self.MIN_COST if color == board.black else self.MAX_COST
         best_turn = self.NULL_TURN
@@ -257,6 +263,8 @@ class Logic:
                     now_turn = Turn((start_pos[0], start_pos[1]), end_pos, color, start_pos[2])
                 elif len(start_pos) == 4:
                     now_turn = Turn(start_pos, end_pos, color, castling=True)
+                elif len(end_pos) == 3:
+                    now_turn = Turn(start_pos, end_pos[:2], color, passant=True)
                 else:
                     now_turn = Turn(start_pos, end_pos, color)
 
@@ -265,7 +273,7 @@ class Logic:
                 if depth == 1:
                     now_cost = board.calculate_board_cost(self.figures_cost)
                 else:
-                    now_cost = self.ai_turn(board, 3 - color, depth - 1, alpha, beta)[1]
+                    now_cost = self.ai_turn(board, 3 - color, depth - 1, now_turn, alpha, beta)[1]
 
                 board.un_do_turn(now_turn, tmp, flags)
 

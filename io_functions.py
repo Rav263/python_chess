@@ -96,12 +96,12 @@ def check_diff(start_pos, end_pos):
     return abs(start_pos[1] - end_pos[1]) > 1
 
 
-def get_turn(logic, color, board):
+def get_turn(logic, color, board, last_turn):
     """get_turn(logic, color, board) -> Turn
 
     Get turn from user
     """
-    possible_turns = logic.generate_all_possible_turns(board, color)
+    possible_turns = logic.generate_all_possible_turns(board, color, last_turn)
 
     if len(possible_turns) == 0:
         return logic.NULL_TURN
@@ -144,6 +144,9 @@ def get_turn(logic, color, board):
 
                 print(start_pos, possible_turns[end_pos])
                 now_turn = gamelogic.Turn(start_pos, end_pos, color, castling=True)
+            elif board.get_type_map(start_pos) == board.pawn and board.get_type_map(end_pos) == board.empty_map and abs(start_pos[1] - end_pos[1]) == 1:
+                now_turn = gamelogic.Turn(start_pos, end_pos, color, passant=True)
+                end_pos = (*end_pos, True)
             else:
                 now_turn = gamelogic.Turn(start_pos, end_pos, color)
 

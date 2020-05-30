@@ -74,9 +74,9 @@ class Api:
         self.logic.add_turn_to_history((now_turn, tmp, flags))
         self.turn_index += 1
 
-    def ai_turn(self, color):
+    def ai_turn(self, color, last_turn):
         """ai do turn with color"""
-        now_turn = self.logic.root_ai_turn(self.board, color, self.difficulty)[0]
+        now_turn = self.logic.root_ai_turn(self.board, color, self.difficulty, last_turn)[0]
         tmp, flags = self.board.do_turn(now_turn)
 
         self.logic.add_turn_to_history((now_turn, tmp, flags))

@@ -12,6 +12,7 @@ def main(api, num_threads):
     io_functions.print_board(api.board.board, api.data)
  
     color = 1
+    last_turn = api.logic.NULL_TURN
 
     while True:
         if color_ai != color:
@@ -22,17 +23,17 @@ def main(api, num_threads):
                 stockfish.do_command("quit")
                 stockfish.end_game()
                 break
-
+            last_turn = turn
             print("stockfish turn:")
             print(turn)
             api.board.do_turn(turn)
             stockfish.do_turn(turn, api.board.board_size)
-
+            stockfish.get_eval()
             io_functions.print_board(api.board.board, api.data)
 
             color = 3 - color
         if color_ai == color:
-            turn = api.ai_turn(color)
+            turn = api.ai_turn(color, last_turn)
 
             if turn == api.logic.NULL_TURN:
                 print("CHECK MATE! AI LOSE!")
@@ -43,6 +44,7 @@ def main(api, num_threads):
             print("AI turn:")
             print(turn)
             stockfish.do_turn(turn, api.board.board_size)
+            stockfish.get_eval()
 
             io_functions.print_board(api.board.board, api.data)
             color = 3 - color

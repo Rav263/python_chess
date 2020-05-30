@@ -30,6 +30,12 @@ class Stockfish:
         while True:
             now_line = self.process.stdout.readline()
             decoded_line = now_line.decode("utf-8")
+            if "evaluation" in decoded_line:
+                print(decoded_line)
+                try:
+                    self.process_queu.put(decoded_line.split()[2])
+                except NameError:
+                    break
             if "bestmove" in decoded_line:
                 print(decoded_line)
                 try:
@@ -61,7 +67,13 @@ class Stockfish:
 
     def check_diff(self, start_pos, end_pos):
         return abs(start_pos[1] - end_pos[1]) > 1
-    
+
+    def get_eval(self):
+        self.do_command("eval")
+        while self.process_queu.empty():
+            pass
+        return self.process_queu.get()
+
     def get_turn(self, board, color):
         """get_turn(self, board, color) -> Turn"""
         while self.process_queu.empty():
@@ -100,6 +112,8 @@ class Stockfish:
                     start_pos = (*start_pos, (start_pos[0], 7), (start_pos[0], 5))
 
                 now_turn = Turn(start_pos, end_pos, color, castling=True)
+            elif board.get_type_map(start_pos) == board.pawn and board.get_type_map(end_pos) == board.empty_map and abs(start_pos[1] - end_pos[1]) == 1:
+                now_turn = Turn(start_pos, end_pos, color, passant=True)
             else:
                 now_turn = Turn(start_pos, end_pos, color)
 

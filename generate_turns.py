@@ -246,6 +246,25 @@ def add_pawn_transformation(start_pos, end_pos, possible_turns, color):
     possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 6))
 
 
+def check_de_passant(board, possible_turns, last_turn, color):
+    if board.get_type_map(last_turn.end_pos) != board.pawn:
+        return None
+
+    if abs(last_turn.start_pos[0] - last_turn.end_pos[0]) != 2:
+        return None
+
+    pos_1 = (last_turn.end_pos[0], last_turn.end_pos[1] - 1)
+    pos_2 = (last_turn.end_pos[0], last_turn.end_pos[1] + 1)
+
+    color_diff = -1 if color == 1 else 1
+
+    if board.get_type_map(pos_1) == board.pawn and board.get_color_map(pos_1) == color:
+        possible_turns[(pos_1[0] + color_diff, pos_1[1] + 1, True)].append(pos_1)
+
+    if board.get_type_map(pos_2) == board.pawn and board.get_color_map(pos_2) == color:
+        possible_turns[(pos_2[0] + color_diff, pos_2[1] - 1, True)].append(pos_2)
+
+
 def generate_turns_pawn(pos, board, possible_turns, turns_for_king):
     """generate_turns_pawn(pos, board, possible_turns) -> None
 

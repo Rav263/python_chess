@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, 
-    QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy)
+    QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy, QDialog)
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QMimeData, Qt
 from PyQt5.QtGui import QDrag, QPixmap
@@ -34,6 +34,7 @@ class Communicate(QObject):
     cellPressed = pyqtSignal(int, int)
     cellReleased = pyqtSignal(int, int)
     figureMoved = pyqtSignal(int, int)
+
 
 class Figure(QFrame):
     def __init__(self, figure_type, comm):
@@ -187,15 +188,46 @@ class GuiBoard(QFrame):
                     self.cells_arr[field[0]][field[1]].release()
 
                 if self.check_move(x, y):
-                    self.api.do_turn(self.start, (x, y))
+                    if self.cells_arr[self.start[0]][self.start[1]].figure.figure_type % 10 == 1 and x in (0, 7):
+                        self.api.do_turn(self.start, (x, y), self.promotion())
+                    else:
+                        self.api.do_turn(self.start, (x, y))
                     self.make_turn(self.start, (x, y))
                     self.change_color()
                     self.ai_do_turn = True
 
-    def make_turn(self, start, stop):
+    def make_turn(self, start, stop, promotion = -1):
         self.cells_arr[start[0]][start[1]].figure.set_type(0)
         self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
 
+    def promotion(self):
+        figures = []
+        figures.append(QPushButton("Knight"))
+        figures.append(QPushButton("Bishop"))
+        figures.append(QPushButton("Rook"))
+        figures.append(QPushButton("Queen"))
+
+        prom_dialog = QDialog()
+        for num, figure in enumerate(figures):
+            figure.clicked.connect(self.make_answer_button(num + 2, prom_dialog))
+        prom_dialog.setWindowTitle("Choose figure:")
+        
+        hbox = QHBoxLayout(prom_dialog)
+        hbox.addStretch(1)
+        for figure in figures:
+            hbox.addWidget(figure)
+        hbox.addStretch(1)
+        hbox.setSpacing(0)
+        hbox.setContentsMargins(0, 0, 0, 0)
+        prom_dialog.setLayout(hbox)
+
+        choice = prom_dialog.exec_()
+        return choice if choice in (2, 3, 4) else 6 
+
+    def make_answer_button(self, figure, dialog):
+        def answer():
+            dialog.done(figure)
+        return answer
 
     def upd_board(self):
         print("ai is going to make a turn")
@@ -257,7 +289,8 @@ class MainContainer(QFrame):
         super().__init__()
         vbox = QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addWidget(inside)
+        for cont in inside:
+            vbox.addWidget(cont)
         vbox.addStretch(1)
         vbox.setSpacing(0)
         vbox.setContentsMargins(0, 0, 0, 0)
@@ -279,9 +312,8 @@ class Main_Window(QWidget):
         self.board = GuiBoard(api)
         self.menu = MainMenu()
         self.board.upd_possible_moves(self.board.color)
-
-        self.game_board = MainContainer(self.board)
-        self.main_menu = MainContainer(self.menu)
+        self.game_board = MainContainer([self.board])
+        self.main_menu = MainContainer([self.menu])
         self.game_board.hide()
 
         

@@ -1,5 +1,6 @@
 """Board class file"""
 from itertools import product
+import subprocess
 
 
 class Board:
@@ -187,6 +188,24 @@ class Board:
         self.board[pos[0]][pos[1]] = pawn if pawn else value
         return tmp
 
+    def generate_fen(self, fen_dict):
+        fen = ""
+        for index, now_line in enumerate(self.board):
+            counter = 0
+            for now_fig in now_line:
+                if now_fig == 0:
+                    counter += 1
+                    continue
+                if counter:
+                    fen += str(counter)
+                    counter = 0
+                fen += fen_dict[now_fig]
+            if counter:
+                fen += str(counter)
+            if index != self.board_size - 1:
+                fen += "/"
+        return fen
+
     def calculate_board_cost(self, figures_cost):
         """calculate_board_cost(self, color, figures_cost) - Int(sum of figures)"""
         summ = 0  # figures_cost["sum"]
@@ -194,3 +213,9 @@ class Board:
             summ += figures_cost[self.get_map(pos)]
 
         return summ
+
+        """
+        fen = self.generate_fen(self.data.data["FEN"])
+
+        return -float(subprocess.getoutput("./stockfish " + fen + " eval").split()[-3])
+        """

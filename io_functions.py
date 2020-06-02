@@ -45,6 +45,13 @@ class Data:
                     debug_tmp[tmp_str[1]] = int(tmp_str[0])
                 self.data["FIGURES"] = tmp
                 self.data["FIGURES_DEBUG"] = debug_tmp
+            if i.strip() == "FEN":
+                tmp = dict()
+                for j in range(13):
+                    tmp_str = file.readline().split()
+                    tmp[int(tmp_str[0])] = tmp_str[1]
+                    debug_tmp[tmp_str[1]] = int(tmp_str[0])
+                self.data["FEN"] = tmp
             if i.strip() == "BOARD_SIZE":
                 self.board_size = int(file.readline().strip())
 

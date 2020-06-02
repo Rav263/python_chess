@@ -5,6 +5,7 @@ from board import Board
 from gamelogic import Logic
 from gamelogic import Turn
 from io_functions import Data
+from evaluate import Evaluate
 
 
 class Api:
@@ -14,9 +15,11 @@ class Api:
         # Here we need to init Field and Game logic
         self.data = Data("data.dat")
         self.board = Board(self.data)
-        self.logic = Logic(self.data, threads)
+        self.evaluate = Evaluate("eval_coofs.dat")
+        self.logic = Logic(self.data, threads, self.evaluate)
         self.difficulty = difficulty
         self.turn_index = 0
+        print(self.evaluate.evaluate_board_mg(self.board, 1))
         # Then we need start game
 
     def start_cmd(self):

@@ -1,8 +1,6 @@
 """Modeue for IO functions"""
 import sys
-
-
-import gamelogic
+from moves import Moves, Turn
 
 
 class Data:
@@ -103,15 +101,15 @@ def check_diff(start_pos, end_pos):
     return abs(start_pos[1] - end_pos[1]) > 1
 
 
-def get_turn(logic, color, board, last_turn):
+def get_turn(moves, color, board, last_turn):
     """get_turn(logic, color, board) -> Turn
 
     Get turn from user
     """
-    possible_turns = logic.generate_all_possible_turns(board, color, last_turn)
+    possible_turns = moves.generate_all_possible_turns(board, color, last_turn)
 
     if len(possible_turns) == 0:
-        return logic.NULL_TURN
+        return moves.NULL_TURN
 
     while True:
         line = input("Please enter your turn: ").strip()
@@ -136,7 +134,7 @@ def get_turn(logic, color, board, last_turn):
             else:
                 continue
 
-            now_turn = gamelogic.Turn(start_pos, end_pos, color, pawn=(color*10+fig_num))
+            now_turn = Turn(start_pos, end_pos, color, pawn=(color*10+fig_num))
 
             if end_pos in possible_turns:
                 if (*start_pos, now_turn.pawn) in possible_turns[end_pos]:
@@ -150,12 +148,12 @@ def get_turn(logic, color, board, last_turn):
                     start_pos = (*start_pos, (start_pos[0], 7), (start_pos[0], 5))
 
                 print(start_pos, possible_turns[end_pos])
-                now_turn = gamelogic.Turn(start_pos, end_pos, color, castling=True)
+                now_turn = Turn(start_pos, end_pos, color, castling=True)
             elif board.get_type_map(start_pos) == board.pawn and board.get_type_map(end_pos) == board.empty_map and abs(start_pos[1] - end_pos[1]) == 1:
-                now_turn = gamelogic.Turn(start_pos, end_pos, color, passant=True)
+                now_turn = Turn(start_pos, end_pos, color, passant=True)
                 end_pos = (*end_pos, True)
             else:
-                now_turn = gamelogic.Turn(start_pos, end_pos, color)
+                now_turn = Turn(start_pos, end_pos, color)
 
             if end_pos in possible_turns and start_pos in possible_turns[end_pos]:
                 break

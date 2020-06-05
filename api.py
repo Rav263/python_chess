@@ -15,16 +15,15 @@ class Api:
         # Here we need to init Field and Game logic
         self.data = Data("data.dat")
         self.board = Board(self.data)
-        self.evaluate = Evaluate("eval_coofs.dat")
-        self.logic = Logic(self.data, threads, self.evaluate)
+        self.evaluation = Evaluate("eval_coofs.dat")
+        self.logic = Logic(self.data, threads, self.evaluation, difficulty, 2)
         self.difficulty = difficulty
         self.turn_index = 0
-        print(self.evaluate.evaluate_board_mg(self.board, 1))
         # Then we need start game
 
     def start_cmd(self):
         """start command line UI"""
-        self.logic.start(self.board, self.data, self.difficulty)
+        self.logic.start(self.board, self.data)
 
     def get_possible_turns(self, color):
         """returns possible turns from backend"""
@@ -77,9 +76,9 @@ class Api:
         self.logic.add_turn_to_history((now_turn, tmp, flags))
         self.turn_index += 1
 
-    def ai_turn(self, color, last_turn):
+    def ai_turn(self, last_turn):
         """ai do turn with color"""
-        now_turn = self.logic.root_ai_turn(self.board, color, self.difficulty, last_turn)[0]
+        now_turn = self.logic.ai_turn(self.board, last_turn)
         tmp, flags = self.board.do_turn(now_turn)
 
         self.logic.add_turn_to_history((now_turn, tmp, flags))

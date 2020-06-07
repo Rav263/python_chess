@@ -1,13 +1,13 @@
 #! /usr/bin/python3
-
-from ui import Gui
-
-from api import Api
-
+"""Main python_chess module file"""
+# pylint: disable=missing-function-docstring
 
 from multiprocessing import cpu_count
 import sys
 
+from api import Api
+from ui import Gui
+import stockfish
 
 
 def parse_args():
@@ -51,14 +51,24 @@ def main():
 
     api = Api(difficulty, threads)
 
-    if "MODE" in parsed_args and parsed_args["MODE"] == "CMD":
-        api.start_cmd()
+    if "MODE" in parsed_args:
+        if parsed_args["MODE"] == "CMD":
+            api.start_cmd()
+        elif parsed_args["MODE"] == "AI":
+            stockfish.main(api, threads)
+        else:
+            print("Starting GUI")
+            # GUI START CODE HERE
+            gui = Gui(api)
+            gui.start()
     else:
         print("Starting GUI")
         # GUI START CODE HERE
         gui = Gui(api)
         gui.start()
-        
+
+    return None
+
 
 if __name__ == "__main__":
     print("Hello, this is python chess game")

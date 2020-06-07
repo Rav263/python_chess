@@ -13,6 +13,7 @@ def main(api, num_threads):
  
     color = 1
     last_turn = api.logic.NULL_TURN
+    last_stockfish_turn = api.logic.NULL_TURN
 
     while True:
         if color_ai != color:
@@ -24,6 +25,10 @@ def main(api, num_threads):
                 stockfish.end_game()
                 break
             last_turn = turn
+            if turn == last_stockfish_turn:
+                print("SOMETHING DONE WRONG")
+                break
+            last_stockfish_turn = turn
             print("stockfish turn:")
             print(turn)
             api.board.do_turn(turn)

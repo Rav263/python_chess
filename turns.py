@@ -26,6 +26,7 @@ class TurnNode:
 
 class Node:
     MIN_COST = -9999
+    best_move_count = 0
 
     def __init__(self, turn, cost):
         self.turn = turn

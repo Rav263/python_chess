@@ -10,11 +10,24 @@ class MainThread:
     def __init__(self, evaluation, num_threads, difficulty, color):
         self.evaluation = evaluation
         self.moves = Moves(self.NULL_TURN)
-        self.threads = [Thread(self.evaluation, self.moves, index) for index in range(num_threads)]
+        self.threads = [Thread(self.evaluation, self.moves, index) for index in range(1)]
         self.color = color
         self.difficulty = difficulty
 
     def start_thinking(self, board, last_turn, turn_num):
+        root_moves = self.moves.generate_turns(board, self.color, last_turn)
+        root_moves = self.evaluation.rank_moves(board, root_moves, turn_num, self.color)
+
+        self.threads[0].root_moves = root_moves
+        self.threads[0].board = board.copy()
+        self.threads[0].depth = self.difficulty
+        self.threads[0].turn = turn_num
+        
+        return_dict = dict()
+        self.threads[0].start_thinking(self.color, return_dict)
+        return max([root_moves[0] for root_moves in return_dict.values()], key=lambda x: x.cost)
+
+    def start_thinking_old(self, board, last_turn, turn_num):
         procs = list()
         manager = Manager()
         return_dict = manager.dict()
@@ -41,7 +54,7 @@ class MainThread:
 
 
 def make_iter(some, thread_index):
-    if thread_index == 0:
+    if thread_index == 6:
         for now in tqdm(some):
             yield now
     else:
@@ -64,6 +77,13 @@ class Thread:
         self.moves = moves
         self.index = index
 
+    def print_root_moves(self, moves=None):
+        if moves is None:
+            moves = self.root_moves
+        for now_move in moves:
+            print(f"({now_move.turn}, {now_move.cost}, {now_move.best_move_count})", end=" ")
+        print()
+
     def start_thinking(self, color, return_dict):
         alpha = self.MIN_COST
         beta = self.MAX_COST
@@ -74,24 +94,46 @@ class Thread:
             self.root_moves.append(Node(self.NULL_TURN, self.MIN_COST))
             return None
 
-        for depth in make_iter(range(1, self.depth), self.index):
-
-            for turn_index, now_turn in enumerate(self.root_moves):
-                if turn_index == self.multi_pv:
-                    break
-                if depth >= 4:
+        for depth in range(1, self.depth):
+            if len(self.root_moves) <= 1:
+                break
+            self.print_root_moves()
+            for turn_index in range(min(len(self.root_moves), self.multi_pv)):
+                now_turn = self.root_moves[turn_index]
+                if depth >= 3:
                     delta = int(21 + abs(now_turn.prev_cost) / 256)
                     alpha = max(now_turn.prev_cost - delta, self.MIN_COST)
                     beta = min(now_turn.prev_cost + delta, self.MAX_COST)
-                    
+
+                while True:
+                    self.print_root_moves()
+                    now_turn = self.root_moves[turn_index]
                     tmp, flags = self.board.do_turn(now_turn.turn)
-                    print(alpha, beta, delta)
+                    print(f"depth: {depth}, turn:\n{now_turn.turn}\ncost: {now_turn.cost}")
+                    print(f"alpha {alpha}, beta: {beta}, delta: {delta}")
+                    print()
                     now_cost = -self.search(3 - color, depth, now_turn.turn, -beta, -alpha)[1]
                     self.board.un_do_turn(now_turn.turn, tmp, flags)
+                    
+                    if now_cost > alpha:
+                        self.root_moves[turn_index].update_cost(now_cost)
+                    else:
+                        self.root_moves[turn_index].update_cost(self.MIN_COST)
 
-                    self.root_moves[turn_index].update_cost(now_cost)
+                    self.root_moves = sorted(self.root_moves, key=lambda x: -x.cost)
 
-            self.root_moves = sorted(self.root_moves, key=lambda x: -x.cost)
+                    if now_cost <= alpha:
+                        beta = (alpha + beta) // 2
+                        alpha = max(now_cost - delta, self.MIN_COST)
+                    elif now_cost >= beta:
+                        beta = min(now_cost + delta, self.MAX_COST)
+                    else:
+                        self.root_moves[turn_index].best_move_count += 1
+                        break
+                    delta += delta // 4 + 5
+
+        self.root_moves = sorted(self.root_moves, key=lambda x: -x.cost)
+        self.print_root_moves()
 
         return_dict[self.index] = self.root_moves
 
@@ -112,10 +154,8 @@ class Thread:
             if now_cost >= best_cost:
                 best_cost = now_cost
                 best_turn = now_turn
-            if color == self.color:
+                
                 alpha = max(alpha, best_cost)
-            else:
-                beta = min(beta, best_cost)
-            if alpha > beta:
+            if best_cost > beta:
                 return (best_turn, best_cost)
         return (best_turn, best_cost)

@@ -18,11 +18,26 @@ class Turn:
         """print(self) -> None: prints Turn information"""
         print("start pos: ({0}, {1})".format(*self.start_pos))
         print("end pos:   ({0}, {1})".format(*self.end_pos))
-
+    
     def __str__(self):
+        """do_turn(self, turn, board_size) -> None"""
+        start_pos = chr(self.start_pos[1] + ord('a')) + str(8 - self.start_pos[0])
+        end_pos = chr(self.end_pos[1] + ord('a')) + str(8 - self.end_pos[0])
+        
+        if self.pawn % 10 == 2:
+            end_pos += "n"
+        elif self.pawn % 10 == 3:
+            end_pos += "b"
+        elif self.pawn % 10 == 4:
+            end_pos += "r"
+        elif self.pawn % 10 == 6:
+            end_pos += "q"
+        """
         return ("start pos: ({0}, {1})\n".format(*self.start_pos) +
                 "end pos:   ({0}, {1})\n".format(*self.end_pos) +
-                f"color:      {self.color}")
+                f"color:      {self.color}\n" +
+        """
+        return f"{start_pos}{end_pos}"
 
     def __eq__(self, second):
         return (self.start_pos == self.start_pos and self.end_pos == second.end_pos and

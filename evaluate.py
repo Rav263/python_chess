@@ -42,7 +42,7 @@ class Evaluate:
             board.un_do_turn(now_move, tmp, flags)
             ranked_moves.append(Node(now_move, now_cost))
 
-        return sorted(ranked_moves, key=lambda x: x.cost)
+        return sorted(ranked_moves, key=lambda x: -x.cost)
 
     def hash_board(self, board):
         hsh = 0
@@ -60,7 +60,7 @@ class Evaluate:
 
     def evaluate_board_mg(self, board, color, turn):
         value = 0
-        # imb_val = 0
+        imb_val = 0
         bishops = [0, 0, 0]
         hsh = self.hash_board(board)
 
@@ -78,11 +78,11 @@ class Evaluate:
             value += (self.psqt_mg(board, color, pos) -
                       self.psqt_mg(board, 3 - color, pos))
 
-            # imb_val += (self.imbalance_mg(board, color, pos) -
-            #             self.imbalance_mg(board, 3 - color, pos))
+            imb_val += (self.imbalance_mg(board, color, pos) -
+                        self.imbalance_mg(board, 3 - color, pos))
 
-        # imb_val += ((bishops[color] // 2) - (bishops[3 - color] // 2)) * 1438
-        # value += (imb_val // 16)
+        imb_val += ((bishops[color] // 2) - (bishops[3 - color] // 2)) * 1438
+        value += (imb_val // 16)
         self.hash_table[hsh] = [value, color, turn]
         self.hash_miss += 1
         return value

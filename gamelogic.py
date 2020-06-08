@@ -39,6 +39,7 @@ class Logic:
         print(self.evaluation.evaluate_board_mg(board, 1, self.turn))
         print(self.evaluation.evaluate_board_mg(board, 2, self.turn))
         moves = Moves(self.NULL_TURN)
+        print([str(x) for x in moves.generate_turns(board, color, last_turn)])
         while True:
             io_functions.print_board(board.board, data)
             now_turn = io_functions.get_turn(moves, color, board, last_turn)

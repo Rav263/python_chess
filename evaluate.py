@@ -40,7 +40,7 @@ class Evaluate:
             tmp, flags = board.do_turn(now_move)
             now_cost = self.evaluate_board_mg(board, color, turn)
             board.un_do_turn(now_move, tmp, flags)
-            ranked_moves.append(Node(now_move, now_cost))
+            ranked_moves.append(Node(now_move, 0))
 
         return sorted(ranked_moves, key=lambda x: -x.cost)
 

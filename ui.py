@@ -226,6 +226,10 @@ class GuiBoard(QFrame):
         figures.append(QPushButton("Queen"))
 
         prom_dialog = QDialog()
+        prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
+        prom_dialog.move(self.mapToGlobal(self.pos()) - QPoint(-2, -200))
+        print()
+
         for num, figure in enumerate(figures):
             figure.clicked.connect(self.make_answer_button(num + 2, prom_dialog))
         prom_dialog.setWindowTitle("Choose figure:")
@@ -298,7 +302,6 @@ class MainMenu(QFrame):
         for difficulty in self.difficulties:
             difficulty.show()
 
-
 class Border(QFrame):
     def __init__(self, name, width, height):
         super().__init__()
@@ -311,18 +314,17 @@ class MainContainer(QFrame):
     def __init__(self, inside):
         super().__init__()
         vbox = QVBoxLayout()
-        # vbox.addStretch(1)
+        vbox.addStretch(1)
         for cont in inside:
             vbox.addWidget(cont)
-            print(cont.sizePolicy().hasHeightForWidth())
-        # vbox.addStretch(1)
+        vbox.addStretch(1)
         vbox.setSpacing(0)
         vbox.setContentsMargins(0, 0, 0, 0)
         
         hbox = QHBoxLayout()
-        # hbox.addStretch(1)
+        hbox.addStretch(1)
         hbox.addLayout(vbox)
-        # hbox.addStretch(1)
+        hbox.addStretch(1)
         hbox.setSpacing(0)
         hbox.setContentsMargins(0, 0, 0, 0)
         self.setLayout(hbox)
@@ -335,8 +337,6 @@ class Main_Window(QWidget):
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
-
-        # print(self.sizePolicy().hasHeightForWidth())
         self.api = api
         self.board = GuiBoard(api)
         self.menu = MainMenu()
@@ -344,7 +344,6 @@ class Main_Window(QWidget):
         self.game_board = MainContainer([self.board])
         self.main_menu = MainContainer([self.menu])
         self.game_board.hide()
-
         
         hbox = QHBoxLayout()
         hbox.addWidget(self.game_board)

@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, 
     QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy, QDialog)
 from PyQt5 import QtGui
-from PyQt5.QtCore import pyqtSignal, QObject, QMimeData, Qt
+from PyQt5.QtCore import pyqtSignal, QObject, QMimeData, Qt, QPoint
 from PyQt5.QtGui import QDrag, QPixmap
 import time
 import threading
@@ -74,8 +74,7 @@ class Figure(QFrame):
         drag = QDrag(self)
         drag.setMimeData(mime_data)
         drag.setPixmap(QPixmap("images/merida/{}.png".format(self.get_figure_name())))
-        drag.setHotSpot(e.pos() - self.rect().topLeft())
-
+        drag.setHotSpot(self.rect().bottomRight())
         dropAction = drag.exec_(Qt.MoveAction)
 
 class Cell(QFrame):

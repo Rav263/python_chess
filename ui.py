@@ -171,7 +171,10 @@ class GuiBoard(QFrame):
         self.cells_arr[self.start[0]][self.start[1]].release()
         self.making_a_move = False
         for field in self.possible_moves[self.start]:
-            self.cells_arr[field[0]][field[1]].release()
+            if self.cells_arr[field[0]][field[1]].figure.get_type() == "possible":
+                self.cells_arr[field[0]][field[1]].figure.set_type(0)
+            else:
+                self.cells_arr[field[0]][field[1]].release()
 
         if ((x, y) in self.possible_moves[self.start]):
             self.api.do_turn(self.start, (x, y))
@@ -236,7 +239,7 @@ class GuiBoard(QFrame):
         prom_dialog.setLayout(hbox)
 
         choice = prom_dialog.exec_()
-        return choice if choice in (2, 3, 4) else 6 
+        return choice if choice in (2, 3, 4) else 6
 
     def make_answer_button(self, figure, dialog):
         def answer():

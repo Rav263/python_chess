@@ -7,7 +7,7 @@ from PyQt5.QtGui import QDrag, QPixmap
 import time
 import threading
 
-board_size = 840 // 2
+board_size = 420
 
 v_width = 840 // 2
 v_height = 66 // 2
@@ -135,7 +135,9 @@ class GuiBoard(QFrame):
         self.color = api.board.white
         self.api = api
         self.setMinimumSize(board_size, board_size)
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePol.setHeightForWidth(True)
+        self.setSizePolicy(sizePol)
 
         self.comm = Communicate()
         self.comm.cellPressed.connect(self.cell_pressed)
@@ -265,9 +267,14 @@ class GuiBoard(QFrame):
 class MainMenu(QFrame):
     def __init__(self):
         super().__init__()
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.setMaximumSize(v_width, v_width)
-        self.setMinimumSize(v_width, v_width)
+        # self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+        # self.setMinimumSize(board_size, board_size)
+        self.setMinimumSize(board_size, board_size)
+        sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePol.setHeightForWidth(True)
+        self.setSizePolicy(sizePol)
+
         self.start_game = QPushButton("Start Game")
         self.difficulties = [QPushButton(str(i)) for i in range(1, 5)]
         vbox = QVBoxLayout()
@@ -304,17 +311,18 @@ class MainContainer(QFrame):
     def __init__(self, inside):
         super().__init__()
         vbox = QVBoxLayout()
-        vbox.addStretch(1)
+        # vbox.addStretch(1)
         for cont in inside:
             vbox.addWidget(cont)
-        vbox.addStretch(1)
+            print(cont.sizePolicy().hasHeightForWidth())
+        # vbox.addStretch(1)
         vbox.setSpacing(0)
         vbox.setContentsMargins(0, 0, 0, 0)
         
         hbox = QHBoxLayout()
-        hbox.addStretch(1)
+        # hbox.addStretch(1)
         hbox.addLayout(vbox)
-        hbox.addStretch(1)
+        # hbox.addStretch(1)
         hbox.setSpacing(0)
         hbox.setContentsMargins(0, 0, 0, 0)
         self.setLayout(hbox)
@@ -323,7 +331,12 @@ class Main_Window(QWidget):
     
     def __init__(self, api):
         super().__init__()
-        self.setMinimumSize(v_width + 2 * h_width, h_height)
+        self.setMinimumSize(board_size, board_size)
+        sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePol.setHeightForWidth(True)
+        self.setSizePolicy(sizePol)
+
+        # print(self.sizePolicy().hasHeightForWidth())
         self.api = api
         self.board = GuiBoard(api)
         self.menu = MainMenu()

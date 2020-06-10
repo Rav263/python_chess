@@ -30,10 +30,24 @@ class Turn:
         print("end pos:   ({0}, {1})".format(*self.end_pos))
 
     def __str__(self):
+        start_pos = chr(self.start_pos[1] + ord('a')) + str(8 - self.start_pos[0])
+        end_pos = chr(self.end_pos[1] + ord('a')) + str(8 - self.end_pos[0])
+
+        if self.pawn % 10 == 2:
+            end_pos += "n"
+        elif self.pawn % 10 == 3:
+            end_pos += "b"
+        elif self.pawn % 10 == 4:
+            end_pos += "r"
+        elif self.pawn % 10 == 6:
+            end_pos += "q"
+
+        return start_pos + end_pos
+        """
         return ("start pos: ({0}, {1})\n".format(*self.start_pos) +
                 "end pos:   ({0}, {1})\n".format(*self.end_pos) +
                 f"color:      {self.color}")
-
+        """
     def __eq__(self, second):
         return (self.start_pos == self.start_pos and self.end_pos == second.end_pos and
                 self.color == second.color and self.pawn == second.pawn and
@@ -61,7 +75,6 @@ class Logic:
 
         color = 1
         last_turn = self.NULL_TURN
-        print(board.generate_fen(data.data["FEN"]))
         print(self.evaluation.evaluate_board_mg(board, 1))
         print(self.evaluation.evaluate_board_mg(board, 2))
         while True:
@@ -85,6 +98,7 @@ class Logic:
             if now_turn == self.NULL_TURN:
                 print("CHECK MATE! YOU WIN!")
                 break
+            print(now_turn)
 
             board.do_turn(now_turn)
             last_turn = now_turn
@@ -263,8 +277,6 @@ class Logic:
 
         return tuple of best_turn and it cost
         """
-        if depth == 1:
-            print(alpha, beta)
         possible_turns = self.generate_all_possible_turns(board, color, last_turn)
 
         best_cost = self.MIN_COST

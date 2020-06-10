@@ -9,13 +9,6 @@ import threading
 
 board_size = 420
 
-
-# v_width = 840 // 2
-# v_height = 66 // 2
-
-# h_width = 66 // 2
-# h_height = (840 + 66 + 66) // 2
-
 lock = threading.Lock()
 
 def swap(a, b):
@@ -42,6 +35,7 @@ class Figure(QFrame):
         super().__init__()
         self.comm = comm
         self.set_type(figure_type)
+        self.fig_translation = {1:"P", 2:"N", 3:"B", 4:"R", 5:"K", 6:"Q"}
     
     def set_type(self, figure_type):
         self.figure_type = figure_type
@@ -54,19 +48,7 @@ class Figure(QFrame):
     def get_figure_name(self):
         name = ""
         name += "w" if self.figure_type // 10 == 1 else "b"
-        if self.figure_type % 10 == 1:
-            name += "P"
-        elif self.figure_type % 10 == 2:
-            name += "N"
-        elif self.figure_type % 10 == 3:
-            name += "B"
-        elif self.figure_type % 10 == 4:
-            name += "R"
-        elif self.figure_type % 10 == 5:
-            name += "K"
-        elif self.figure_type % 10 == 6:
-            name += "Q"
-
+        name += self.fig_translation[self.figure_type % 10]
         return name
 
     def mouseMoveEvent(self, e):
@@ -170,19 +152,8 @@ class GuiBoard(QFrame):
         
 
     def figure_moved(self, x, y):
-        self.cells_arr[self.start[0]][self.start[1]].release()
-        self.making_a_move = False
-        for field in self.possible_moves[self.start]:
-            if self.cells_arr[field[0]][field[1]].figure.get_type() == "possible":
-                self.cells_arr[field[0]][field[1]].figure.set_type(0)
-            else:
-                self.cells_arr[field[0]][field[1]].release()
-
-        if ((x, y) in self.possible_moves[self.start]):
-            self.api.do_turn(self.start, (x, y))
-            self.make_turn(self.start, (x, y))
-            self.change_color()
-            self.upd_board()
+        # pass
+        self.process_move(x, y, "drag")
 
 
     def cell_pressed(self, x, y):
@@ -198,22 +169,28 @@ class GuiBoard(QFrame):
                         self.cells_arr[field[0]][field[1]].beat()
 
             else:
-                self.cells_arr[self.start[0]][self.start[1]].release()
-                self.making_a_move = False
-                for field in self.possible_moves[self.start]:
-                    if self.cells_arr[field[0]][field[1]].figure.get_type() == "possible":
-                        self.cells_arr[field[0]][field[1]].figure.set_type(0)
-                    else:
-                        self.cells_arr[field[0]][field[1]].release()
+                self.process_move(x, y, "press")
+    
+    def process_move(self, x, y, method):
+        self.cells_arr[self.start[0]][self.start[1]].release()
+        self.making_a_move = False
+        for field in self.possible_moves[self.start]:
+            if self.cells_arr[field[0]][field[1]].figure.get_type() == "possible":
+                self.cells_arr[field[0]][field[1]].figure.set_type(0)
+            else:
+                self.cells_arr[field[0]][field[1]].release()
 
-                if self.check_move(x, y):
-                    if self.cells_arr[self.start[0]][self.start[1]].figure.figure_type % 10 == 1 and x in (0, 7):
-                        self.api.do_turn(self.start, (x, y), self.promotion())
-                    else:
-                        self.api.do_turn(self.start, (x, y))
-                    self.make_turn(self.start, (x, y))
-                    self.change_color()
-                    self.ai_do_turn = True
+        if self.check_move(x, y):
+            if self.cells_arr[self.start[0]][self.start[1]].figure.figure_type % 10 == 1 and x in (0, 7):
+                self.api.do_turn(self.start, (x, y), self.promotion())
+            else:
+                self.api.do_turn(self.start, (x, y))
+            self.make_turn(self.start, (x, y))
+            self.change_color()
+            if method == "press":
+                self.ai_do_turn = True
+            elif method == "drag":
+                self.upd_board()
 
     def make_turn(self, start, stop, promotion = -1):
         self.cells_arr[start[0]][start[1]].figure.set_type(0)

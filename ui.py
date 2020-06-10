@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, 
-    QHBoxLayout, QVBoxLayout, QApplication, QGridLayout, QFrame, QSizePolicy, QDialog)
+    QHBoxLayout, QVBoxLayout, QStackedLayout, QApplication, QGridLayout, QFrame, QSizePolicy, QDialog)
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QMimeData, Qt, QPoint
 from PyQt5.QtGui import QDrag, QPixmap
@@ -9,11 +9,12 @@ import threading
 
 board_size = 420
 
-v_width = 840 // 2
-v_height = 66 // 2
 
-h_width = 66 // 2
-h_height = (840 + 66 + 66) // 2
+# v_width = 840 // 2
+# v_height = 66 // 2
+
+# h_width = 66 // 2
+# h_height = (840 + 66 + 66) // 2
 
 lock = threading.Lock()
 
@@ -271,9 +272,6 @@ class GuiBoard(QFrame):
 class MainMenu(QFrame):
     def __init__(self):
         super().__init__()
-        # self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-        # self.setMinimumSize(board_size, board_size)
         self.setMinimumSize(board_size, board_size)
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePol.setHeightForWidth(True)
@@ -310,24 +308,6 @@ class Border(QFrame):
         self.setMaximumSize(width, height)
         self.setMinimumSize(width, height)
 
-class MainContainer(QFrame):
-    def __init__(self, inside):
-        super().__init__()
-        vbox = QVBoxLayout()
-        vbox.addStretch(1)
-        for cont in inside:
-            vbox.addWidget(cont)
-        vbox.addStretch(1)
-        vbox.setSpacing(0)
-        vbox.setContentsMargins(0, 0, 0, 0)
-        
-        hbox = QHBoxLayout()
-        hbox.addStretch(1)
-        hbox.addLayout(vbox)
-        hbox.addStretch(1)
-        hbox.setSpacing(0)
-        hbox.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(hbox)
 
 class Main_Window(QWidget):
     
@@ -338,19 +318,22 @@ class Main_Window(QWidget):
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
         self.api = api
+
         self.board = GuiBoard(api)
-        self.menu = MainMenu()
         self.board.upd_possible_moves(self.board.color)
-        self.game_board = MainContainer([self.board])
-        self.main_menu = MainContainer([self.menu])
-        self.game_board.hide()
-        
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.game_board)
-        hbox.addWidget(self.main_menu)
-        hbox.setSpacing(0)
-        hbox.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(hbox)
+        self.menu = MainMenu()
+
+        self.tabs = QStackedLayout()
+        self.tabs.addWidget(self.menu)
+        self.tabs.addWidget(self.board)
+
+        #TODO: make a dictionary of indexes
+        self.tab_names = {"start":0, "game_board":1}
+        self.tabs.setCurrentIndex(0)
+
+        self.tabs.setSpacing(self.tab_names["start"])
+        self.tabs.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self.tabs)
 
         for diff, difficulty in enumerate(self.menu.difficulties):
             difficulty.clicked.connect(self.start_game_with_difficulty(diff + 1))
@@ -361,8 +344,7 @@ class Main_Window(QWidget):
     def start_game_with_difficulty(self, difficulty):
         def start_game():
             self.api.difficulty = difficulty + 1
-            self.main_menu.hide()
-            self.game_board.show()
+            self.tabs.setCurrentIndex(self.tab_names["game_board"])
         return start_game
   
     

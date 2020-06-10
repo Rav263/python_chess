@@ -31,7 +31,7 @@ QFrame#border-down {
 } */
 
 MainMenu{
-    background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
+    border-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
 }
 
 Cell[color="black"][pressed="yes"]{

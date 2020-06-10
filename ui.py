@@ -28,7 +28,8 @@ class Communicate(QObject):
     cellPressed = pyqtSignal(int, int)
     cellReleased = pyqtSignal(int, int)
     figureMoved = pyqtSignal(int, int)
-
+    nextMove = pyqtSignal()
+    prevMove = pyqtSignal()
 
 class Figure(QFrame):
     def __init__(self, figure_type, comm):
@@ -67,6 +68,9 @@ class Figure(QFrame):
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm, color, check_move):
         super().__init__()
+        self.setMinimumSize(52, 52)
+        sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePol.setHeightForWidth(True)
         self.setAcceptDrops(True)
         self.comm = comm
         self.x = x
@@ -130,6 +134,13 @@ class GuiBoard(QFrame):
         self.comm.cellPressed.connect(self.cell_pressed)
         self.comm.cellReleased.connect(self.cell_released)
         self.comm.figureMoved.connect(self.figure_moved)
+        self.comm.nextMove.connect(self.next_move)
+        self.comm.prevMove.connect(self.prev_move)
+
+        v_layout = QGridLayout()
+        v_layout.setSpacing(0)
+        v_layout.setContentsMargins(0, 0, 0, 0)
+        
         cells = QGridLayout()
         cells.setSpacing(0)
         cells.setContentsMargins(0, 0, 0, 0)
@@ -147,7 +158,11 @@ class GuiBoard(QFrame):
                 cell_color = 3 - cell_color
             cell_color = 3 - cell_color
                 
-        self.setLayout(cells)
+        v_layout.addLayout(cells, 0, 0)
+
+        self.bottom_menu = BottomMenu(self.comm)
+        v_layout.addWidget(self.bottom_menu, 1, 0)
+        self.setLayout(v_layout)
 
     def cell_released(self, x, y):
         if self.ai_do_turn:
@@ -188,7 +203,6 @@ class GuiBoard(QFrame):
             if moved_fig_type == "P" and x in (0, 7):
                 self.api.do_turn(self.start, (x, y), self.promotion())
             elif moved_fig_type == "K" and y in (2, 6):
-                print("castling", x, y)
                 self.api.do_turn(self.start, (x, y), castling=True)
                 if y == 2:
                     #long castling
@@ -227,7 +241,6 @@ class GuiBoard(QFrame):
         prom_dialog = QDialog()
         prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
         prom_dialog.move(self.mapToGlobal(self.pos()) - QPoint(-2, -200))
-        print()
 
         for num, figure in enumerate(figures):
             figure.clicked.connect(self.make_answer_button(num + 2, prom_dialog))
@@ -259,11 +272,45 @@ class GuiBoard(QFrame):
         self.upd_possible_moves(self.color)
     
     def upd_possible_moves(self, color):
-        self.possible_moves = self.api.get_possible_turns(color)
-    
+        self.possible_moves = self.api.get_possible_turns(color)   
 
     def change_color(self):
         self.color = 3 - self.color
+
+    def next_move(self):
+        turn = self.api.next_turn()
+        if turn:
+            self.make_turn(turn.start_pos, turn.end_pos)
+
+    def prev_move(self):
+        turn = self.api.previous_turn()
+        if turn:
+            self.make_turn(turn[0].end_pos, turn[0].start_pos)
+    
+class BottomMenu(QFrame):
+    def __init__(self, comm):
+        super().__init__()
+        self.comm = comm
+        buttons = []
+        buttons.append(QPushButton("undo"))
+        buttons.append(QPushButton("redo"))
+        buttons[0].clicked.connect(self.previous)
+        buttons[1].clicked.connect(self.next)
+
+        h_layout = QHBoxLayout()
+        h_layout.addStretch(1)
+        for but in buttons:
+            h_layout.addWidget(but)
+        h_layout.addStretch(1)
+        h_layout.setSpacing(0)
+        h_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(h_layout)
+        
+    def previous(self):
+        self.comm.prevMove.emit()
+
+    def next(self):
+        self.comm.nextMove.emit()
 
 class MainMenu(QFrame):
     def __init__(self):
@@ -323,7 +370,6 @@ class Main_Window(QWidget):
         self.tabs.addWidget(self.menu)
         self.tabs.addWidget(self.board)
 
-        #TODO: make a dictionary of indexes
         self.tab_names = {"start":0, "game_board":1}
         self.tabs.setCurrentIndex(self.tab_names["start"])
 

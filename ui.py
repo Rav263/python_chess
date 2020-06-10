@@ -44,11 +44,14 @@ class Figure(QFrame):
 
     def get_type(self):
         return self.figure_type
+
+    def get_named_type(self):
+        return self.fig_translation[self.figure_type % 10]
         
     def get_figure_name(self):
         name = ""
         name += "w" if self.figure_type // 10 == 1 else "b"
-        name += self.fig_translation[self.figure_type % 10]
+        name += self.get_named_type()
         return name
 
     def mouseMoveEvent(self, e):
@@ -59,6 +62,7 @@ class Figure(QFrame):
         drag.setPixmap(QPixmap("images/merida/{}.png".format(self.get_figure_name())))
         drag.setHotSpot(self.rect().bottomRight())
         dropAction = drag.exec_(Qt.MoveAction)
+    
 
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm, color, check_move):
@@ -152,7 +156,6 @@ class GuiBoard(QFrame):
         
 
     def figure_moved(self, x, y):
-        # pass
         self.process_move(x, y, "drag")
 
 
@@ -181,9 +184,24 @@ class GuiBoard(QFrame):
                 self.cells_arr[field[0]][field[1]].release()
 
         if self.check_move(x, y):
-            if self.cells_arr[self.start[0]][self.start[1]].figure.figure_type % 10 == 1 and x in (0, 7):
+            moved_fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.get_named_type()
+            if moved_fig_type == "P" and x in (0, 7):
                 self.api.do_turn(self.start, (x, y), self.promotion())
-            else:
+            elif moved_fig_type == "K" and y in (2, 6):
+                print("castling", x, y)
+                self.api.do_turn(self.start, (x, y), castling=True)
+                if y == 2:
+                    #long castling
+                    rook_color = self.cells_arr[x][0].figure.figure_type
+                    self.cells_arr[x][0].figure.set_type(0)
+                    self.cells_arr[x][3].figure.set_type(rook_color)
+                else:
+                    #short castling
+                    rook_color = self.cells_arr[x][7].figure.figure_type
+                    print(rook_color)
+                    self.cells_arr[x][7].figure.set_type(0)
+                    self.cells_arr[x][5].figure.set_type(rook_color)
+            else:    
                 self.api.do_turn(self.start, (x, y))
             self.make_turn(self.start, (x, y))
             self.change_color()
@@ -195,6 +213,9 @@ class GuiBoard(QFrame):
     def make_turn(self, start, stop, promotion = -1):
         self.cells_arr[start[0]][start[1]].figure.set_type(0)
         self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
+
+    def check_move(self, x, y):
+        return True if ((x, y) in self.possible_moves[self.start]) else False
 
     def promotion(self):
         figures = []
@@ -240,8 +261,6 @@ class GuiBoard(QFrame):
     def upd_possible_moves(self, color):
         self.possible_moves = self.api.get_possible_turns(color)
     
-    def check_move(self, x, y):
-        return True if ((x, y) in self.possible_moves[self.start]) else False
 
     def change_color(self):
         self.color = 3 - self.color
@@ -306,7 +325,7 @@ class Main_Window(QWidget):
 
         #TODO: make a dictionary of indexes
         self.tab_names = {"start":0, "game_board":1}
-        self.tabs.setCurrentIndex(0)
+        self.tabs.setCurrentIndex(self.tab_names["start"])
 
         self.tabs.setSpacing(self.tab_names["start"])
         self.tabs.setContentsMargins(0, 0, 0, 0)

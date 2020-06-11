@@ -310,8 +310,8 @@ class BottomMenu(QFrame):
         super().__init__()
         self.comm = comm
         buttons = []
-        buttons.append(MenuButton("undo"))
-        buttons.append(MenuButton("redo"))
+        buttons.append(ControllButton("Undo"))
+        buttons.append(ControllButton("Redo"))
         buttons[0].clicked.connect(self.previous)
         buttons[1].clicked.connect(self.next)
 
@@ -320,7 +320,7 @@ class BottomMenu(QFrame):
         for but in buttons:
             h_layout.addWidget(but)
         h_layout.addStretch(1)
-        h_layout.setSpacing(0)
+        h_layout.setSpacing(50)
         h_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(h_layout)
         
@@ -378,6 +378,14 @@ class PromotionButton(QPushButton):
         super().__init__(*args)
         self.setObjectName(args[0])
         self.setText("")
+
+class ControllButton(QPushButton):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setObjectName(args[0])
+        self.setText("")
+
+
 class Main_Window(QWidget):
     
     def __init__(self, api):

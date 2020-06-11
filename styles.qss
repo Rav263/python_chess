@@ -42,7 +42,18 @@ PromotionButton#bR{
     border-image: url(images/merida/wR.png) 0 0 0 0 stretch stretch;
 }
 
+ControllButton{
+    min-width: 50px;
+    min-height: 50px;
+}
 
+ControllButton#Undo{
+    border-image: url(images/Undo.png) 0 0 0 0 stretch stretch;
+}
+
+ControllButton#Redo{
+    border-image: url(images/Redo.png) 0 0 0 0 stretch stretch;
+}
 
 QFrame#border-left {
     border-image: url(images/left.jpg) 0 0 0 0 stretch stretch;

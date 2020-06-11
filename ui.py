@@ -31,6 +31,8 @@ class Communicate(QObject):
     nextMove = pyqtSignal()
     prevMove = pyqtSignal()
     backMenu = pyqtSignal()
+    toStart = pyqtSignal()
+    skipHist = pyqtSignal()
 
 class Figure(QFrame):
     def __init__(self, figure_type, comm):
@@ -126,6 +128,7 @@ class GuiBoard(QFrame):
     def __init__(self, api, comm):
         super().__init__()
         self.history = 0
+        self.reached_hist_bottom = False
         self.color = api.board.white
         self.api = api
         self.setMinimumSize(board_size, board_size)
@@ -139,6 +142,8 @@ class GuiBoard(QFrame):
         self.comm.figureMoved.connect(self.figure_moved)
         self.comm.nextMove.connect(self.next_move)
         self.comm.prevMove.connect(self.prev_move)
+        self.comm.toStart.connect(self.to_start)
+        self.comm.skipHist.connect(self.skip_history)
 
         v_layout = QGridLayout()
         v_layout.setSpacing(0)
@@ -276,6 +281,8 @@ class GuiBoard(QFrame):
             self.make_turn(turn.start_pos, turn.end_pos)
             if turn.castling:
                 self.make_castling(*turn.end_pos)
+        else:
+            self.reached_hist_bottom = False
 
     def prev_move(self):
         turn = self.api.previous_turn()
@@ -284,7 +291,19 @@ class GuiBoard(QFrame):
             if turn[0].castling:
                 self.make_castling(*turn[0].end_pos, True)
             self.make_turn(turn[0].end_pos, turn[0].start_pos)
-                    
+        else:
+            self.reached_hist_bottom = True
+
+    def skip_history(self):
+        print(self.history)
+        while(self.history < 0):
+            self.next_move()
+        self.reached_hist_bottom = False
+    
+    def to_start(self):
+        while(not self.reached_hist_bottom):
+            self.prev_move()
+      
     def make_castling(self, x, y, reverse=False):
         short_rook_st = 7
         short_rook_fn = 5
@@ -317,8 +336,10 @@ class BottomMenu(QFrame):
         
         back_button = MenuButton("Back")
 
+        buttons[0].clicked.connect(self.to_game_start)
         buttons[1].clicked.connect(self.previous)
         buttons[2].clicked.connect(self.next)
+        buttons[3].clicked.connect(self.skip_hist)
         back_button.clicked.connect(self.back)
 
         h_layout = QHBoxLayout()
@@ -333,12 +354,19 @@ class BottomMenu(QFrame):
         
     def previous(self):
         self.comm.prevMove.emit()
+    
+    def to_game_start(self):
+        self.comm.toStart.emit()
 
     def next(self):
         self.comm.nextMove.emit()
     
+    def skip_hist(self):
+        self.comm.skipHist.emit()
+    
     def back(self):
         self.comm.backMenu.emit()
+    
 
 class MainMenu(QFrame):
     def __init__(self):

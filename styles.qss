@@ -54,6 +54,13 @@ ControllButton#Undo{
 ControllButton#Redo{
     border-image: url(images/Redo.png) 0 0 0 0 stretch stretch;
 }
+ControllButton#Back{
+    border-image: url(images/Back.png) 0 0 0 0 stretch stretch;
+}
+
+ControllButton#Skip{
+    border-image: url(images/Skip.png) 0 0 0 0 stretch stretch;
+}
 
 QFrame#border-left {
     border-image: url(images/left.jpg) 0 0 0 0 stretch stretch;

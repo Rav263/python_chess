@@ -30,6 +30,7 @@ class Communicate(QObject):
     figureMoved = pyqtSignal(int, int)
     nextMove = pyqtSignal()
     prevMove = pyqtSignal()
+    backMenu = pyqtSignal()
 
 class Figure(QFrame):
     def __init__(self, figure_type, comm):
@@ -94,13 +95,11 @@ class Cell(QFrame):
     def dragEnterEvent(self, e):
         e.accept()
 
-
     def dropEvent(self, e):
         position = e.pos()
         if self.check_move(self.x, self.y):
             self.comm.figureMoved.emit(self.x, self.y)
         e.accept()
-
 
     def mousePressEvent(self, event):
         self.comm.cellPressed.emit(self.x, self.y)
@@ -124,7 +123,7 @@ class Cell(QFrame):
 
 class GuiBoard(QFrame):
     updBoard = pyqtSignal()
-    def __init__(self, api):
+    def __init__(self, api, comm):
         super().__init__()
         self.color = api.board.white
         self.api = api
@@ -133,7 +132,7 @@ class GuiBoard(QFrame):
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
 
-        self.comm = Communicate()
+        self.comm = comm
         self.comm.cellPressed.connect(self.cell_pressed)
         self.comm.cellReleased.connect(self.cell_released)
         self.comm.figureMoved.connect(self.figure_moved)
@@ -291,8 +290,8 @@ class GuiBoard(QFrame):
         long_rook_st = 0
         long_rook_fn = 3
         if reverse:
-            short_rook_fn, short_rook_st = short_rook_st, short_rook_fn
-            long_rook_fn, long_rook_st = long_rook_st, long_rook_fn
+            swap(short_rook_fn, short_rook_st)
+            swap(long_rook_fn, long_rook_st)
         if y == 2:
             #long castling
             rook_color = self.cells_arr[x][long_rook_st].figure.figure_type
@@ -310,18 +309,25 @@ class BottomMenu(QFrame):
         super().__init__()
         self.comm = comm
         buttons = []
+        buttons.append(ControllButton("Back"))
         buttons.append(ControllButton("Undo"))
         buttons.append(ControllButton("Redo"))
-        buttons[0].clicked.connect(self.previous)
-        buttons[1].clicked.connect(self.next)
+        buttons.append(ControllButton("Skip"))
+        
+        back_button = MenuButton("Back")
+
+        buttons[1].clicked.connect(self.previous)
+        buttons[2].clicked.connect(self.next)
+        back_button.clicked.connect(self.back)
 
         h_layout = QHBoxLayout()
         h_layout.addStretch(1)
+        h_layout.addWidget(back_button)
         for but in buttons:
             h_layout.addWidget(but)
         h_layout.addStretch(1)
-        h_layout.setSpacing(50)
-        h_layout.setContentsMargins(0, 0, 0, 0)
+        h_layout.setSpacing(20)
+        h_layout.setContentsMargins(10, 0, 10, 0)
         self.setLayout(h_layout)
         
     def previous(self):
@@ -329,6 +335,9 @@ class BottomMenu(QFrame):
 
     def next(self):
         self.comm.nextMove.emit()
+    
+    def back(self):
+        self.comm.backMenu.emit()
 
 class MainMenu(QFrame):
     def __init__(self):
@@ -395,8 +404,11 @@ class Main_Window(QWidget):
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
         self.api = api
+        self.comm = Communicate()
 
-        self.board = GuiBoard(api)
+        self.comm.backMenu.connect(self.return_to_menu)
+
+        self.board = GuiBoard(api, self.comm)
         self.board.upd_possible_moves(self.board.color)
         self.menu = MainMenu()
 
@@ -417,10 +429,14 @@ class Main_Window(QWidget):
         self.setWindowTitle('Chess')
         self.show()
 
+    def return_to_menu(self):
+        self.tabs.setCurrentIndex(self.tab_names["start"])
+
     def start_game_with_difficulty(self, difficulty):
         def start_game():
             self.api.difficulty = difficulty + 1
             self.tabs.setCurrentIndex(self.tab_names["game_board"])
+
         return start_game
   
     

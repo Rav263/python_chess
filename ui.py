@@ -223,27 +223,28 @@ class GuiBoard(QFrame):
 
     def promotion(self):
         figures = []
-        figures.append(QPushButton("Knight"))
-        figures.append(QPushButton("Bishop"))
-        figures.append(QPushButton("Rook"))
-        figures.append(QPushButton("Queen"))
+        figures.append(QPushButton(""))
+        figures.append(QPushButton(""))
+        figures.append(QPushButton(""))
+        figures.append(QPushButton(""))
 
         prom_dialog = QDialog()
         prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
-        prom_dialog.move(self.mapToGlobal(self.pos()) - QPoint(-2, -200))
+        prom_dialog.move(self.mapToGlobal(self.pos()) - QPoint(-53 * 3, -52 * 3))
 
         for num, figure in enumerate(figures):
             figure.clicked.connect(self.make_answer_button(num + 2, prom_dialog))
         prom_dialog.setWindowTitle("Choose figure:")
         
-        hbox = QHBoxLayout(prom_dialog)
-        hbox.addStretch(1)
-        for figure in figures:
-            hbox.addWidget(figure)
-        hbox.addStretch(1)
-        hbox.setSpacing(0)
-        hbox.setContentsMargins(0, 0, 0, 0)
-        prom_dialog.setLayout(hbox)
+        layout = QGridLayout(prom_dialog)
+        for i, figure in enumerate(figures):
+            figure.setObjectName("Rook")
+            layout.addWidget(figure, i % 2, i // 2)
+
+
+        layout.setSpacing(2)
+        layout.setContentsMargins(0, 0, 0, 0)
+        prom_dialog.setLayout(layout)
 
         choice = prom_dialog.exec_()
         return choice if choice in (2, 3, 4) else 6
@@ -306,8 +307,8 @@ class BottomMenu(QFrame):
         super().__init__()
         self.comm = comm
         buttons = []
-        buttons.append(QPushButton("undo"))
-        buttons.append(QPushButton("redo"))
+        buttons.append(MenuButton("undo"))
+        buttons.append(MenuButton("redo"))
         buttons[0].clicked.connect(self.previous)
         buttons[1].clicked.connect(self.next)
 
@@ -334,8 +335,8 @@ class MainMenu(QFrame):
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
 
-        self.start_game = QPushButton("Start Game")
-        self.difficulties = [QPushButton(str(i)) for i in range(1, 5)]
+        self.start_game = MenuButton("Start Game")
+        self.difficulties = [MenuButton(str(i)) for i in range(1, 5)]
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(self.start_game)
@@ -365,6 +366,9 @@ class Border(QFrame):
         self.setMaximumSize(width, height)
         self.setMinimumSize(width, height)
 
+class MenuButton(QPushButton):
+    def __init__(self, *args):
+        super().__init__(*args)
 
 class Main_Window(QWidget):
     

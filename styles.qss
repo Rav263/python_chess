@@ -1,4 +1,4 @@
-QPushButton {
+MenuButton {
     border: 2px solid #613924;
     border-radius: 3px;
     background-color: #875032;
@@ -6,11 +6,31 @@ QPushButton {
     min-height: 30px;
 }
 
-QPushButton:pressed {
+MenuButton:pressed {
     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
 }
 
+QPushButton#Knight{
+    min-width: 57px;
+    min-height: 57px;
+    border-image: url(images/merida/wN.png) 0 0 0 0 stretch stretch;
+}
+QPushButton#Queen{
+    min-width: 57px;
+    min-height: 57px;
+    border-image: url(images/merida/wQ.png) 0 0 0 0 stretch stretch;
+}
+QPushButton#Bishop{
+    min-width: 57px;
+    min-height: 57px;
+    border-image: url(images/merida/wB.png) 0 0 0 0 stretch stretch;
+}
+QPushButton#Rook{
+    min-width: 57px;
+    min-height: 57px;
+    border-image: url(images/merida/wR.png) 0 0 0 0 stretch stretch;
+}
 
 
 QFrame#border-left {

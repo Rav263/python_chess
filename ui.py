@@ -204,17 +204,7 @@ class GuiBoard(QFrame):
                 self.api.do_turn(self.start, (x, y), self.promotion())
             elif moved_fig_type == "K" and y in (2, 6):
                 self.api.do_turn(self.start, (x, y), castling=True)
-                if y == 2:
-                    #long castling
-                    rook_color = self.cells_arr[x][0].figure.figure_type
-                    self.cells_arr[x][0].figure.set_type(0)
-                    self.cells_arr[x][3].figure.set_type(rook_color)
-                else:
-                    #short castling
-                    rook_color = self.cells_arr[x][7].figure.figure_type
-                    print(rook_color)
-                    self.cells_arr[x][7].figure.set_type(0)
-                    self.cells_arr[x][5].figure.set_type(rook_color)
+                self.make_castling(x, y)
             else:    
                 self.api.do_turn(self.start, (x, y))
             self.make_turn(self.start, (x, y))
@@ -282,39 +272,34 @@ class GuiBoard(QFrame):
         if turn:
             self.make_turn(turn.start_pos, turn.end_pos)
             if turn.castling:
-                x, y = turn.end_pos
-                if y == 2:
-                    #long castling
-                    rook_color = self.cells_arr[x][0].figure.figure_type
-                    self.cells_arr[x][0].figure.set_type(0)
-                    self.cells_arr[x][3].figure.set_type(rook_color)
-                else:
-                    #short castling
-                    rook_color = self.cells_arr[x][7].figure.figure_type
-                    print(rook_color)
-                    self.cells_arr[x][7].figure.set_type(0)
-                    self.cells_arr[x][5].figure.set_type(rook_color)
+                self.make_castling(*turn.end_pos)
 
     def prev_move(self):
         turn = self.api.previous_turn()
         if turn:
             if turn[0].castling:
-                x, y = turn[0].end_pos
-                print(x, y)
-                if y == 2:
-                    #long castling
-                    rook_color = self.cells_arr[x][3].figure.figure_type
-                    self.cells_arr[x][3].figure.set_type(0)
-                    self.cells_arr[x][0].figure.set_type(rook_color)
-                else:
-                    #short castling
-                    rook_color = self.cells_arr[x][5].figure.figure_type
-                    print(rook_color)
-                    self.cells_arr[x][5].figure.set_type(0)
-                    self.cells_arr[x][7].figure.set_type(rook_color)
-            
+                self.make_castling(*turn[0].end_pos, True)
             self.make_turn(turn[0].end_pos, turn[0].start_pos)
                     
+    def make_castling(self, x, y, reverse=False):
+        short_rook_st = 7
+        short_rook_fn = 5
+        long_rook_st = 0
+        long_rook_fn = 3
+        if reverse:
+            short_rook_fn, short_rook_st = short_rook_st, short_rook_fn
+            long_rook_fn, long_rook_st = long_rook_st, long_rook_fn
+        if y == 2:
+            #long castling
+            rook_color = self.cells_arr[x][long_rook_st].figure.figure_type
+            self.cells_arr[x][long_rook_st].figure.set_type(0)
+            self.cells_arr[x][long_rook_fn].figure.set_type(rook_color)
+        else:
+            #short castling
+            rook_color = self.cells_arr[x][short_rook_st].figure.figure_type
+            print(rook_color)
+            self.cells_arr[x][short_rook_st].figure.set_type(0)
+            self.cells_arr[x][short_rook_fn].figure.set_type(rook_color)
     
 class BottomMenu(QFrame):
     def __init__(self, comm):

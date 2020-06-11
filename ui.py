@@ -125,6 +125,7 @@ class GuiBoard(QFrame):
     updBoard = pyqtSignal()
     def __init__(self, api, comm):
         super().__init__()
+        self.history = 0
         self.color = api.board.white
         self.api = api
         self.setMinimumSize(board_size, board_size)
@@ -175,9 +176,8 @@ class GuiBoard(QFrame):
     def figure_moved(self, x, y):
         self.process_move(x, y, "drag")
 
-
     def cell_pressed(self, x, y):
-        if not self.ai_do_turn:
+        if not self.ai_do_turn and not self.history:
             if not self.making_a_move:
                 self.start = (x, y)
                 self.cells_arr[x][y].press()
@@ -187,7 +187,6 @@ class GuiBoard(QFrame):
                         self.cells_arr[field[0]][field[1]].figure.set_type("possible")
                     else:
                         self.cells_arr[field[0]][field[1]].beat()
-
             else:
                 self.process_move(x, y, "press")
     
@@ -222,7 +221,7 @@ class GuiBoard(QFrame):
         self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
 
     def check_move(self, x, y):
-        return True if ((x, y) in self.possible_moves[self.start]) else False
+        return True if not self.history and (x, y) in self.possible_moves[self.start] else False
 
     def promotion(self, color):
         figures = []
@@ -273,6 +272,7 @@ class GuiBoard(QFrame):
     def next_move(self):
         turn = self.api.next_turn()
         if turn:
+            self.history += 1
             self.make_turn(turn.start_pos, turn.end_pos)
             if turn.castling:
                 self.make_castling(*turn.end_pos)
@@ -280,6 +280,7 @@ class GuiBoard(QFrame):
     def prev_move(self):
         turn = self.api.previous_turn()
         if turn:
+            self.history -= 1
             if turn[0].castling:
                 self.make_castling(*turn[0].end_pos, True)
             self.make_turn(turn[0].end_pos, turn[0].start_pos)
@@ -436,7 +437,6 @@ class Main_Window(QWidget):
         def start_game():
             self.api.difficulty = difficulty + 1
             self.tabs.setCurrentIndex(self.tab_names["game_board"])
-
         return start_game
   
     

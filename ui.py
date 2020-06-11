@@ -281,11 +281,40 @@ class GuiBoard(QFrame):
         turn = self.api.next_turn()
         if turn:
             self.make_turn(turn.start_pos, turn.end_pos)
+            if turn.castling:
+                x, y = turn.end_pos
+                if y == 2:
+                    #long castling
+                    rook_color = self.cells_arr[x][0].figure.figure_type
+                    self.cells_arr[x][0].figure.set_type(0)
+                    self.cells_arr[x][3].figure.set_type(rook_color)
+                else:
+                    #short castling
+                    rook_color = self.cells_arr[x][7].figure.figure_type
+                    print(rook_color)
+                    self.cells_arr[x][7].figure.set_type(0)
+                    self.cells_arr[x][5].figure.set_type(rook_color)
 
     def prev_move(self):
         turn = self.api.previous_turn()
         if turn:
+            if turn[0].castling:
+                x, y = turn[0].end_pos
+                print(x, y)
+                if y == 2:
+                    #long castling
+                    rook_color = self.cells_arr[x][3].figure.figure_type
+                    self.cells_arr[x][3].figure.set_type(0)
+                    self.cells_arr[x][0].figure.set_type(rook_color)
+                else:
+                    #short castling
+                    rook_color = self.cells_arr[x][5].figure.figure_type
+                    print(rook_color)
+                    self.cells_arr[x][5].figure.set_type(0)
+                    self.cells_arr[x][7].figure.set_type(rook_color)
+            
             self.make_turn(turn[0].end_pos, turn[0].start_pos)
+                    
     
 class BottomMenu(QFrame):
     def __init__(self, comm):

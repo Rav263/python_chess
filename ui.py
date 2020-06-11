@@ -43,6 +43,9 @@ class Figure(QFrame):
         self.setProperty("type", str(figure_type))
         self.setStyle(self.style())
 
+    def get_color(self):
+        return "w" if self.figure_type // 10 == 1 else "b"
+
     def get_type(self):
         return self.figure_type
 
@@ -200,8 +203,9 @@ class GuiBoard(QFrame):
 
         if self.check_move(x, y):
             moved_fig_type = self.cells_arr[self.start[0]][self.start[1]].figure.get_named_type()
+            fig_color = self.cells_arr[self.start[0]][self.start[1]].figure.get_color()
             if moved_fig_type == "P" and x in (0, 7):
-                self.api.do_turn(self.start, (x, y), self.promotion())
+                self.api.do_turn(self.start, (x, y), self.promotion(fig_color))
             elif moved_fig_type == "K" and y in (2, 6):
                 self.api.do_turn(self.start, (x, y), castling=True)
                 self.make_castling(x, y)
@@ -221,16 +225,16 @@ class GuiBoard(QFrame):
     def check_move(self, x, y):
         return True if ((x, y) in self.possible_moves[self.start]) else False
 
-    def promotion(self):
+    def promotion(self, color):
         figures = []
-        figures.append(QPushButton(""))
-        figures.append(QPushButton(""))
-        figures.append(QPushButton(""))
-        figures.append(QPushButton(""))
+        figures.append(PromotionButton(color + "Q"))
+        figures.append(PromotionButton(color + "R"))
+        figures.append(PromotionButton(color + "N"))
+        figures.append(PromotionButton(color + "B"))
 
         prom_dialog = QDialog()
         prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
-        prom_dialog.move(self.mapToGlobal(self.pos()) - QPoint(-53 * 3, -52 * 3))
+        prom_dialog.move(self.mapToGlobal(self.pos()) - QPoint(-53 * 3, -52 * 3)) #fix constants
 
         for num, figure in enumerate(figures):
             figure.clicked.connect(self.make_answer_button(num + 2, prom_dialog))
@@ -238,7 +242,6 @@ class GuiBoard(QFrame):
         
         layout = QGridLayout(prom_dialog)
         for i, figure in enumerate(figures):
-            figure.setObjectName("Rook")
             layout.addWidget(figure, i % 2, i // 2)
 
 
@@ -370,6 +373,11 @@ class MenuButton(QPushButton):
     def __init__(self, *args):
         super().__init__(*args)
 
+class PromotionButton(QPushButton):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setObjectName(args[0])
+        self.setText("")
 class Main_Window(QWidget):
     
     def __init__(self, api):

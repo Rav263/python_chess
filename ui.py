@@ -7,7 +7,7 @@ from PyQt5.QtGui import QDrag, QPixmap
 import time
 import threading
 
-board_size = 420
+board_size = 416
 
 lock = threading.Lock()
 
@@ -220,14 +220,16 @@ class GuiBoard(QFrame):
 
     def promotion(self, color):
         figures = []
-        figures.append(PromotionButton(color + "N"))
-        figures.append(PromotionButton(color + "B"))
-        figures.append(PromotionButton(color + "R"))
-        figures.append(PromotionButton(color + "Q"))
+        figures.append(PromotionButton(color + "N", self.size()))
+        figures.append(PromotionButton(color + "B", self.size()))
+        figures.append(PromotionButton(color + "R", self.size()))
+        figures.append(PromotionButton(color + "Q", self.size()))
 
         prom_dialog = QDialog()
         prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
-        prom_dialog.move(self.mapToGlobal(self.pos()) - QPoint(-53 * 3, -52 * 3)) #fix constants
+        curr_board = self.size().height() // 2 - figures[0].size().height()
+        # print(figures[0].size(), self.size())
+        prom_dialog.move(self.mapToGlobal(QPoint(0, 0)) + QPoint(curr_board, curr_board)) #fix constants
 
         for num, figure in enumerate(figures):
             figure.clicked.connect(self.make_answer_button(num + 2, prom_dialog))
@@ -238,7 +240,7 @@ class GuiBoard(QFrame):
             layout.addWidget(figure, i % 2, i // 2)
 
 
-        layout.setSpacing(2)
+        layout.setSpacing(12)
         layout.setContentsMargins(0, 0, 0, 0)
         prom_dialog.setLayout(layout)
 
@@ -425,9 +427,16 @@ class MenuButton(QPushButton):
 
 class PromotionButton(QPushButton):
     def __init__(self, *args):
-        super().__init__(*args)
+        super().__init__()
         self.setObjectName(args[0])
+        button_size = args[1].width() // 8
         self.setText("")
+        self.setMinimumSize(button_size, button_size)
+        self.resize(button_size, button_size)
+
+    def resizeEvent(self, event):
+        new_size = min(event.size().height(), event.size().width())
+        self.resize(new_size, new_size)
 
 class ControllButton(QPushButton):
     def __init__(self, *args):
@@ -448,7 +457,6 @@ class Main_Window(QWidget):
         self.comm = Communicate()
 
         self.comm.backMenu.connect(self.return_to_menu)
-
         
         self.game = MainGame(api, self.comm)
         self.menu = MainMenu()
@@ -473,6 +481,7 @@ class Main_Window(QWidget):
     def resizeEvent(self, event):
         new_size = min(event.size().height(), event.size().width())
         self.resize(new_size, new_size + 50)
+
 
     def return_to_menu(self):
         self.tabs.setCurrentIndex(self.tab_names["start"])

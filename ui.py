@@ -144,10 +144,6 @@ class GuiBoard(QFrame):
         self.comm.prevMove.connect(self.prev_move)
         self.comm.toStart.connect(self.to_start)
         self.comm.skipHist.connect(self.skip_history)
-
-        v_layout = QGridLayout()
-        v_layout.setSpacing(0)
-        v_layout.setContentsMargins(0, 0, 0, 0)
         
         cells = QGridLayout()
         cells.setSpacing(0)
@@ -165,19 +161,13 @@ class GuiBoard(QFrame):
                 cells.addWidget(self.cells_arr[x][y], x, y)
                 cell_color = 3 - cell_color
             cell_color = 3 - cell_color
-                
-        v_layout.addLayout(cells, 0, 0)
-
-        self.bottom_menu = BottomMenu(self.comm)
-        v_layout.addWidget(self.bottom_menu, 1, 0)
-        self.setLayout(v_layout)
+        self.setLayout(cells)
 
     def cell_released(self, x, y):
         if self.ai_do_turn:
             self.upd_board()
             self.ai_do_turn = False
         
-
     def figure_moved(self, x, y):
         self.process_move(x, y, "drag")
 
@@ -295,7 +285,6 @@ class GuiBoard(QFrame):
             self.reached_hist_bottom = True
 
     def skip_history(self):
-        print(self.history)
         while(self.history < 0):
             self.next_move()
         self.reached_hist_bottom = False
@@ -324,6 +313,10 @@ class GuiBoard(QFrame):
             self.cells_arr[x][short_rook_st].figure.set_type(0)
             self.cells_arr[x][short_rook_fn].figure.set_type(rook_color)
     
+    def resizeEvent(self, event):
+        new_size = max(event.size().height(), event.size().width())
+        self.resize(new_size, new_size)
+
 class BottomMenu(QFrame):
     def __init__(self, comm):
         super().__init__()
@@ -399,6 +392,25 @@ class MainMenu(QFrame):
         for difficulty in self.difficulties:
             difficulty.show()
 
+class MainGame(QFrame):
+    def __init__(self, api, comm):
+        super().__init__()
+        v_layout = QVBoxLayout()
+        v_layout.setSpacing(0)
+        v_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.board = GuiBoard(api, comm)
+        self.board.upd_possible_moves(self.board.color)
+        v_layout.addWidget(self.board)
+        self.bottom_menu = BottomMenu(comm)
+        v_layout.addWidget(self.bottom_menu)
+
+        h_layout = QHBoxLayout()
+        h_layout.addLayout(v_layout)
+        h_layout.setSpacing(0)
+        h_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(h_layout)
+
 class Border(QFrame):
     def __init__(self, name, width, height):
         super().__init__()
@@ -428,7 +440,7 @@ class Main_Window(QWidget):
     
     def __init__(self, api):
         super().__init__()
-        self.setMinimumSize(board_size, board_size)
+        self.setMinimumSize(board_size, board_size + 50)
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
@@ -437,13 +449,13 @@ class Main_Window(QWidget):
 
         self.comm.backMenu.connect(self.return_to_menu)
 
-        self.board = GuiBoard(api, self.comm)
-        self.board.upd_possible_moves(self.board.color)
+        
+        self.game = MainGame(api, self.comm)
         self.menu = MainMenu()
 
         self.tabs = QStackedLayout()
         self.tabs.addWidget(self.menu)
-        self.tabs.addWidget(self.board)
+        self.tabs.addWidget(self.game)
 
         self.tab_names = {"start":0, "game_board":1}
         self.tabs.setCurrentIndex(self.tab_names["start"])
@@ -457,6 +469,10 @@ class Main_Window(QWidget):
 
         self.setWindowTitle('Chess')
         self.show()
+    
+    def resizeEvent(self, event):
+        new_size = min(event.size().height(), event.size().width())
+        self.resize(new_size, new_size + 50)
 
     def return_to_menu(self):
         self.tabs.setCurrentIndex(self.tab_names["start"])

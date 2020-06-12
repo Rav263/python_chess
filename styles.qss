@@ -4,6 +4,7 @@ MenuButton {
     background-color: #875032;
     min-width: 100px;
     min-height: 30px;
+    color: #ffffff;
 }
 
 MenuButton:pressed {

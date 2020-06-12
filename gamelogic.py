@@ -12,46 +12,7 @@ from multiprocessing import Manager
 import io_functions
 import generate_turns as gt
 from board import Board
-
-
-class Turn:
-    """Turn class for store chess turn"""
-    def __init__(self, start_pos, end_pos, color, pawn=0, castling=False, passant=False):
-        self.start_pos = start_pos
-        self.end_pos = end_pos
-        self.color = color
-        self.pawn = pawn
-        self.castling = castling
-        self.passant = passant
-
-    def print(self):
-        """print(self) -> None: prints Turn information"""
-        print("start pos: ({0}, {1})".format(*self.start_pos))
-        print("end pos:   ({0}, {1})".format(*self.end_pos))
-
-    def __str__(self):
-        start_pos = chr(self.start_pos[1] + ord('a')) + str(8 - self.start_pos[0])
-        end_pos = chr(self.end_pos[1] + ord('a')) + str(8 - self.end_pos[0])
-
-        if self.pawn % 10 == 2:
-            end_pos += "n"
-        elif self.pawn % 10 == 3:
-            end_pos += "b"
-        elif self.pawn % 10 == 4:
-            end_pos += "r"
-        elif self.pawn % 10 == 6:
-            end_pos += "q"
-
-        return start_pos + end_pos
-        """
-        return ("start pos: ({0}, {1})\n".format(*self.start_pos) +
-                "end pos:   ({0}, {1})\n".format(*self.end_pos) +
-                f"color:      {self.color}")
-        """
-    def __eq__(self, second):
-        return (self.start_pos == self.start_pos and self.end_pos == second.end_pos and
-                self.color == second.color and self.pawn == second.pawn and
-                self.castling == second.castling)
+from turns import read_nodes, Turn, Node
 
 
 class Logic:
@@ -66,6 +27,8 @@ class Logic:
         self.figures_cost = data.data["FIGURES_COST"]
         self.av_threads = num_threads
         self.evaluation = evaluation
+        self.debuts = read_nodes()
+        self.flag = True
 
     def start(self, board, data, difficulty):
         """start(self, board, data, difficulty) -> None
@@ -228,6 +191,17 @@ class Logic:
 
         return tuple of best_turn and it cost
         """
+
+        if last_turn in self.debuts.next_turns and self.flag:
+            self.debuts = self.debuts.next_turns[last_turn]
+        else:
+            self.flag = False
+        if len(self.debuts.next_turns) == 0:
+            self.flag = False
+        elif self.flag:
+            best_turn = self.debuts.sorted_turns[0][0]
+            self.debuts = self.debuts.next_turns[best_turn]
+            return (best_turn, 0, 0)
 
         manager = Manager()
         return_dict = manager.dict()

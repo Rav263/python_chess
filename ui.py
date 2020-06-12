@@ -240,7 +240,7 @@ class GuiBoard(QFrame):
             layout.addWidget(figure, i % 2, i // 2)
 
 
-        layout.setSpacing(12)
+        layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         prom_dialog.setLayout(layout)
 

@@ -11,10 +11,6 @@ MenuButton:pressed {
                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
 }
 
-PromotionButton{
-    min-width: 57px;
-    min-height: 57px;
-}
 
 PromotionButton#wN{
     border-image: url(images/merida/wN.png) 0 0 0 0 stretch stretch;

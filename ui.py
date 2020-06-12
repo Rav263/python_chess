@@ -220,10 +220,10 @@ class GuiBoard(QFrame):
 
     def promotion(self, color):
         figures = []
-        figures.append(PromotionButton(color + "Q"))
-        figures.append(PromotionButton(color + "R"))
         figures.append(PromotionButton(color + "N"))
         figures.append(PromotionButton(color + "B"))
+        figures.append(PromotionButton(color + "R"))
+        figures.append(PromotionButton(color + "Q"))
 
         prom_dialog = QDialog()
         prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);

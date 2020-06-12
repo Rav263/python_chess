@@ -228,7 +228,6 @@ class GuiBoard(QFrame):
         prom_dialog = QDialog()
         prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
         curr_board = self.size().height() // 2 - figures[0].size().height()
-        # print(figures[0].size(), self.size())
         prom_dialog.move(self.mapToGlobal(QPoint(0, 0)) + QPoint(curr_board, curr_board)) #fix constants
 
         for num, figure in enumerate(figures):
@@ -301,8 +300,8 @@ class GuiBoard(QFrame):
         long_rook_st = 0
         long_rook_fn = 3
         if reverse:
-            swap(short_rook_fn, short_rook_st)
-            swap(long_rook_fn, long_rook_st)
+            short_rook_fn, short_rook_st = short_rook_st, short_rook_fn
+            long_rook_fn, long_rook_st = long_rook_st, long_rook_fn
         if y == 2:
             #long castling
             rook_color = self.cells_arr[x][long_rook_st].figure.figure_type

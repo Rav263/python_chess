@@ -128,14 +128,12 @@ class Logic:
         """
         best_cost = self.MIN_COST
         best_turn = self.NULL_TURN
-        print("thread:", index, "turns:", turns) 
         for now_turn in turns:
             tmp, flags = board.do_turn(now_turn)
 
             now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn)[1]
 
             board.un_do_turn(now_turn, tmp, flags)
-            print(now_cost)
             if now_cost >= best_cost:
                 best_cost = now_cost
                 best_turn = now_turn
@@ -193,7 +191,6 @@ class Logic:
 
         for thread in threads:
             thread.join()
-        print(return_dict)
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, last_turn, alpha=MIN_COST, beta=MAX_COST):
@@ -218,7 +215,6 @@ class Logic:
 
             if depth == 1:
                 now_cost = self.evaluation.evaluate_board_mg(board, color)
-                # board.calculate_board_cost(self.figures_cost)
             else:
                 now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn, alpha, beta)[1]
 

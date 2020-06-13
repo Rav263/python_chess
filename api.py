@@ -23,7 +23,11 @@ class Api:
         self.logic = Logic(self.data, threads, self.evaluate, self.debuts)
         self.difficulty = difficulty
         self.turn_index = 0
+
         print(self.evaluate.evaluate_board_mg(self.board, 1))
+        print("difficulty:", difficulty)
+        print("threads:   ", threads)
+
         # Then we need start game
 
     def start_cmd(self):
@@ -46,14 +50,14 @@ class Api:
 
         return turns
 
-    def get_map(self, pos):
+    def get_field(self, pos):
         """returns cell value on board"""
         if self.board.check_pos(pos):
             return self.board.get_map(pos)
 
         return -1
 
-    def set_map(self, pos, value):
+    def set_field(self, pos, value):
         """set cell value on board"""
         if self.board.check_pos(pos):
             return self.board.set_map(pos, value)

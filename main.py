@@ -2,16 +2,13 @@
 """Main python_chess module file"""
 # pylint: disable=missing-function-docstring
 
+from multiprocessing import cpu_count
 import sys
-import os
 
 from api import Api
 from cmd_ui import CmdUi
+from ui import Gui
 import stockfish
-
-
-def get_num_threads():
-    return (int)(os.popen('grep -c cores /proc/cpuinfo').read())
 
 
 def parse_args():
@@ -62,9 +59,13 @@ def main():
         else:
             print("Starting GUI")
             # GUI START CODE HERE
+            gui = Gui(api)
+            gui.start()
     else:
         print("Starting GUI")
         # GUI START CODE HERE
+        gui = Gui(api)
+        gui.start()
 
     return None
 

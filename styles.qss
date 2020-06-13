@@ -1,0 +1,101 @@
+QPushButton {
+    border: 2px solid #613924;
+    border-radius: 3px;
+    background-color: #875032;
+    min-width: 100px;
+    min-height: 30px;
+}
+
+QPushButton:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+
+
+
+QFrame#border-left {
+    border-image: url(images/left.jpg) 0 0 0 0 stretch stretch;
+}
+QFrame#border-right {
+    border-image: url(images/right.jpg) 0 0 0 0 stretch stretch;
+}
+QFrame#border-up {
+    border-image: url(images/up.jpg) 0 0 0 0 stretch stretch;
+}
+QFrame#border-down {
+    border-image: url(images/down.jpg) 0 0 0 0 stretch stretch;
+}
+
+/* GuiBoard {
+    background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
+} */
+
+MainMenu{
+    background-image: url(images/board.jpg) 0 0 0 0 stretch stretch;
+}
+
+Cell[color="black"][pressed="1"]{
+    border: 3px solid green;
+    background-color: #9a561b;
+}
+Cell[color="white"][pressed="1"]{
+    border: 3px solid green;
+    background-color: #e6ccab;
+}
+
+Cell[color="black"]{
+    background-color: #9a561b;
+}
+Cell[color="white"]{
+    background-color: #e6ccab;
+}
+
+
+Figure[type="11"]{
+    border-image: url(images/merida/wP.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="12"]{
+    border-image: url(images/merida/wN.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="13"]{
+    border-image: url(images/merida/wB.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="14"]{
+    border-image: url(images/merida/wR.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="15"]{
+    border-image: url(images/merida/wK.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="16"]{
+    border-image: url(images/merida/wQ.png) 0 0 0 0 stretch stretch;
+}
+
+
+Figure[type="21"]{
+    border-image: url(images/merida/bP.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="22"]{
+    border-image: url(images/merida/bN.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="23"]{
+    border-image: url(images/merida/bB.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="24"]{
+    border-image: url(images/merida/bR.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="25"]{
+    border-image: url(images/merida/bK.png) 0 0 0 0 stretch stretch;
+}
+
+Figure[type="26"]{
+    border-image: url(images/merida/bQ.png) 0 0 0 0 stretch stretch;
+}

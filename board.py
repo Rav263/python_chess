@@ -133,7 +133,10 @@ class Board:
 
     def load_board(self, data):
         """load_board(self, data) -> set self.board object from data file"""
-        self.board = data.data["BOARD"]
+        self.board = []
+        for line in data.data["BOARD"]:
+            new_line = [x for x in line]
+            self.board.append(new_line)
 
     def get_map(self, pos):
         """get_map(self, pos) -> figure

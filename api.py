@@ -90,6 +90,7 @@ class Api:
 
         self.logic.add_turn_to_history((now_turn, tmp, flags))
         self.turn_index += 1
+        return now_turn.passant or now_turn.castling or now_turn.pawn != 0
 
     def ai_turn(self, color):
         """ai do turn with color"""
@@ -105,7 +106,7 @@ class Api:
         self.logic.add_turn_to_history((now_turn, tmp, flags))
 
         self.turn_index += 1
-        return now_turn
+        return (now_turn, now_turn.passant or now_turn.castling or now_turn.pawn != 0)
 
     def start_new_game(self, difficulty):
         self.board = Board(self.data)

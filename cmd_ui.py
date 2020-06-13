@@ -26,7 +26,7 @@ class CmdUi:
             
                     color = 3 - color
                 else:
-                    now_turn = self.api.ai_turn(color)
+                    now_turn = self.api.ai_turn(color)[0]
 
                     if now_turn == self.api.logic.NULL_TURN:
                         print("CHECK MATE! YOU WIN!")

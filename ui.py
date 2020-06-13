@@ -83,10 +83,7 @@ class Figure(QFrame):
         :return: "w" or "b" + "P", "N", "B", "R", "K" or "Q"  depending on figure type
         :rtype: str
         """
-        name = ""
-        name += "w" if self.figure_type // 10 == 1 else "b"
-        name += self.get_named_type()
-        return name
+        return self.get_color + self.get_named_type()
 
     def mouseMoveEvent(self, event):
         """Proccess figure moving

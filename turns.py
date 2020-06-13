@@ -1,3 +1,6 @@
+from tqdm import tqdm
+
+
 class Turn:
     """Turn class for store chess turn"""
     def __init__(self, start_pos, end_pos, color, pawn=0, castling=False, passant=False):
@@ -92,10 +95,14 @@ def build_tree(nodes, now_index, node, depth):
 
 
 def read_nodes():
-    file_deb = open("./debuts.dat")
-    nodes = eval(file_deb.readline())
-    file_deb.close()
-
+    print("Reading debuts, please wait:")
+    fil = open("./debuts.dat", "r")
+    lines = [line for line in fil]
+    fil.close()
+    nodes = list()
+    for line in tqdm(lines):
+        nodes.extend(eval(line))
+    
     root = Node()
     build_tree(nodes, 0, root, -1)
 

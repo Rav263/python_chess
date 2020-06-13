@@ -12,7 +12,7 @@ from multiprocessing import Manager
 import io_functions
 import generate_turns as gt
 from board import Board
-from turns import read_nodes, Turn, Node
+from turns import Turn
 
 
 class Logic:
@@ -22,12 +22,12 @@ class Logic:
     NULL_TURN = Turn((-1, -1), (-1, -1), 0)
     turn_history = list()
 
-    def __init__(self, data, num_threads, evaluation):
+    def __init__(self, data, num_threads, evaluation, debuts):
         print("Init game logic class")
         self.figures_cost = data.data["FIGURES_COST"]
         self.av_threads = num_threads
         self.evaluation = evaluation
-        self.debuts = read_nodes()
+        self.debuts = debuts
         self.flag = True
 
     def start(self, board, data, difficulty):
@@ -52,11 +52,8 @@ class Logic:
             last_turn = now_turn
 
             color = 3 - color
-            self.depth = [0, 0, 0, 0, 0]
-            now_turn, now_cost, tmp = self.root_ai_turn(board, color, difficulty, last_turn)
+            now_turn, now_cost = self.root_ai_turn(board, color, difficulty, last_turn)
             print("BEST COST: ", now_cost)
-
-            print(*[f"depth {x}: {self.depth[x]}" for x in range(5)], sep="\n")
 
             if now_turn == self.NULL_TURN:
                 print("CHECK MATE! YOU WIN!")
@@ -75,7 +72,26 @@ class Logic:
     def get_turn_from_history(self, index):
         """returns turn from history"""
         return self.turn_history[index]
+    
+    def generate_turns(self, board, color, last_turn):
+        possible_turns = self.generate_all_possible_turns(board, color, last_turn)
+        turns = list()
 
+        for end_pos in possible_turns:
+            for start_pos in possible_turns[end_pos]:
+                if len(start_pos) == 3:
+                    now_turn = Turn((start_pos[0], start_pos[1]), end_pos, color, start_pos[2])
+                elif len(start_pos) == 4:
+                    now_turn = Turn(start_pos, end_pos, color, castling=True)
+                elif len(end_pos) == 3:
+                    now_turn = Turn(start_pos, end_pos[:2], color, passant=True)
+                else:
+                    now_turn = Turn(start_pos, end_pos, color)
+
+                turns.append(now_turn)
+
+        return turns
+    
     def generate_all_possible_turns(self, board, color, last_turn, check_check=True):
         """generate_all_possible_turns(self, board, color) -> dict
 
@@ -132,11 +148,6 @@ class Logic:
 
         return (possible_turns, turns_for_king)
 
-    def sum_depth(self, itr, size):
-        for x in itr:
-            for i in range(size):
-                self.depth[i] += x[2][i]
-
     def thread_generate(self, board, color, depth, turns, index, return_dict):
         """thread_generate(self, board, color, depth, turns, index, return_dict) -> tuple
 
@@ -152,34 +163,19 @@ class Logic:
         """
         best_cost = self.MIN_COST
         best_turn = self.NULL_TURN
-
-        for turn in turns:
-            self.depth[depth] += 1
-            if len(turn[0]) == 3:
-                now_turn = Turn(turn[0][:2], turn[1], color, pawn=turn[0][2])
-            elif len(turn[0]) == 4:
-                now_turn = Turn(turn[0], turn[1], color, castling=True)
-            elif len(turn[1]) == 3:
-                now_turn = Turn(turn[0], turn[1][:2], color, passant=True)
-            else:
-                now_turn = Turn(turn[0], turn[1], color)
-
+        print("thread:", index, "turns:", turns) 
+        for now_turn in turns:
             tmp, flags = board.do_turn(now_turn)
 
             now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn)[1]
 
             board.un_do_turn(now_turn, tmp, flags)
             print(now_cost)
-            if color == board.black:
-                if now_cost >= best_cost:
-                    best_cost = now_cost
-                    best_turn = now_turn
-            else:
-                if now_cost <= best_cost:
-                    best_cost = now_cost
-                    best_turn = now_turn
+            if now_cost >= best_cost:
+                best_cost = now_cost
+                best_turn = now_turn
 
-        return_dict[index] = (best_turn, best_cost, self.depth)
+        return_dict[index] = (best_turn, best_cost)
 
     def root_ai_turn(self, board, color, depth, last_turn):
         """root_ai_turn(self, board, color, depth) -> tuple
@@ -194,6 +190,10 @@ class Logic:
 
         if last_turn in self.debuts.next_turns and self.flag:
             self.debuts = self.debuts.next_turns[last_turn]
+        elif last_turn == self.NULL_TURN and len(self.debuts.next_turns) != 0:
+            best_turn = self.debuts.sorted_turns[0][0]
+            self.debuts = self.debuts.next_turns[best_turn]
+            return (best_turn, 0)
         else:
             self.flag = False
         if len(self.debuts.next_turns) == 0:
@@ -201,26 +201,18 @@ class Logic:
         elif self.flag:
             best_turn = self.debuts.sorted_turns[0][0]
             self.debuts = self.debuts.next_turns[best_turn]
-            return (best_turn, 0, 0)
+            return (best_turn, 0)
 
         manager = Manager()
         return_dict = manager.dict()
 
-        possible_turns = self.generate_all_possible_turns(board, color, last_turn)
-
-        turns = []
+        turns = self.generate_turns(board, color, last_turn)
         threads = []
-
-        for end_pos in possible_turns:
-            for start_pos in possible_turns[end_pos]:
-                turns.append((start_pos, end_pos))
 
         num_of_turns = len(turns) // self.av_threads + 1
         num_of_threads = len(turns) // num_of_turns + 1
-
         if len(turns) < self.av_threads:
             num_of_threads = 1
-
         for i in range(num_of_threads):
             now_board = Board(None, board)
             start = i * num_of_turns
@@ -236,7 +228,7 @@ class Logic:
 
         for thread in threads:
             thread.join()
-        self.sum_depth(return_dict.values(), len(self.depth))
+        print(return_dict)
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, last_turn, alpha=MIN_COST, beta=MAX_COST):
@@ -251,42 +243,31 @@ class Logic:
 
         return tuple of best_turn and it cost
         """
-        possible_turns = self.generate_all_possible_turns(board, color, last_turn)
+        turns = self.generate_turns(board, color, last_turn)
 
         best_cost = self.MIN_COST
         best_turn = self.NULL_TURN
 
-        for end_pos in possible_turns:
-            for start_pos in possible_turns[end_pos]:
-                self.depth[depth] += 1
-                if len(start_pos) == 3:
-                    now_turn = Turn((start_pos[0], start_pos[1]), end_pos, color, start_pos[2])
-                elif len(start_pos) == 4:
-                    now_turn = Turn(start_pos, end_pos, color, castling=True)
-                elif len(end_pos) == 3:
-                    now_turn = Turn(start_pos, end_pos[:2], color, passant=True)
-                else:
-                    now_turn = Turn(start_pos, end_pos, color)
+        for now_turn in turns:
+            tmp, flags = board.do_turn(now_turn)
 
-                tmp, flags = board.do_turn(now_turn)
+            if depth == 1:
+                now_cost = self.evaluation.evaluate_board_mg(board, color)
+                # board.calculate_board_cost(self.figures_cost)
+            else:
+                now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn, alpha, beta)[1]
 
-                if depth == 1:
-                    now_cost = self.evaluation.evaluate_board_mg(board, color)
-                    # board.calculate_board_cost(self.figures_cost)
-                else:
-                    now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn, alpha, beta)[1]
+            board.un_do_turn(now_turn, tmp, flags)
+            if now_cost >= best_cost:
+                best_cost = now_cost
+                best_turn = now_turn
+           
+            if color == board.black:
+                alpha = max(alpha, best_cost)
+            else:
+                beta = min(beta, best_cost)
 
-                board.un_do_turn(now_turn, tmp, flags)
-                if now_cost >= best_cost:
-                    best_cost = now_cost
-                    best_turn = now_turn
-               
-                if color == board.black:
-                    alpha = max(alpha, best_cost)
-                else:
-                    beta = min(beta, best_cost)
-
-                if beta <= alpha:
-                    return (best_turn, best_cost)
+            if beta <= alpha:
+                return (best_turn, best_cost)
         
         return (best_turn, best_cost)

@@ -288,30 +288,28 @@ class GuiBoard(QFrame):
             fig_color = self.cells_arr[self.start[0]][self.start[1]].figure.get_color()
             if moved_fig_type == "P" and x in (0, 7):
                 self.api.do_turn(self.start, (x, y), self.promotion(fig_color))
-            elif moved_fig_type == "K" and y in (2, 6):
-                self.api.do_turn(self.start, (x, y), castling=True)
-                self.make_castling(x, y)
+                self.make_turn(self.start, (x, y), True)
             else:    
-                self.api.do_turn(self.start, (x, y))
-            self.make_turn(self.start, (x, y))
+                self.make_turn(self.start, (x, y), self.api.do_turn(self.start, (x, y)))
             self.change_color()
             if method == "press":
                 self.ai_do_turn = True
             elif method == "drag":
                 self.upd_board()
 
-    def make_turn(self, start, stop, promotion = -1):
+    def make_turn(self, start, stop, upd_all = False):
         """Display move on the board
 
         :param start: start position
         :type start: (int, int)
         :param stop: stop position
         :type stop: (int, int)
-        :param promotion: pawn promotion value, defaults to -1
-        :type promotion: int, optional
         """
-        self.cells_arr[start[0]][start[1]].figure.set_type(0)
-        self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
+        if upd_all:
+            self.upd_whole_board()
+        else:
+            self.cells_arr[start[0]][start[1]].figure.set_type(0)
+            self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
 
     def check_move(self, x, y):
         """Checks if a move is correct
@@ -375,10 +373,15 @@ class GuiBoard(QFrame):
     def upd_board(self):
         """Updates board after AI turn
         """
-        turn = self.api.ai_turn(self.color)
-        self.make_turn(turn.start_pos, turn.end_pos)
+        turn, upd_whole = self.api.ai_turn(self.color)
+        self.make_turn(turn.start_pos, turn.end_pos, upd_whole)
         self.change_color()
         self.upd_possible_moves(self.color)
+    
+    def upd_whole_board(self):
+        for x in range(8):
+            for y in range(8):
+                self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
     
     def upd_possible_moves(self, color):
         """Gets all possible turns of a specific color from API
@@ -399,9 +402,7 @@ class GuiBoard(QFrame):
         turn = self.api.next_turn()
         if turn:
             self.history += 1
-            self.make_turn(turn.start_pos, turn.end_pos)
-            if turn.castling:
-                self.make_castling(*turn.end_pos)
+            self.make_turn(turn.start_pos, turn.end_pos, True)
         else:
             self.reached_hist_bottom = False
 
@@ -411,9 +412,7 @@ class GuiBoard(QFrame):
         turn = self.api.previous_turn()
         if turn:
             self.history -= 1
-            if turn[0].castling:
-                self.make_castling(*turn[0].end_pos, True)
-            self.make_turn(turn[0].end_pos, turn[0].start_pos)
+            self.make_turn(turn[0].end_pos, turn[0].start_pos, True)
         else:
             self.reached_hist_bottom = True
 
@@ -430,26 +429,6 @@ class GuiBoard(QFrame):
         while(not self.reached_hist_bottom):
             self.prev_move()
       
-    def make_castling(self, x, y, reverse=False):
-        short_rook_st = 7
-        short_rook_fn = 5
-        long_rook_st = 0
-        long_rook_fn = 3
-        if reverse:
-            short_rook_fn, short_rook_st = short_rook_st, short_rook_fn
-            long_rook_fn, long_rook_st = long_rook_st, long_rook_fn
-        if y == 2:
-            #long castling
-            rook_color = self.cells_arr[x][long_rook_st].figure.figure_type
-            self.cells_arr[x][long_rook_st].figure.set_type(0)
-            self.cells_arr[x][long_rook_fn].figure.set_type(rook_color)
-        else:
-            #short castling
-            rook_color = self.cells_arr[x][short_rook_st].figure.figure_type
-            print(rook_color)
-            self.cells_arr[x][short_rook_st].figure.set_type(0)
-            self.cells_arr[x][short_rook_fn].figure.set_type(rook_color)
-    
     def resizeEvent(self, event):
         """Process resize event
 

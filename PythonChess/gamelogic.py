@@ -9,10 +9,9 @@ from multiprocessing import Process
 from multiprocessing import Manager
 
 
-import io_functions
-import generate_turns as gt
-from board import Board
-from turns import Turn
+import PythonChess.generate_turns as gt
+from .board import Board
+from .turns import Turn
 
 
 class Logic:

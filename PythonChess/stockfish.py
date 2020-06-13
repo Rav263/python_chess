@@ -1,6 +1,6 @@
 """Stockfish vs ai play"""
-from other_engines_io import Stockfish
-import io_functions
+from .other_engines_io import Stockfish
+import PythonChess.io_functions as io_functions
 
 
 def main(api, num_threads):

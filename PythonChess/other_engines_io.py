@@ -4,7 +4,7 @@ import threading
 import subprocess
 from queue import Queue
 
-from gamelogic import Turn
+from .turns import Turn
 
 
 class Stockfish:

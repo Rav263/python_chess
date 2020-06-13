@@ -1,11 +1,11 @@
 """module to connect backend ang gui"""
 
 from collections import defaultdict
-from board import Board
-from gamelogic import Logic
-from io_functions import Data
-from evaluate import Evaluate
-from turns import read_nodes, Node
+from .board import Board
+from .gamelogic import Logic
+from .io_functions import Data
+from .evaluate import Evaluate
+from .turns import read_nodes, Node
 
 
 class Api:

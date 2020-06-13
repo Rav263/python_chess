@@ -1,6 +1,5 @@
 """Board class file"""
 from itertools import product
-import subprocess
 
 
 class Board:

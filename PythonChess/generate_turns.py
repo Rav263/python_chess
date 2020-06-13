@@ -11,7 +11,7 @@ from itertools import product
 from collections import defaultdict
 
 
-import math_functions as mf
+import PythonChess.math_functions as mf
 
 
 def transform_turns_dict(possible_turns):

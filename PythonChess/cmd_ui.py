@@ -1,5 +1,5 @@
-from io_functions import print_board, get_turn, get_color, new_game
-from io_functions import get_difficulty
+from .io_functions import print_board, get_turn, get_color, new_game
+from .io_functions import get_difficulty
 
 
 class CmdUi:

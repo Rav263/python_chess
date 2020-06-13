@@ -5,10 +5,10 @@
 from multiprocessing import cpu_count
 import sys
 
-from api import Api
-from cmd_ui import CmdUi
-from ui import Gui
-import stockfish
+from PythonChess.api import Api
+from PythonChess.cmd_ui import CmdUi
+from PythonChess.ui import Gui
+import PythonChess.stockfish
 
 
 def parse_args():
@@ -55,7 +55,7 @@ def main():
             ui = CmdUi(api)
             ui.start()
         elif parsed_args["MODE"] == "AI":
-            stockfish.main(api, parsed_args["THREADS"])
+            PythonChess.stockfish.main(api, parsed_args["THREADS"])
         else:
             print("Starting GUI")
             # GUI START CODE HERE

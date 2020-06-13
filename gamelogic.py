@@ -30,41 +30,6 @@ class Logic:
         self.debuts = debuts
         self.flag = True
 
-    def start(self, board, data, difficulty):
-        """start(self, board, data, difficulty) -> None
-
-        Main game cycle in text mode
-        """
-
-        color = 1
-        last_turn = self.NULL_TURN
-        print(self.evaluation.evaluate_board_mg(board, 1))
-        print(self.evaluation.evaluate_board_mg(board, 2))
-        while True:
-            io_functions.print_board(board.board, data)
-            now_turn = io_functions.get_turn(self, color, board, last_turn)
-            print(now_turn)
-            if now_turn == self.NULL_TURN:
-                print("CHECK MATE! YOU LOSE!")
-                break
-
-            board.do_turn(now_turn)
-            last_turn = now_turn
-
-            color = 3 - color
-            now_turn, now_cost = self.root_ai_turn(board, color, difficulty, last_turn)
-            print("BEST COST: ", now_cost)
-
-            if now_turn == self.NULL_TURN:
-                print("CHECK MATE! YOU WIN!")
-                break
-            print(now_turn)
-
-            board.do_turn(now_turn)
-            last_turn = now_turn
-            print(self.evaluation.evaluate_board_mg(board, 2))
-            color = 3 - color
-
     def add_turn_to_history(self, now_turn):
         """adds turn for history"""
         self.turn_history.append(now_turn)

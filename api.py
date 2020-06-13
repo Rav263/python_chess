@@ -107,11 +107,11 @@ class Api:
         self.turn_index += 1
         return now_turn
 
-    def start_new_game(self):
+    def start_new_game(self, difficulty):
         self.board = Board(self.data)
-        print("WTF")
         self.logic.debuts = self.debuts
         self.logic.flag = True
+        self.difficulty = difficulty
 
     def previous_turn(self):
         """returns previous turn and un do it on board"""

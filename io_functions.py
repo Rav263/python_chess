@@ -109,7 +109,21 @@ def new_game():
         game = input("Do you whant another game (y\\n):").strip().lower()
         if game in ("y", "n"):
             break
+        print("Please, try again")
     return game == "y"
+
+
+def get_difficulty():
+    while True:
+        diff = input("Please enter difficulty (2-5): ")
+        if not diff.isnumeric():
+            print("This is not num")
+            continue
+        if int(diff) < 2 or int(diff) > 5:
+            print("This is wrong difficulty")
+            continue
+        break
+    return int(diff)
 
 
 def get_turn(color, api):

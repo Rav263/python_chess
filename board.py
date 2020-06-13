@@ -1,5 +1,6 @@
 """Board class file"""
 from itertools import product
+import subprocess
 
 
 class Board:
@@ -94,6 +95,12 @@ class Board:
             self.set_map(turn.start_pos[3], self.get_map(turn.start_pos[2]))
             self.set_map(turn.start_pos[2], 0)
             flags = dict()
+        elif turn.passant:
+            diff = turn.end_pos[1] - turn.start_pos[1]
+            tmp = self.set_map((turn.start_pos[0], turn.start_pos[1] + diff), 0)
+            flags = self.set_movement_flags(turn.start_pos)
+            self.set_map(turn.end_pos, self.get_map(turn.start_pos), pawn=turn.pawn)
+            self.set_map(turn.start_pos, 0)
         else:
             flags = self.set_movement_flags(turn.start_pos)
             tmp = self.set_map(turn.end_pos, self.get_map(turn.start_pos), pawn=turn.pawn)
@@ -107,6 +114,12 @@ class Board:
             self.set_map(turn.end_pos, 0)
             self.set_map(turn.start_pos[2], self.get_map(turn.start_pos[3]))
             self.set_map(turn.start_pos[3], 0)
+        elif turn.passant:
+            self.un_set_movement_flags(flags)
+            diff = turn.end_pos[1] - turn.start_pos[1]
+            self.set_map((turn.start_pos[0], turn.start_pos[1] + diff), fig)
+            self.set_map(turn.start_pos, self.get_map(turn.end_pos))
+            self.set_map(turn.end_pos, 0)
         else:
             self.un_set_movement_flags(flags)
             self.set_map(turn.start_pos, self.get_map(turn.end_pos))
@@ -120,7 +133,10 @@ class Board:
 
     def load_board(self, data):
         """load_board(self, data) -> set self.board object from data file"""
-        self.board = data.data["BOARD"]
+        self.board = []
+        for line in data.data["BOARD"]:
+            new_line = [x for x in line]
+            self.board.append(new_line)
 
     def get_map(self, pos):
         """get_map(self, pos) -> figure
@@ -175,6 +191,24 @@ class Board:
         self.board[pos[0]][pos[1]] = pawn if pawn else value
         return tmp
 
+    def generate_fen(self, fen_dict):
+        fen = ""
+        for index, now_line in enumerate(self.board):
+            counter = 0
+            for now_fig in now_line:
+                if now_fig == 0:
+                    counter += 1
+                    continue
+                if counter:
+                    fen += str(counter)
+                    counter = 0
+                fen += fen_dict[now_fig]
+            if counter:
+                fen += str(counter)
+            if index != self.board_size - 1:
+                fen += "/"
+        return fen
+
     def calculate_board_cost(self, figures_cost):
         """calculate_board_cost(self, color, figures_cost) - Int(sum of figures)"""
         summ = 0  # figures_cost["sum"]
@@ -182,3 +216,9 @@ class Board:
             summ += figures_cost[self.get_map(pos)]
 
         return summ
+
+        """
+        fen = self.generate_fen(self.data.data["FEN"])
+
+        return -float(subprocess.getoutput("./stockfish " + fen + " eval").split()[-3])
+        """

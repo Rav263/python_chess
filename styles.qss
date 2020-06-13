@@ -99,9 +99,11 @@ Cell[color="white"][pressed="beat"]{
 }
 
 Cell[color="black"]{
+    border: 3px solid transparent;
     background-color: #9a561b;
 }
 Cell[color="white"]{
+    border: 3px solid transparent;
     background-color: #e6ccab;
 }
 

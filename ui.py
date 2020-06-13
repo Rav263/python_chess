@@ -37,11 +37,13 @@ class Communicate(QObject):
     skipHist = pyqtSignal()
 
 class Figure(QFrame):
+    fig_translation = {1:"P", 2:"N", 3:"B", 4:"R", 5:"K", 6:"Q"}
+    
     def __init__(self, figure_type, comm):
         super().__init__()
         self.comm = comm
         self.set_type(figure_type)
-        self.fig_translation = {1:"P", 2:"N", 3:"B", 4:"R", 5:"K", 6:"Q"}
+        
     
     def set_type(self, figure_type):
         """Updates figure's type
@@ -83,7 +85,7 @@ class Figure(QFrame):
         :return: "w" or "b" + "P", "N", "B", "R", "K" or "Q"  depending on figure type
         :rtype: str
         """
-        return self.get_color + self.get_named_type()
+        return self.get_color() + self.get_named_type()
 
     def mouseMoveEvent(self, event):
         """Proccess figure moving
@@ -91,6 +93,8 @@ class Figure(QFrame):
         :param event: movement event
         :type event: QEvent
         """
+        if (self.get_type() == 0):
+            return
         mime_data = QMimeData()
         mime_data.setText(str(self.figure_type))
         drag = QDrag(self)

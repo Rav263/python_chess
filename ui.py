@@ -98,8 +98,10 @@ class Figure(QFrame):
         mime_data.setText(str(self.figure_type))
         drag = QDrag(self)
         drag.setMimeData(mime_data)
-        drag.setPixmap(QPixmap("images/merida/{}.png".format(self.get_figure_name())))
-        drag.setHotSpot(self.rect().bottomRight())
+        pic = QPixmap("images/merida/{}.png".format(self.get_figure_name()))
+        drag.setPixmap(pic.scaled(self.size()))
+        center_coord = self.rect().bottomRight().x() // 2
+        drag.setHotSpot(QPoint(center_coord, center_coord))
         dropAction = drag.exec_(Qt.MoveAction)
     
 
@@ -178,8 +180,6 @@ class Cell(QFrame):
         """
         self.setProperty("pressed", "no")
         self.setStyle(self.style())
-        
-
 
 class GuiBoard(QFrame):
     updBoard = pyqtSignal()

@@ -9,7 +9,6 @@ from multiprocessing import Process
 from multiprocessing import Manager
 
 
-import io_functions
 import generate_turns as gt
 from board import Board
 from turns import Turn
@@ -37,7 +36,7 @@ class Logic:
     def get_turn_from_history(self, index):
         """returns turn from history"""
         return self.turn_history[index]
-    
+
     def generate_turns(self, board, color, last_turn):
         possible_turns = self.generate_all_possible_turns(board, color, last_turn)
         turns = list()
@@ -56,7 +55,7 @@ class Logic:
                 turns.append(now_turn)
 
         return turns
-    
+
     def generate_all_possible_turns(self, board, color, last_turn, check_check=True):
         """generate_all_possible_turns(self, board, color) -> dict
 
@@ -222,7 +221,7 @@ class Logic:
             if now_cost >= best_cost:
                 best_cost = now_cost
                 best_turn = now_turn
-           
+
             if color == board.black:
                 alpha = max(alpha, best_cost)
             else:
@@ -230,5 +229,5 @@ class Logic:
 
             if beta <= alpha:
                 return (best_turn, best_cost)
-        
+
         return (best_turn, best_cost)

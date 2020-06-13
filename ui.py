@@ -140,7 +140,7 @@ class GuiBoard(QFrame):
 
     def upd_board(self):
         print("ai is going to make a turn")
-        turn = self.api.ai_turn(self.color)
+        turn = self.api.ai_turn(self.color)[0]
         print("ai made a turn")
         self.make_turn(turn.start_pos, turn.end_pos)
         self.change_color()

@@ -15,7 +15,7 @@ def parse_args():
     parsed_args = dict()
     parsed_args["DEBUTS"] = True
     parsed_args["DIFFICULTY"] = 4
-    parsed_args["THREADS"] = get_num_threads()
+    parsed_args["THREADS"] = cpu_count()
     parsed_args["HELP"] = False
     for index, arg in enumerate(sys.argv):
         if arg == "--mode":

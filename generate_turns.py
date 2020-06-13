@@ -167,8 +167,7 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
     for pos_for_block in positions_for_block:
         if pos_for_block in turns:
             for start_pos in turns[pos_for_block]:
-                if start_pos not in opponent_turns or pos_for_block in opponent_turns[start_pos]:
-                    possible_turns[pos_for_block].append(start_pos)
+                possible_turns[pos_for_block].append(start_pos)
 
     return possible_turns
 

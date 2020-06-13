@@ -113,6 +113,9 @@ class Api:
         self.logic.debuts = self.debuts
         self.logic.flag = True
         self.difficulty = difficulty
+ 
+    def get_board_eval(self):
+        return self.evaluate.evaluate_board_mg(self.board, self.board.white) / 1000
 
     def previous_turn(self):
         """returns previous turn and un do it on board"""

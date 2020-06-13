@@ -41,22 +41,12 @@ class Turn:
                 self.castling == second.castling)
 
     def __repr__(self):
-        start_pos = chr(self.start_pos[1] + ord('a')) + str(8 - self.start_pos[0])
-        end_pos = chr(self.end_pos[1] + ord('a')) + str(8 - self.end_pos[0])
-
-        if self.pawn % 10 == 2:
-            end_pos += "n"
-        elif self.pawn % 10 == 3:
-            end_pos += "b"
-        elif self.pawn % 10 == 4:
-            end_pos += "r"
-        elif self.pawn % 10 == 6:
-            end_pos += "q"
-
-        return start_pos + end_pos
+        return str(self)
 
     def __hash__(self):
-        return hash((self.start_pos, self.end_pos, self.color, self.pawn, self.castling, self.passant))
+        return hash((self.start_pos, self.end_pos,
+                     self.color, self.pawn, self.castling, self.passant))
+
 
 class Node:
     def __init__(self):

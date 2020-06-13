@@ -72,14 +72,14 @@ class Evaluate:
             map_type = board.get_type_map(pos)
             if map_type == board.king:
                 return 0
-            if map_type == 6:
+            if map_type == board.queen:
                 map_type = 5
             bishop = [0, 0, 0]
             for now_pos in product(range(board.board_size), repeat=2):
                 now_map_type = board.get_type_map(now_pos)
                 if now_map_type in (board.empty_map, board.king):
                     continue
-                if now_map_type == 6:
+                if now_map_type == board.queen:
                     now_map_type = 5
                 if now_map_type == board.bishop:
                     bishop[board.get_color_map(now_pos)] += 1

@@ -14,7 +14,7 @@ lock = threading.Lock()
 def swap(a, b):
     a, b = b, a
 
-class  Gui():
+class Gui():
     def __init__(self, api):
         qss_file = open('styles.qss').read()
         self.app = QApplication(sys.argv)
@@ -22,6 +22,8 @@ class  Gui():
         self.main_window = Main_Window(api)
     
     def start(self):
+        """Starts UI
+        """
         sys.exit(self.app.exec_())
 
 class Communicate(QObject):
@@ -42,26 +44,56 @@ class Figure(QFrame):
         self.fig_translation = {1:"P", 2:"N", 3:"B", 4:"R", 5:"K", 6:"Q"}
     
     def set_type(self, figure_type):
+        """Updates figure's type
+
+        :param figure_type: new type
+        :type figure_type: int
+        """
         self.figure_type = figure_type
         self.setProperty("type", str(figure_type))
         self.setStyle(self.style())
 
     def get_color(self):
+        """Converts figure color to text
+
+        :return: "w" or "b" depending on figure color
+        :rtype: str
+        """
         return "w" if self.figure_type // 10 == 1 else "b"
 
     def get_type(self):
+        """Returns numeric type
+
+        :return: Returns numeric type
+        :rtype: int
+        """
         return self.figure_type
 
     def get_named_type(self):
+        """Converts numeric type to text
+
+        :return: "P", "N", "B", "R", "K" or "Q"  depending on figure type
+        :rtype: str
+        """
         return self.fig_translation[self.figure_type % 10]
         
     def get_figure_name(self):
+        """Converts full numeric type to text
+
+        :return: "w" or "b" + "P", "N", "B", "R", "K" or "Q"  depending on figure type
+        :rtype: str
+        """
         name = ""
         name += "w" if self.figure_type // 10 == 1 else "b"
         name += self.get_named_type()
         return name
 
-    def mouseMoveEvent(self, e):
+    def mouseMoveEvent(self, event):
+        """Proccess figure moving
+
+        :param event: movement event
+        :type event: QEvent
+        """
         mime_data = QMimeData()
         mime_data.setText(str(self.figure_type))
         drag = QDrag(self)
@@ -94,30 +126,56 @@ class Cell(QFrame):
         self.setLayout(vbox)
         vbox.setContentsMargins(4, 4, 4, 4)
     
-    def dragEnterEvent(self, e):
-        e.accept()
+    def dragEnterEvent(self, event):
+        """Allows drag and drop
 
-    def dropEvent(self, e):
-        position = e.pos()
+        :param event: drag event
+        :type event: QEvent
+        """
+        event.accept()
+
+    def dropEvent(self, event):
+        """Process drop event
+
+        :param event: drop event
+        :type event: QEvent
+        """
+        position = event.pos()
         if self.check_move(self.x, self.y):
             self.comm.figureMoved.emit(self.x, self.y)
-        e.accept()
+        event.accept()
 
     def mousePressEvent(self, event):
+        """Process cell press event
+
+        :param event: press event
+        :type event: QEvent
+        """
         self.comm.cellPressed.emit(self.x, self.y)
 
     def mouseReleaseEvent(self, event):
+        """Process cell release event
+
+        :param event: release event
+        :type event: QEvent
+        """
         self.comm.cellReleased.emit(self.x, self.y)
 
     def press(self):
+        """Set cell style when cell is pressed
+        """
         self.setProperty("pressed", "yes")
         self.setStyle(self.style())
 
     def beat(self):
+        """Set cell style when figure in cell may be beaten
+        """
         self.setProperty("pressed", "beat")
         self.setStyle(self.style())
 
     def release(self):
+        """Set cell style to normal state
+        """
         self.setProperty("pressed", "no")
         self.setStyle(self.style())
         
@@ -164,14 +222,35 @@ class GuiBoard(QFrame):
         self.setLayout(cells)
 
     def cell_released(self, x, y):
+        """Alows II to make a move
+
+        :param x: x coordinate
+        :type x: int
+        :param y: y coordinate
+        :type y: int
+        """
         if self.ai_do_turn:
             self.upd_board()
             self.ai_do_turn = False
         
     def figure_moved(self, x, y):
+        """Proccess event when user drags a figure
+
+        :param x: x coordinate
+        :type x: int
+        :param y: y coordinate
+        :type y: int
+        """
         self.process_move(x, y, "drag")
 
     def cell_pressed(self, x, y):
+        """Processes event when user presses a field
+
+        :param x: x coordinate
+        :type x: int
+        :param y: y coordinate
+        :type y: int
+        """
         if not self.ai_do_turn and not self.history:
             if not self.making_a_move:
                 self.start = (x, y)
@@ -186,6 +265,15 @@ class GuiBoard(QFrame):
                 self.process_move(x, y, "press")
     
     def process_move(self, x, y, method):
+        """Processes a piece move, and displays it on the board
+
+        :param x: x coordinate
+        :type x: int
+        :param y: y coordinate
+        :type y: int
+        :param method: type of movement
+        :type method: string
+        """
         self.cells_arr[self.start[0]][self.start[1]].release()
         self.making_a_move = False
         for field in self.possible_moves[self.start]:
@@ -212,13 +300,38 @@ class GuiBoard(QFrame):
                 self.upd_board()
 
     def make_turn(self, start, stop, promotion = -1):
+        """Display move on the board
+
+        :param start: start position
+        :type start: (int, int)
+        :param stop: stop position
+        :type stop: (int, int)
+        :param promotion: pawn promotion value, defaults to -1
+        :type promotion: int, optional
+        """
         self.cells_arr[start[0]][start[1]].figure.set_type(0)
         self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
 
     def check_move(self, x, y):
+        """Checks if a move is correct
+
+        :param x: x coordinate
+        :type x: int
+        :param y: y coordinate
+        :type y: int
+        :return: returns true if user can make such a move
+        :rtype: bool
+        """
         return True if not self.history and (x, y) in self.possible_moves[self.start] else False
 
     def promotion(self, color):
+        """Promotes a pawn
+
+        :param color: pawn color
+        :type color: int(1,2)
+        :return: [description]
+        :rtype: int
+        """
         figures = []
         figures.append(PromotionButton(color + "N", self.size()))
         figures.append(PromotionButton(color + "B", self.size()))
@@ -247,25 +360,41 @@ class GuiBoard(QFrame):
         return choice if choice in (2, 3, 4) else 6
 
     def make_answer_button(self, figure, dialog):
+        """Makes a funnction processing a promotion reply
+
+        :param figure: chosen figure
+        :type figure: int
+        :param dialog: promotion dialog
+        :type dialog: QDialog
+        """
         def answer():
             dialog.done(figure)
         return answer
 
     def upd_board(self):
-        print("ai is going to make a turn")
+        """Updates board after AI turn
+        """
         turn = self.api.ai_turn(self.color)
-        print("ai made a turn")
         self.make_turn(turn.start_pos, turn.end_pos)
         self.change_color()
         self.upd_possible_moves(self.color)
     
     def upd_possible_moves(self, color):
-        self.possible_moves = self.api.get_possible_turns(color)   
+        """Gets all possible turns of a specific color from API
+
+        :param color: color of a side making a turn
+        :type color: int(1,2)
+        """
+        self.possible_moves = self.api.get_possible_turns(color)
 
     def change_color(self):
+        """Changes sides
+        """
         self.color = 3 - self.color
 
     def next_move(self):
+        """Applies redo option in history
+        """
         turn = self.api.next_turn()
         if turn:
             self.history += 1
@@ -276,6 +405,8 @@ class GuiBoard(QFrame):
             self.reached_hist_bottom = False
 
     def prev_move(self):
+        """Applies undo option in history
+        """
         turn = self.api.previous_turn()
         if turn:
             self.history -= 1
@@ -286,11 +417,15 @@ class GuiBoard(QFrame):
             self.reached_hist_bottom = True
 
     def skip_history(self):
+        """Applies redo in history until current situation
+        """
         while(self.history < 0):
             self.next_move()
         self.reached_hist_bottom = False
     
     def to_start(self):
+        """Applies undo in history till the beginning of a game
+        """
         while(not self.reached_hist_bottom):
             self.prev_move()
       
@@ -315,6 +450,11 @@ class GuiBoard(QFrame):
             self.cells_arr[x][short_rook_fn].figure.set_type(rook_color)
     
     def resizeEvent(self, event):
+        """Process resize event
+
+        :param event: new size of a vindow
+        :type event: QEvent
+        """
         new_size = max(event.size().height(), event.size().width())
         self.resize(new_size, new_size)
 
@@ -347,18 +487,28 @@ class BottomMenu(QFrame):
         self.setLayout(h_layout)
         
     def previous(self):
+        """Tells board to make undo in history
+        """
         self.comm.prevMove.emit()
     
     def to_game_start(self):
+        """Tells board to make move history to the beggining of the game
+        """
         self.comm.toStart.emit()
 
     def next(self):
+        """Tells board to make redo in history
+        """
         self.comm.nextMove.emit()
     
     def skip_hist(self):
+        """Tells board to make move history to the current position in the game
+        """
         self.comm.skipHist.emit()
     
     def back(self):
+        """Tells main window to open start menu tab
+        """
         self.comm.backMenu.emit()
     
 
@@ -389,6 +539,8 @@ class MainMenu(QFrame):
         self.start_game.clicked.connect(self.choose_difficulty)
 
     def choose_difficulty(self):
+        """Shows difficulty buttons
+        """
         self.start_game.hide()
         for difficulty in self.difficulties:
             difficulty.show()
@@ -445,7 +597,6 @@ class ControllButton(QPushButton):
 
 
 class Main_Window(QWidget):
-    
     def __init__(self, api):
         super().__init__()
         self.setMinimumSize(board_size, board_size + 50)
@@ -478,14 +629,25 @@ class Main_Window(QWidget):
         self.show()
     
     def resizeEvent(self, event):
+        """Process resize event
+
+        :param event: new size of a vindow
+        :type event: QEvent
+        """
         new_size = min(event.size().height(), event.size().width())
         self.resize(new_size, new_size + 50)
 
-
     def return_to_menu(self):
+        """Return user to main menu
+        """
         self.tabs.setCurrentIndex(self.tab_names["start"])
 
     def start_game_with_difficulty(self, difficulty):
+        """Makes functions that start a new game with a specific difficulty
+
+        :param difficulty: difficulty of a game
+        :type difficulty: int
+        """
         def start_game():
             self.api.difficulty = difficulty + 1
             self.tabs.setCurrentIndex(self.tab_names["game_board"])

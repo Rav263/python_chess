@@ -5,17 +5,21 @@ from board import Board
 from gamelogic import Logic
 from io_functions import Data
 from evaluate import Evaluate
-from turns import read_nodes
+from turns import read_nodes, Node
+
 
 class Api:
     """backend api class to ui"""
 
-    def __init__(self, difficulty, threads):
+    def __init__(self, difficulty, threads, deb):
         # Here we need to init Field and Game logic
         self.data = Data("data.dat")
         self.board = Board(self.data)
         self.evaluate = Evaluate("eval_coofs.dat")
-        self.debuts = read_nodes()
+        if deb:
+            self.debuts = read_nodes()
+        else:
+            self.debuts = Node()
         self.logic = Logic(self.data, threads, self.evaluate, self.debuts)
         self.difficulty = difficulty
         self.turn_index = 0

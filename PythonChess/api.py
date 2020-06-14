@@ -30,10 +30,6 @@ class Api:
 
         # Then we need start game
 
-    def start_cmd(self):
-        """start command line UI"""
-        self.logic.start(self.board, self.data, self.difficulty)
-
     def get_possible_turns(self, color):
         """returns possible turns from backend"""
         if self.turn_index != 0:

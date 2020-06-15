@@ -116,6 +116,7 @@ class Cell(QFrame):
         self.y = y
         self.figure = Figure(figure_type, comm)
         self.setProperty("pressed", "0")
+        self.setProperty("type", "")
         self.check_move = check_move
         self.pressed = 0
         if color == 1:
@@ -126,6 +127,15 @@ class Cell(QFrame):
         vbox.addWidget(self.figure)
         self.setLayout(vbox)
         vbox.setContentsMargins(4, 4, 4, 4)
+
+    def set_type(self, cell_type):
+        """Updates cell's type
+
+        :param cell_type: new type
+        :type cell_type: int
+        """
+        self.setProperty("type", str(cell_type))
+        self.setStyle(self.style())
     
     def dragEnterEvent(self, event):
         """Allows drag and drop
@@ -182,12 +192,14 @@ class Cell(QFrame):
 
 class GuiBoard(QFrame):
     updBoard = pyqtSignal()
-    def __init__(self, api, comm):
+    def __init__(self, api, comm, start_color):
         super().__init__()
         self.history = 0
         self.reached_hist_bottom = False
-        self.color = api.board.white
+        self.color = start_color
         self.api = api
+        self.white = self.api.board.white
+        self.black = self.api.board.black
         self.setMinimumSize(board_size, board_size)
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePol.setHeightForWidth(True)
@@ -210,8 +222,11 @@ class GuiBoard(QFrame):
         self.ai_do_turn = False
         self.start = (0, 0)
         
+        self.after_st = (0, 0)
+        self.after_fn = (0, 0)
+
         self.cells_arr = [list() for i  in range(8)]
-        cell_color = api.board.white
+        cell_color = self.color
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x].append(Cell(x, y, self.api.get_field((x, y)), self.comm, cell_color, self.check_move))
@@ -303,11 +318,20 @@ class GuiBoard(QFrame):
         :param stop: stop position
         :type stop: (int, int)
         """
+
         if upd_all:
             self.upd_whole_board()
         else:
             self.cells_arr[start[0]][start[1]].figure.set_type(0)
             self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
+        
+        self.cells_arr[self.after_st[0]][self.after_st[1]].set_type("")
+        self.cells_arr[self.after_fn[0]][self.after_fn[1]].set_type("")
+        self.cells_arr[start[0]][start[1]].set_type("moved")
+        self.cells_arr[stop[0]][stop[1]].set_type("moved")
+        self.after_st = start
+        self.after_fn = stop
+
 
     def check_move(self, x, y):
         """Checks if a move is correct
@@ -524,13 +548,13 @@ class MainMenu(QFrame):
             difficulty.show()
 
 class MainGame(QFrame):
-    def __init__(self, api, comm):
+    def __init__(self, api, comm, start_color):
         super().__init__()
         v_layout = QVBoxLayout()
         v_layout.setSpacing(0)
         v_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.board = GuiBoard(api, comm)
+        self.board = GuiBoard(api, comm, start_color)
         v_layout.addWidget(self.board)
         self.bottom_menu = BottomMenu(comm)
         v_layout.addWidget(self.bottom_menu)
@@ -586,7 +610,7 @@ class Main_Window(QWidget):
 
         self.comm.backMenu.connect(self.return_to_menu)
         
-        self.game = MainGame(api, self.comm)
+        self.game = MainGame(api, self.comm, self.start_color)
         self.menu = MainMenu()
 
         self.tabs = QStackedLayout()

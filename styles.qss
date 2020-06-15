@@ -107,6 +107,34 @@ Cell[color="white"]{
     background-color: #e6ccab;
 }
 
+Cell[color="black"][type="moved"]{
+    border: 3px solid transparent;
+    background-color: #9a9b1b;
+}
+Cell[color="white"][type="moved"]{
+    border: 3px solid transparent;
+    background-color: #aabb5b;
+}
+
+Cell[color="black"][type="moved"][pressed="yes"]{
+    border: 3px solid green;
+    background-color: #9a9b1b;
+}
+Cell[color="white"][type="moved"][pressed="yes"]{
+    border: 3px solid green;
+    background-color: #aabb5b;
+}
+
+Cell[color="black"][type="moved"][pressed="beat"]{
+    border: 3px solid red;
+    background-color: #9a9b1b;
+}
+Cell[color="white"][type="moved"][pressed="beat"]{
+    border: 3px solid red;
+    background-color: #aabb5b;
+}
+
+
 Figure[type="possible"]{
     background-image: url(images/green_dot.png) 0 0 0 0 fixed fixed;
     background-repeat:no-repeat;

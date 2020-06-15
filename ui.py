@@ -423,9 +423,8 @@ class GuiBoard(QFrame):
         
         finish = QDialog()
         finish.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
-        pos_x = self.size().height() // 2 - finish.size().width() // 2
-        pos_y = self.size().height() // 2 - finish.size().height() // 2
-        finish.move(self.mapToGlobal(QPoint(pos_x, pos_y)))
+        finish.resize(3 * 52, 3 * 52)
+        
 
         ok_button = MenuButton("OK")
         ok_button.clicked.connect(finish.accept)
@@ -433,10 +432,25 @@ class GuiBoard(QFrame):
         result = QLabel("Game over! \nYou lost.") if user_lost else QLabel("Game over! \nYou won.") 
         result.setAlignment(Qt.AlignCenter)
 
-        layout = QGridLayout(finish)
-        layout.addWidget(ok_button, 1, 1)
-        layout.addWidget(result, 0, 0, 1, 3)
-        finish.setLayout(layout)
+        
+
+        v_layout = QVBoxLayout()
+        v_layout.setSpacing(0)
+        v_layout.setContentsMargins(0, 0, 0, 0)
+        v_layout.addStretch()
+        v_layout.addWidget(result)
+        v_layout.addStretch()
+        v_layout.addWidget(ok_button)
+        v_layout.addStretch()
+
+        h_layout = QHBoxLayout(finish)
+        h_layout.addStretch()
+        h_layout.addLayout(v_layout)
+        h_layout.addStretch()
+        finish.setLayout(h_layout)
+        pos_x = self.size().height() // 2 - finish.size().width() // 2 - 0
+        pos_y = self.size().height() // 2 - finish.size().height() // 2 
+        finish.move(self.mapToGlobal(QPoint(pos_x, pos_y)))
         res = finish.exec_()
             
 

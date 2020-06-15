@@ -63,6 +63,17 @@ class Api:
 
         return -1
 
+    def check_check(self, color):
+        if self.turn_index != 0:
+            last_turn = self.logic.turn_history[self.turn_index - 1][0]
+        else:
+            last_turn = self.logic.NULL_TURN
+        possible_turns = self.logic.generate_all_possible_turns(self.board, 3 - color, last_turn)
+        
+        king_pos = self.board.get_king_pos(color)
+
+        return king_pos in possible_turns
+
     def do_turn(self, start, end, pawn=0):
         """doing User turn
         start    -- start position

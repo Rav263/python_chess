@@ -43,8 +43,7 @@ class Figure(QFrame):
         super().__init__()
         self.comm = comm
         self.set_type(figure_type)
-        
-    
+
     def set_type(self, figure_type):
         """Updates figure's type
 
@@ -105,7 +104,6 @@ class Figure(QFrame):
         drag.setHotSpot(QPoint(center_coord, center_coord))
         dropAction = drag.exec_(Qt.MoveAction)
     
-
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm, color, check_move):
         super().__init__()
@@ -533,7 +531,6 @@ class MainGame(QFrame):
         v_layout.setContentsMargins(0, 0, 0, 0)
 
         self.board = GuiBoard(api, comm)
-        self.board.upd_possible_moves(self.board.color)
         v_layout.addWidget(self.board)
         self.bottom_menu = BottomMenu(comm)
         v_layout.addWidget(self.bottom_menu)
@@ -584,6 +581,7 @@ class Main_Window(QWidget):
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
         self.api = api
+        self.start_color = self.api.board.white
         self.comm = Communicate()
 
         self.comm.backMenu.connect(self.return_to_menu)
@@ -620,6 +618,9 @@ class Main_Window(QWidget):
     def return_to_menu(self):
         """Return user to main menu
         """
+        for difficulty in self.menu.difficulties:
+            difficulty.hide()
+        self.menu.start_game.show()
         self.tabs.setCurrentIndex(self.tab_names["start"])
 
     def start_game_with_difficulty(self, difficulty):
@@ -629,7 +630,9 @@ class Main_Window(QWidget):
         :type difficulty: int
         """
         def start_game():
-            self.api.difficulty = difficulty + 1
+            self.api.start_new_game(difficulty + 1)
+            self.game.board.upd_whole_board()
+            self.game.board.upd_possible_moves(self.start_color)
             self.tabs.setCurrentIndex(self.tab_names["game_board"])
         return start_game
   

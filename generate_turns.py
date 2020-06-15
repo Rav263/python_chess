@@ -26,12 +26,14 @@ def transform_turns_dict(possible_turns):
 
 
 def process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
-                bad_figs, good_figs, beating_figures):
+                bad_figs, good_figs, beating_figures, figs):
     """process_pos(...) -> (bool, fig_pos)"""
     if not board.check_pos(turn_end):
         return (True, fig_pos)
 
     if board.get_type_map(turn_end) != board.empty_map:
+        if board.get_color_map(turn_end) != color and board.get_type_map(turn_end) in good_figs:
+            figs.append(turn_end)
         if board.get_color_map(turn_end) != color and fig_pos == (-1, -1):
             return (True, fig_pos)
 
@@ -63,6 +65,7 @@ def check_king_protected(board, king_pos, color, turns):
     possible_turns = defaultdict(list)
     bad_figures = list()
     beating_figures = list()
+    figs = list()
 
     # check for roook and queen
     possible_diffs = [-1, 1]
@@ -73,17 +76,16 @@ def check_king_protected(board, king_pos, color, turns):
         for x_coord in islice(count(king_pos[0] + diff, diff), board.board_size):
             turn_end = (x_coord, king_pos[1])
             flag, fig_pos = process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
-                                        bad_figures, (board.rook, board.queen), beating_figures)
+                                        bad_figures, (board.rook, board.queen), beating_figures, figs)
             if flag:
                 break
-
         tmp_list = list()
         fig_pos = (-1, -1)
 
         for y_coord in islice(count(king_pos[1] + diff, diff), board.board_size):
             turn_end = (king_pos[0], y_coord)
             flag, fig_pos = process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
-                                        bad_figures, (board.rook, board.queen), beating_figures)
+                                        bad_figures, (board.rook, board.queen), beating_figures, figs)
             if flag:
                 break
     # check foor bishop and queen
@@ -95,7 +97,7 @@ def check_king_protected(board, king_pos, color, turns):
         for i in range(1, board.board_size):
             turn_end = mf.tuple_sum(king_pos, (diff_x * i, diff_y * i))
             flag, fig_pos = process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
-                                        bad_figures, (board.bishop, board.queen), beating_figures)
+                                        bad_figures, (board.bishop, board.queen), beating_figures, figs)
             if flag:
                 break
 
@@ -113,7 +115,7 @@ def check_king_protected(board, king_pos, color, turns):
                     bad_figures.remove(start_pos)
                     possible_turns[start_pos].append(end_pos)
 
-    return (possible_turns, bad_figures)
+    return (possible_turns, bad_figures, figs)
 
 
 def remove_not_important_turns(turns, important_start_positions):
@@ -139,7 +141,20 @@ def normalize_tuple(tuple_1):
 def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
     """remove_not_possible_turns(board, king_pos, turns, opponent_turns) -> defaultdict(list)"""
     start_turns = transform_turns_dict(turns)
-    good_turns, bad_figures = check_king_protected(board, king_pos, color, start_turns)
+    good_turns, bad_figures, figs = check_king_protected(board, king_pos, color, start_turns)
+
+    bad_positions = list()
+    for now_fig in figs:
+        if board.get_type_map(now_fig) in (board.rook, board.queen):
+            if now_fig[0] == king_pos[0]:
+                bad_positions.append((king_pos[0], king_pos[1] + 1))
+                bad_positions.append((king_pos[0], king_pos[1] - 1))
+            else:
+                bad_positions.append((king_pos[0] + 1, king_pos[1]))
+                bad_positions.append((king_pos[0] - 1, king_pos[1]))
+        if board.get_type_map(now_fig) in (board.bishop, board.queen):
+            now = normalize_tuple(mf.difference(king_pos, now_fig))[0]
+            bad_positions.append(mf.tuple_sum(king_pos, now))
 
     for start_turn in good_turns:
         start_turns[start_turn] = good_turns[start_turn]
@@ -160,8 +175,9 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
     possible_turns = defaultdict(list)
 
     for end_turn in start_turns[king_pos]:
-        possible_turns[end_turn].append(king_pos)
-    
+        if end_turn not in bad_positions:
+            possible_turns[end_turn].append(king_pos)
+
     positions_for_block = positions_for_turns_block(board, [*important_turns], king_pos)
 
     for pos_for_block in positions_for_block:

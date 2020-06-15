@@ -202,8 +202,8 @@ class GuiBoard(QFrame):
         self.white = self.api.board.white
         self.black = self.api.board.black
         self.setMinimumSize(board_size, board_size)
+        self.resize(board_size, board_size)
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
-        sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
 
         self.comm = comm
@@ -358,10 +358,10 @@ class GuiBoard(QFrame):
         :rtype: int
         """
         figures = []
-        figures.append(PromotionButton(color + "N", self.size()))
-        figures.append(PromotionButton(color + "B", self.size()))
-        figures.append(PromotionButton(color + "R", self.size()))
-        figures.append(PromotionButton(color + "Q", self.size()))
+        figures.append(PromotionButton(color + "N", self.get_size()))
+        figures.append(PromotionButton(color + "B", self.get_size()))
+        figures.append(PromotionButton(color + "R", self.get_size()))
+        figures.append(PromotionButton(color + "Q", self.get_size()))
 
         prom_dialog = QDialog()
         prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
@@ -425,14 +425,11 @@ class GuiBoard(QFrame):
         finish.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
         finish.resize(3 * 52, 3 * 52)
         
-
         ok_button = MenuButton("OK")
         ok_button.clicked.connect(finish.accept)
         
         result = QLabel("Game over! \nYou lost.") if user_lost else QLabel("Game over! \nYou won.") 
         result.setAlignment(Qt.AlignCenter)
-
-        
 
         v_layout = QVBoxLayout()
         v_layout.setSpacing(0)
@@ -453,8 +450,6 @@ class GuiBoard(QFrame):
         finish.move(self.mapToGlobal(QPoint(pos_x, pos_y)))
         res = finish.exec_()
             
-
-
     def change_color(self):
         """Changes sides
         """
@@ -499,8 +494,11 @@ class GuiBoard(QFrame):
         :param event: new size of a vindow
         :type event: QEvent
         """
-        new_size = max(event.size().height(), event.size().width())
+        new_size = min(event.size().height(), event.size().width())
         self.resize(new_size, new_size)
+    
+    def get_size(self):
+        return self.size().width()
 
 class BottomMenu(QFrame):
     def __init__(self, comm):
@@ -555,6 +553,24 @@ class BottomMenu(QFrame):
         """
         self.comm.backMenu.emit()
     
+class TakenFigures(QFrame):
+    possible_figures = ["Q", "R", "R", "N", "N", "B", "B", "P", "P", "P", "P", "P", "P", "P", "P"]
+    def __init__(self, comm, color, board_size):
+        super().__init__()
+        self.comm = comm
+        buttons = []
+        text_color = "w" if color == 1 else "b"
+        for fig in self.possible_figures:
+            buttons.append(PromotionButton(text_color + fig, board_size // 2))
+        score = QLabel("+0")
+        h_layout = QHBoxLayout()
+        for but in buttons:
+            h_layout.addWidget(but)
+        h_layout.addWidget(score)
+        h_layout.addStretch(1)
+        h_layout.setSpacing(0)
+        h_layout.setContentsMargins(5, 0, 5, 0)
+        self.setLayout(h_layout)
 
 class MainMenu(QFrame):
     def __init__(self):
@@ -595,9 +611,12 @@ class MainGame(QFrame):
         v_layout = QVBoxLayout()
         v_layout.setSpacing(0)
         v_layout.setContentsMargins(0, 0, 0, 0)
-
         self.board = GuiBoard(api, comm, start_color)
+        up_taken = TakenFigures(comm, 3 - start_color, self.board.get_size())
+        down_taken = TakenFigures(comm, start_color, self.board.get_size())
+        v_layout.addWidget(up_taken)
         v_layout.addWidget(self.board)
+        v_layout.addWidget(down_taken)
         self.bottom_menu = BottomMenu(comm)
         v_layout.addWidget(self.bottom_menu)
 
@@ -607,13 +626,6 @@ class MainGame(QFrame):
         h_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(h_layout)
 
-class Border(QFrame):
-    def __init__(self, name, width, height):
-        super().__init__()
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.setObjectName(name)
-        self.setMaximumSize(width, height)
-        self.setMinimumSize(width, height)
 
 class MenuButton(QPushButton):
     def __init__(self, *args):
@@ -623,7 +635,8 @@ class PromotionButton(QPushButton):
     def __init__(self, *args):
         super().__init__()
         self.setObjectName(args[0])
-        button_size = args[1].width() // 8
+        # button_size = args[1].width() // 8
+        button_size = args[1] // 8
         self.setText("")
         self.setMinimumSize(button_size, button_size)
         self.resize(button_size, button_size)
@@ -642,7 +655,7 @@ class ControllButton(QPushButton):
 class Main_Window(QWidget):
     def __init__(self, api):
         super().__init__()
-        self.setMinimumSize(board_size, board_size + 50)
+        self.setMinimumSize(board_size, board_size + 105)
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
@@ -679,7 +692,7 @@ class Main_Window(QWidget):
         :type event: QEvent
         """
         new_size = min(event.size().height(), event.size().width())
-        self.resize(new_size, new_size + 50)
+        self.resize(new_size, new_size + 105)
 
     def return_to_menu(self):
         """Return user to main menu

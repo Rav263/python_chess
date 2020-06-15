@@ -1,6 +1,7 @@
 """module to connect backend ang gui"""
 
 from collections import defaultdict
+from itertools import product
 from board import Board
 from gamelogic import Logic
 from io_functions import Data
@@ -50,6 +51,9 @@ class Api:
 
         return turns
 
+    def flip_board(self):
+        self.board.rotate_board()
+
     def get_field(self, pos):
         """returns cell value on board"""
         if self.board.check_pos(pos):
@@ -63,6 +67,46 @@ class Api:
             return self.board.set_map(pos, value)
 
         return -1
+
+    def check_check(self, color):
+        if self.turn_index != 0:
+            last_turn = self.logic.turn_history[self.turn_index - 1][0]
+        else:
+            last_turn = self.logic.NULL_TURN
+        possible_turns = self.logic.generate_all_possible_turns(self.board, 3 - color, last_turn)
+        
+        king_pos = self.board.get_king_pos(color)
+
+        return king_pos in possible_turns
+
+    def get_taken_figures(self):
+        white_figs = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+        black_figs = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+        
+        for pos in product(range(self.board.board_size), repeat=2):
+            if self.board.get_color_map(pos) == self.board.white:
+                white_figs[self.board.get_type_map(pos)] += 1
+            if self.board.get_color_map(pos) == self.board.black:
+                black_figs[self.board.get_type_map(pos)] += 1
+        
+        all_figs = dict()
+
+        for now in white_figs:
+            all_figs[now] = white_figs[now] - black_figs[now]
+        
+        black_figs = list()
+        white_figs = list()
+        black_score = 0
+        white_score = 0
+
+        for now in all_figs:
+            if all_figs[now] < 0:
+                black_figs.append((now, abs(all_figs[now])))
+                black_score += self.data.data["FIGURES_COST"][10 + now] * all_figs[now] 
+            elif all_figs[now] > 0:
+                white_figs.append((now, abs(all_figs[now])))
+                white_score -= self.data.data["FIGURES_COST"][10 + now] * all_figs[now] 
+        return (white_figs, black_figs, white_score, black_score)
 
     def do_turn(self, start, end, pawn=0):
         """doing User turn
@@ -88,7 +132,7 @@ class Api:
                 break
 
         if pawn != 0:
-            now_turn.pawn = pawn
+            now_turn.pawn = 10 * color + pawn
 
         tmp, flags = self.board.do_turn(now_turn)
 

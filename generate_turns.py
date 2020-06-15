@@ -149,13 +149,12 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
             if now_fig[0] == king_pos[0]:
                 bad_positions.append((king_pos[0], king_pos[1] + 1))
                 bad_positions.append((king_pos[0], king_pos[1] - 1))
-            else:
+            elif now_fig[1] == king_pos[1]:
                 bad_positions.append((king_pos[0] + 1, king_pos[1]))
                 bad_positions.append((king_pos[0] - 1, king_pos[1]))
         if board.get_type_map(now_fig) in (board.bishop, board.queen):
             now = normalize_tuple(mf.difference(king_pos, now_fig))[0]
             bad_positions.append(mf.tuple_sum(king_pos, now))
-
     for start_turn in good_turns:
         start_turns[start_turn] = good_turns[start_turn]
 

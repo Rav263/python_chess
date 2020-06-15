@@ -45,8 +45,8 @@ class Evaluate:
             value += (self.psqt_mg(board, color, pos) -
                       self.psqt_mg(board, 3 - color, pos))
             
-            imb_val += (self.imbalance_mg(board, color, pos) -
-                        self.imbalance_mg(board, 3 - color, pos))
+#            imb_val += (self.imbalance_mg(board, color, pos) -
+#                        self.imbalance_mg(board, 3 - color, pos))
        
         # imb_val += ((bishops[color] // 2) - (bishops[3 - color] // 2)) * 1438
 

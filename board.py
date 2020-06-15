@@ -14,8 +14,9 @@ class Board:
     white = 1
     black = 2
 
-    white_pawn_start = 6
-    black_pawn_start = 1
+    flipped = False
+
+    pawn_start = ["костыль", 1, 6]
 
     king_movement = ["костыль", False, False]
     rook_movement = ["костыль", [False, False], [False, False]]
@@ -38,8 +39,8 @@ class Board:
                 f"castling flags: {self.castling}")
 
     def rotate_board(self):
-        self.white_pawn_start = 7 - self.white_pawn_start
-        self.black_pawn_start = 7 - self.black_pawn_start
+        self.flipped = not self.flipped
+
         for now in range(4):
             self.board[7 - now], self.board[now] = self.board[now], self.board[7 - now]
 

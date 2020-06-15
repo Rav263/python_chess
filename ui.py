@@ -338,11 +338,11 @@ class GuiBoard(QFrame):
         self.after_fn = stop
         white, black, score_w, score_b = self.api.get_taken_figures()
         if self.taken[0].color == self.white:
-            self.taken[0].update_taken_fig(white, score_w)
-            self.taken[1].update_taken_fig(black, score_b)
-        else:
             self.taken[1].update_taken_fig(white, score_w)
             self.taken[0].update_taken_fig(black, score_b)
+        else:
+            self.taken[0].update_taken_fig(white, score_w)
+            self.taken[1].update_taken_fig(black, score_b)
 
     def check_move(self, x, y):
         """Checks if a move is correct
@@ -588,6 +588,8 @@ class TakenFigures(QFrame):
             if (fig_n in figures and figures[fig_n]):
                 fig.show()
                 figures[fig_n] -= 1
+            else:
+                fig.hide()
         
         if score:
             self.score.setText("+{}".format(score))
@@ -635,8 +637,8 @@ class MainGame(QFrame):
         v_layout = QVBoxLayout()
         v_layout.setSpacing(0)
         v_layout.setContentsMargins(0, 0, 0, 0)
-        up_taken = TakenFigures(comm, 3 - start_color, board_size)
-        down_taken = TakenFigures(comm, start_color, board_size)
+        up_taken = TakenFigures(comm, start_color, board_size)
+        down_taken = TakenFigures(comm, 3 - start_color, board_size)
         self.board = GuiBoard(api, comm, start_color, (up_taken, down_taken))
         v_layout.addWidget(up_taken)
         v_layout.addWidget(self.board)

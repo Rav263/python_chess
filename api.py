@@ -106,13 +106,12 @@ class Api:
             elif all_figs[now] > 0:
                 white_figs[now] = abs(all_figs[now])
                 white_score -= self.data.data["FIGURES_COST"][10 + now] * all_figs[now] 
-        
         if white_score > black_score:
             white_score = white_score - black_score
             black_score = 0
         else:
-            white_score = 0
             black_score = black_score - white_score
+            white_score = 0
         return (white_figs, black_figs, white_score, black_score)
 
     def do_turn(self, start, end, pawn=0):

@@ -193,8 +193,9 @@ class Cell(QFrame):
 
 class GuiBoard(QFrame):
     updBoard = pyqtSignal()
-    def __init__(self, api, comm, start_color):
+    def __init__(self, api, comm, start_color, taken):
         super().__init__()
+        self.taken = taken
         self.history = 0
         self.reached_hist_bottom = False
         self.color = start_color
@@ -335,7 +336,13 @@ class GuiBoard(QFrame):
         self.cells_arr[stop[0]][stop[1]].set_type("moved")
         self.after_st = start
         self.after_fn = stop
-
+        white, black, score_w, score_b = self.api.get_taken_figures()
+        if self.taken[0].color == self.white:
+            self.taken[0].update_taken_fig(white, score_w)
+            self.taken[1].update_taken_fig(black, score_b)
+        else:
+            self.taken[1].update_taken_fig(white, score_w)
+            self.taken[0].update_taken_fig(black, score_b)
 
     def check_move(self, x, y):
         """Checks if a move is correct
@@ -555,22 +562,39 @@ class BottomMenu(QFrame):
     
 class TakenFigures(QFrame):
     possible_figures = ["Q", "R", "R", "N", "N", "B", "B", "P", "P", "P", "P", "P", "P", "P", "P"]
+    translate = {"Q":6, "R":4, "B":3, "N":2, "P":1}
     def __init__(self, comm, color, board_size):
         super().__init__()
         self.comm = comm
-        buttons = []
+        self.color = color
+        self.buttons = []
         text_color = "w" if color == 1 else "b"
         for fig in self.possible_figures:
-            buttons.append(PromotionButton(text_color + fig, board_size // 2))
-        score = QLabel("+0")
+            self.buttons.append(PromotionButton(text_color + fig, board_size // 2))
+        self.score = QLabel("")
         h_layout = QHBoxLayout()
-        for but in buttons:
+        for but in self.buttons:
             h_layout.addWidget(but)
-        h_layout.addWidget(score)
+            but.hide()
+        h_layout.addWidget(self.score)
         h_layout.addStretch(1)
         h_layout.setSpacing(0)
         h_layout.setContentsMargins(5, 0, 5, 0)
         self.setLayout(h_layout)
+    
+    def update_taken_fig(self, figures, score):
+        for fig in self.buttons:
+            fig_n = self.translate[fig.objectName()[1]]
+            if (fig_n in figures and figures[fig_n]):
+                fig.show()
+                figures[fig_n] -= 1
+        
+        if score:
+            self.score.setText("+{}".format(score))
+        else:
+            self.score.setText("")
+
+
 
 class MainMenu(QFrame):
     def __init__(self):
@@ -611,9 +635,9 @@ class MainGame(QFrame):
         v_layout = QVBoxLayout()
         v_layout.setSpacing(0)
         v_layout.setContentsMargins(0, 0, 0, 0)
-        self.board = GuiBoard(api, comm, start_color)
-        up_taken = TakenFigures(comm, 3 - start_color, self.board.get_size())
-        down_taken = TakenFigures(comm, start_color, self.board.get_size())
+        up_taken = TakenFigures(comm, 3 - start_color, board_size)
+        down_taken = TakenFigures(comm, start_color, board_size)
+        self.board = GuiBoard(api, comm, start_color, (up_taken, down_taken))
         v_layout.addWidget(up_taken)
         v_layout.addWidget(self.board)
         v_layout.addWidget(down_taken)

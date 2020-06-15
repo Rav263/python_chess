@@ -149,13 +149,12 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
             if now_fig[0] == king_pos[0]:
                 bad_positions.append((king_pos[0], king_pos[1] + 1))
                 bad_positions.append((king_pos[0], king_pos[1] - 1))
-            else:
+            elif now_fig[1] == king_pos[1]:
                 bad_positions.append((king_pos[0] + 1, king_pos[1]))
                 bad_positions.append((king_pos[0] - 1, king_pos[1]))
         if board.get_type_map(now_fig) in (board.bishop, board.queen):
             now = normalize_tuple(mf.difference(king_pos, now_fig))[0]
             bad_positions.append(mf.tuple_sum(king_pos, now))
-
     for start_turn in good_turns:
         start_turns[start_turn] = good_turns[start_turn]
 
@@ -289,7 +288,9 @@ def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
 
     Adds all turns for pawn in dict
     """
-    diff = -1 if color == 1 and not board.flipped else 1
+    diff = -1
+    if (color == 2 and not board.flipped) or (color == 1 and board.flipped):
+        diff = 1
     if (pos[0] == board.pawn_start[diff] and
             board.get_type_map((pos[0] + 2 * diff, pos[1])) == board.empty_map and
             board.get_type_map((pos[0] + diff, pos[1])) == board.empty_map):
@@ -298,7 +299,7 @@ def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
         possible_turns[(pos[0] + 2 * diff, pos[1])].append(pos)
 
     if board.get_type_map((pos[0] + diff, pos[1])) == board.empty_map:
-        if pos[0] + diff == board.board_size - 1:
+        if pos[0] + diff in (board.board_size - 1, 0):
             add_pawn_transformation(pos, (pos[0] + diff, pos[1]), possible_turns, color)
         else:
             possible_turns[(pos[0] + diff, pos[1])].append(pos)

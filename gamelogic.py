@@ -170,7 +170,6 @@ class Logic:
 
         turns = self.generate_turns(board, color, last_turn)
         threads = []
-
         num_of_turns = len(turns) // self.av_threads + 1
         num_of_threads = len(turns) // num_of_turns + 1
         if len(turns) < self.av_threads:

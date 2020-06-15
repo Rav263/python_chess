@@ -1,6 +1,7 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, 
-    QHBoxLayout, QVBoxLayout, QStackedLayout, QApplication, QGridLayout, QFrame, QSizePolicy, QDialog)
+    QHBoxLayout, QVBoxLayout, QStackedLayout, QApplication, QGridLayout, QFrame, QSizePolicy, QDialog, 
+    QLabel)
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QMimeData, Qt, QPoint
 from PyQt5.QtGui import QDrag, QPixmap
@@ -319,6 +320,9 @@ class GuiBoard(QFrame):
         :type stop: (int, int)
         """
 
+        if (start[0] == -1):
+            self.mate(False)
+            return
         if upd_all:
             self.upd_whole_board()
         else:
@@ -412,6 +416,30 @@ class GuiBoard(QFrame):
         :type color: int(1,2)
         """
         self.possible_moves = self.api.get_possible_turns(color)
+        if not self.possible_moves:
+            self.mate(True)
+        
+    def mate(self, user_lost):
+        
+        finish = QDialog()
+        finish.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
+        pos_x = self.size().height() // 2 - finish.size().width() // 2
+        pos_y = self.size().height() // 2 - finish.size().height() // 2
+        finish.move(self.mapToGlobal(QPoint(pos_x, pos_y)))
+
+        ok_button = MenuButton("OK")
+        ok_button.clicked.connect(finish.accept)
+        
+        result = QLabel("Game over! \nYou lost.") if user_lost else QLabel("Game over! \nYou won.") 
+        result.setAlignment(Qt.AlignCenter)
+
+        layout = QGridLayout(finish)
+        layout.addWidget(ok_button, 1, 1)
+        layout.addWidget(result, 0, 0, 1, 3)
+        finish.setLayout(layout)
+        res = finish.exec_()
+            
+
 
     def change_color(self):
         """Changes sides
@@ -659,7 +687,3 @@ class Main_Window(QWidget):
             self.game.board.upd_possible_moves(self.start_color)
             self.tabs.setCurrentIndex(self.tab_names["game_board"])
         return start_game
-  
-    
-
-

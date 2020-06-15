@@ -87,7 +87,7 @@ class Api:
                 break
 
         if pawn != 0:
-            now_turn.pawn = pawn
+            now_turn.pawn = 10 * color + pawn
 
         tmp, flags = self.board.do_turn(now_turn)
 

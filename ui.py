@@ -614,7 +614,19 @@ class MainMenu(QFrame):
         for difficulty in self.difficulties:
             vbox.addWidget(difficulty)
             difficulty.hide()
+
+        h_col_lay = QHBoxLayout()
+        self.white = MenuButton("white")
+        self.white.setProperty("pushed", "yes")
+        self.black = MenuButton("black")
+        self.black.setProperty("pushed", "no")
+        self.white.hide()
+        self.black.hide()
+        h_col_lay.addWidget(self.white)
+        h_col_lay.addWidget(self.black)
+        vbox.addLayout(h_col_lay)
         vbox.addStretch(1)
+
 
         hbox = QHBoxLayout()
         hbox.addStretch(1)
@@ -630,6 +642,9 @@ class MainMenu(QFrame):
         self.start_game.hide()
         for difficulty in self.difficulties:
             difficulty.show()
+        self.white.show()
+        self.black.show()
+        
 
 class MainGame(QFrame):
     def __init__(self, api, comm, start_color):
@@ -701,6 +716,7 @@ class Main_Window(QWidget):
         self.tab_names = {"start":0, "game_board":1}
         self.tabs.setCurrentIndex(self.tab_names["start"])
 
+
         self.tabs.setSpacing(self.tab_names["start"])
         self.tabs.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.tabs)
@@ -708,9 +724,28 @@ class Main_Window(QWidget):
         for diff, difficulty in enumerate(self.menu.difficulties):
             difficulty.clicked.connect(self.start_game_with_difficulty(diff + 1))
 
+        self.menu.white.clicked.connect(self.white_start)
+        self.menu.black.clicked.connect(self.black_start)
+
         self.setWindowTitle('Chess')
         self.show()
     
+    def white_start(self):
+        self.start_color = self.api.board.white
+        self.menu.white.setProperty("pushed", "yes")
+        self.menu.black.setProperty("pushed", "no")
+        self.menu.black.setStyle(self.style())
+        self.menu.white.setStyle(self.style())
+        
+
+
+    def black_start(self):
+        self.start_color = self.api.board.black
+        self.menu.black.setProperty("pushed", "yes")
+        self.menu.white.setProperty("pushed", "no")
+        self.menu.black.setStyle(self.style())
+        self.menu.white.setStyle(self.style())
+
     def resizeEvent(self, event):
         """Process resize event
 
@@ -725,6 +760,8 @@ class Main_Window(QWidget):
         """
         for difficulty in self.menu.difficulties:
             difficulty.hide()
+        self.menu.black.hide()
+        self.menu.white.hide()
         self.menu.start_game.show()
         self.tabs.setCurrentIndex(self.tab_names["start"])
 
@@ -736,6 +773,8 @@ class Main_Window(QWidget):
         """
         def start_game():
             self.api.start_new_game(difficulty + 1)
+            if self.start_color == 2:
+                self.api.flip_board()
             self.game.board.upd_whole_board()
             self.game.board.upd_possible_moves(self.start_color)
             self.tabs.setCurrentIndex(self.tab_names["game_board"])

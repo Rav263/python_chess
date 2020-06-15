@@ -1,6 +1,5 @@
 """Board class file"""
 from itertools import product
-import subprocess
 
 
 class Board:
@@ -37,6 +36,12 @@ class Board:
         return (f"king flags: {self.king_movement}\n" +
                 f"rook flags: {self.rook_movement}\n" +
                 f"castling flags: {self.castling}")
+
+    def rotate_board(self):
+        self.white_pawn_start = 7 - self.white_pawn_start
+        self.black_pawn_start = 7 - self.black_pawn_start
+        for now in range(4):
+            self.board[7 - now], self.board[now] = self.board[now], self.board[7 - now]
 
     def get_king_pos(self, color):
         """get_king_pos(self, color) -> tuple

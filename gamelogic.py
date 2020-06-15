@@ -81,7 +81,7 @@ class Logic:
         for pos in product(range(board.board_size), repeat=2):
             if board.get_color_map(pos) == color:
                 if board.get_type_map(pos) == board.pawn:
-                    gt.generate_turns_pawn(pos, board, possible_turns, turns_for_king)
+                    gt.generate_turns_pawn(pos, board, possible_turns, color, turns_for_king)
 
                 if board.get_type_map(pos) == board.knight:
                     gt.generate_turns_knight(pos, board, possible_turns, color, turns_for_king)

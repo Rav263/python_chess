@@ -46,6 +46,9 @@ class Api:
 
         return turns
 
+    def flip_board(self):
+        self.board.rotate_board()
+
     def get_map(self, pos):
         """returns cell value on board"""
         if self.board.check_pos(pos):

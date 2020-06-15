@@ -4,7 +4,7 @@ from collections import defaultdict
 from itertools import product
 from board import Board
 from gamelogic import Logic
-from io_functions import Data
+from io_functions import Data, print_board
 from evaluate import Evaluate
 from turns import read_nodes, Node
 
@@ -30,6 +30,9 @@ class Api:
         print("threads:   ", threads)
 
         # Then we need start game
+    
+    def print_board(self):
+        print_board(self.board.board, self.data)
 
     def start_cmd(self):
         """start command line UI"""

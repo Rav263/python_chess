@@ -131,14 +131,18 @@ class Cell(QFrame):
         self.setProperty("type", "")
         self.check_move = check_move
         self.pressed = 0
-        if color == 1:
-            self.setProperty("color", "white")
-        else:
-            self.setProperty("color", "black")
+        self.color = color
+        self.set_color(color)
         vbox = QVBoxLayout()
         vbox.addWidget(self.figure)
         self.setLayout(vbox)
         vbox.setContentsMargins(4, 4, 4, 4)
+
+    def set_color(self, color):
+        self.color = color
+        text_color = "white" if color == 1 else "black"
+        self.setProperty("color", text_color)
+        self.setStyle(self.style())
 
     def set_type(self, cell_type):
         """Updates cell's type
@@ -206,6 +210,8 @@ class GuiBoard(QFrame):
     updBoard = pyqtSignal()
     def __init__(self, api, comm, start_color, taken):
         super().__init__()
+        self.game_human = False
+        self.change_human = False
         self.taken = taken
         self.history = 0
         self.reached_hist_bottom = False
@@ -218,6 +224,7 @@ class GuiBoard(QFrame):
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         self.setSizePolicy(sizePol)
         self.game_over = False
+
         self.comm = comm
         self.comm.cellPressed.connect(self.cell_pressed)
         self.comm.cellReleased.connect(self.cell_released)
@@ -248,6 +255,15 @@ class GuiBoard(QFrame):
             cell_color = 3 - cell_color
         self.setLayout(cells)
 
+    def flip_board(self):
+        self.clear_afterturn()
+        self.after_st = (7 - self.after_st[0], 7 - self.after_st[1])
+        self.after_fn = (7 - self.after_fn[0], 7 - self.after_fn[1])
+        self.cells_arr[self.after_st[0]][self.after_st[1]].set_type("moved")
+        self.cells_arr[self.after_fn[0]][self.after_fn[1]].set_type("moved")
+        self.api.flip_board()
+        self.upd_whole_board(self.color)
+
     def cell_released(self, x, y):
         """Alows II to make a move
 
@@ -259,6 +275,10 @@ class GuiBoard(QFrame):
         if self.ai_do_turn:
             self.upd_board()
             self.ai_do_turn = False
+
+        if self.change_human:
+            self.upd_board()
+            self.change_human = False
         
     def figure_moved(self, x, y):
         """Proccess event when user drags a figure
@@ -319,7 +339,10 @@ class GuiBoard(QFrame):
                 self.make_turn(self.start, (x, y), self.api.do_turn(self.start, (x, y)))
             self.change_color()
             if method == "press":
-                self.ai_do_turn = True
+                if self.game_human:
+                    self.change_human = True
+                else:
+                    self.ai_do_turn = True
             elif method == "drag":
                 self.upd_board()
 
@@ -421,15 +444,24 @@ class GuiBoard(QFrame):
     def upd_board(self):
         """Updates board after AI turn
         """
-        turn, upd_whole = self.api.ai_turn(self.color)
-        self.make_turn(turn.start_pos, turn.end_pos, upd_whole)
-        self.change_color()
+        if self.game_human:
+            self.flip_board()
+        else:
+            turn, upd_whole = self.api.ai_turn(self.color)
+            self.make_turn(turn.start_pos, turn.end_pos, upd_whole)
+            self.change_color()
         self.upd_possible_moves(self.color)
     
-    def upd_whole_board(self):
+    def upd_whole_board(self, ch_color = 0):
+        cell_color = self.color
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
+                if ch_color:
+                    self.cells_arr[x][y].set_color(cell_color)
+                    cell_color = 3 - cell_color
+            if ch_color:
+                cell_color = 3 - cell_color
     
     def upd_possible_moves(self, color):
         """Gets all possible turns of a specific color from API
@@ -691,7 +723,6 @@ class MainMenu(QFrame):
         self.white.show()
         self.black.show()
         
-
 class MainGame(QFrame):
     def __init__(self, api, comm, start_color):
         super().__init__()
@@ -712,7 +743,6 @@ class MainGame(QFrame):
         h_layout.setSpacing(0)
         h_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(h_layout)
-
 
 class MenuButton(QPushButton):
     def __init__(self, *args):
@@ -772,9 +802,15 @@ class Main_Window(QWidget):
         self.menu.resume.clicked.connect(self.resume_game)
         self.menu.white.clicked.connect(self.white_start)
         self.menu.black.clicked.connect(self.black_start)
-
+        self.menu.human.clicked.connect(self.game_with_human)
         self.setWindowTitle('Chess')
         self.show()
+
+    def game_with_human(self):
+        self.api.start_new_game()
+        self.game.board.game_human = True
+        self.start_color = self.api.board.white
+        self.start_new_game()
 
     def resume_game(self):
         self.tabs.setCurrentIndex(self.tab_names["game_board"])
@@ -823,17 +859,21 @@ class Main_Window(QWidget):
         :type difficulty: int
         """
         def start_game():
+            self.game.board.game_human = False
             self.api.start_new_game(difficulty + 1)
-            self.game.board.color = self.start_color
             if self.start_color == 2:
-                self.api.flip_board()
-            self.game.up_taken.set_color(self.start_color)
-            self.game.down_taken.set_color(3 - self.start_color)
-            self.game.up_taken.hide_all()
-            self.game.down_taken.hide_all()
-
-            self.game.board.upd_whole_board()
-            self.game.board.clear_afterturn()
-            self.game.board.upd_possible_moves(self.start_color)
-            self.tabs.setCurrentIndex(self.tab_names["game_board"])
+                self.game.board.flip_board()
+            self.start_new_game()
         return start_game
+    
+    def start_new_game(self):
+        self.game.up_taken.set_color(self.start_color)
+        self.game.down_taken.set_color(3 - self.start_color)
+        self.game.up_taken.hide_all()
+        self.game.down_taken.hide_all()
+
+        self.game.board.color = self.start_color
+        self.game.board.upd_whole_board(self.start_color)
+        self.game.board.clear_afterturn()
+        self.game.board.upd_possible_moves(self.start_color)
+        self.tabs.setCurrentIndex(self.tab_names["game_board"])

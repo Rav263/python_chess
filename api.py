@@ -165,7 +165,7 @@ class Api:
         self.turn_index += 1
         return (now_turn, now_turn.passant or now_turn.castling or now_turn.pawn != 0)
 
-    def start_new_game(self, difficulty):
+    def start_new_game(self, difficulty = 2):
         self.board = Board(self.data)
         self.logic.turn_history = list()
         self.turn_index = 0

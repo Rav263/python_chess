@@ -113,7 +113,6 @@ class TakenFigure(Figure):
         self.comm = comm
         self.set_type(figure_type)
         self.setMinimumSize(board_size // 17, board_size // 17)
-        # self.resize(board_size // 16, board_size // 16)
     
     def mouseMoveEvent(self, event):
         pass
@@ -343,12 +342,12 @@ class GuiBoard(QFrame):
             self.cells_arr[start[0]][start[1]].figure.set_type(0)
             self.cells_arr[stop[0]][stop[1]].figure.set_type(self.api.get_field(stop))
         
-        self.cells_arr[self.after_st[0]][self.after_st[1]].set_type("")
-        self.cells_arr[self.after_fn[0]][self.after_fn[1]].set_type("")
+        self.clear_afterturn()
         self.cells_arr[start[0]][start[1]].set_type("moved")
         self.cells_arr[stop[0]][stop[1]].set_type("moved")
         self.after_st = start
         self.after_fn = stop
+
         white, black, score_w, score_b = self.api.get_taken_figures()
         if self.taken[0].color == self.white:
             self.taken[1].update_taken_fig(white, score_w)
@@ -356,6 +355,10 @@ class GuiBoard(QFrame):
         else:
             self.taken[0].update_taken_fig(white, score_w)
             self.taken[1].update_taken_fig(black, score_b)
+
+    def clear_afterturn(self):
+        self.cells_arr[self.after_st[0]][self.after_st[1]].set_type("")
+        self.cells_arr[self.after_fn[0]][self.after_fn[1]].set_type("")
 
     def check_move(self, x, y):
         """Checks if a move is correct
@@ -619,8 +622,6 @@ class TakenFigures(QFrame):
             fig.hide()
         self.score.setText("")
 
-
-
 class MainMenu(QFrame):
     def __init__(self):
         super().__init__()
@@ -802,7 +803,9 @@ class Main_Window(QWidget):
             self.game.down_taken.set_color(3 - self.start_color)
             self.game.up_taken.hide_all()
             self.game.down_taken.hide_all()
+
             self.game.board.upd_whole_board()
+            self.game.board.clear_afterturn()
             self.game.board.upd_possible_moves(self.start_color)
             self.tabs.setCurrentIndex(self.tab_names["game_board"])
         return start_game

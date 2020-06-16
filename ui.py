@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton, 
     QHBoxLayout, QVBoxLayout, QStackedLayout, QApplication, QGridLayout, QFrame, QSizePolicy, QDialog, 
-    QLabel)
+    QLabel, QProgressBar)
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal, QObject, QMimeData, Qt, QPoint
 from PyQt5.QtGui import QDrag, QPixmap
@@ -36,6 +36,7 @@ class Communicate(QObject):
     backMenu = pyqtSignal()
     toStart = pyqtSignal()
     skipHist = pyqtSignal()
+    Situation = pyqtSignal(float)
 
 
 class Figure(QFrame):
@@ -377,6 +378,8 @@ class GuiBoard(QFrame):
         else:
             self.taken[0].update_taken_fig(white, score_w)
             self.taken[1].update_taken_fig(black, score_b)
+        
+        self.comm.Situation.emit(self.api.get_board_eval())
 
     def clear_afterturn(self):
         self.cells_arr[self.after_st[0]][self.after_st[1]].set_type("")
@@ -551,6 +554,7 @@ class GuiBoard(QFrame):
         :type event: QEvent
         """
         new_size = min(event.size().height(), event.size().width())
+        # print(new_size)
         self.resize(new_size, new_size)
     
     def get_size(self):
@@ -729,11 +733,25 @@ class MainGame(QFrame):
         v_layout = QVBoxLayout()
         v_layout.setSpacing(0)
         v_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.comm = comm
+        self.comm.Situation.connect(self.upd_progress)
+        hbox = QHBoxLayout()
+
+        self.pbar = QProgressBar(self)
         self.up_taken = TakenFigures(comm, start_color, board_size)
         self.down_taken = TakenFigures(comm, 3 - start_color, board_size)
         self.board = GuiBoard(api, comm, start_color, (self.up_taken, self.down_taken))
+        self.pbar.setGeometry(0, 0, 40, 52*8)
+        self.pbar.setOrientation(Qt.Vertical)
+        self.pbar.setValue(50)
+        self.pbar.setTextVisible(False)
+
+        hbox.addWidget(self.pbar)
+        hbox.addWidget(self.board)
+
         v_layout.addWidget(self.up_taken)
-        v_layout.addWidget(self.board)
+        v_layout.addLayout(hbox)
         v_layout.addWidget(self.down_taken)
         self.bottom_menu = BottomMenu(comm)
         v_layout.addWidget(self.bottom_menu)
@@ -743,6 +761,10 @@ class MainGame(QFrame):
         h_layout.setSpacing(0)
         h_layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(h_layout)
+
+    def upd_progress(self, val):
+        print(val)
+        self.pbar.setValue(val * 100)
 
 class MenuButton(QPushButton):
     def __init__(self, *args):
@@ -771,7 +793,8 @@ class ControllButton(QPushButton):
 class Main_Window(QWidget):
     def __init__(self, api):
         super().__init__()
-        self.setMinimumSize(board_size, board_size + 105)
+        self.resiz = True
+        self.setMinimumSize(board_size + 40, board_size + 105)
         sizePol = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
@@ -835,8 +858,12 @@ class Main_Window(QWidget):
         :param event: new size of a vindow
         :type event: QEvent
         """
-        new_size = min(event.size().height(), event.size().width())
-        self.resize(new_size, new_size + 105)
+        if self.resiz:
+            self.resiz = False
+            new_size = min(event.size().height(), event.size().width())
+            self.resize(new_size + 40, new_size + 105)
+        
+        self.resiz = True
 
     def return_to_menu(self):
         """Return user to main menu

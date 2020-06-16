@@ -15,7 +15,16 @@ MenuButton[pushed="yes"] {
     background-color: #aa562b;
 }
 
+QProgressBar{
+    border: 2px solid grey;
+    border-radius: 0px;
+    text-align: center;
+    background-color: black;
+}
 
+QProgressBar::chunk {
+    background-color: white;
+}
 
 PromotionButton#wN{
     border-image: url(images/merida/wN.png) 0 0 0 0 stretch stretch;

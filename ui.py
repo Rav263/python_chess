@@ -37,6 +37,8 @@ class Communicate(QObject):
     toStart = pyqtSignal()
     skipHist = pyqtSignal()
 
+
+
 class Figure(QFrame):
     fig_translation = {1:"P", 2:"N", 3:"B", 4:"R", 5:"K", 6:"Q"}
     
@@ -104,6 +106,17 @@ class Figure(QFrame):
         center_coord = self.rect().bottomRight().x() // 2
         drag.setHotSpot(QPoint(center_coord, center_coord))
         dropAction = drag.exec_(Qt.MoveAction)
+
+class TakenFigure(Figure):
+    def __init__(self, figure_type, comm):
+        super().__init__(figure_type, comm)
+        self.comm = comm
+        self.set_type(figure_type)
+        self.setMinimumSize(board_size // 17, board_size // 17)
+        # self.resize(board_size // 16, board_size // 16)
+    
+    def mouseMoveEvent(self, event):
+        pass
     
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm, color, check_move):
@@ -561,21 +574,21 @@ class BottomMenu(QFrame):
         self.comm.backMenu.emit()
     
 class TakenFigures(QFrame):
-    possible_figures = ["Q", "R", "R", "N", "N", "B", "B", "P", "P", "P", "P", "P", "P", "P", "P"]
+    possible_figures = [6, 4, 4, 3, 3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1]
     translate = {"Q":6, "R":4, "B":3, "N":2, "P":1}
     def __init__(self, comm, color, board_size):
         super().__init__()
+        self.setMinimumHeight(board_size // 17)
         self.comm = comm
         self.color = color
-        self.buttons = []
-        text_color = "w" if color == 1 else "b"
+        self.figures = []
         for fig in self.possible_figures:
-            self.buttons.append(PromotionButton(text_color + fig, board_size // 2))
+            self.figures.append(TakenFigure(color * 10 + fig, comm))
         self.score = QLabel("")
         h_layout = QHBoxLayout()
-        for but in self.buttons:
-            h_layout.addWidget(but)
-            but.hide()
+        for fig in self.figures:
+            h_layout.addWidget(fig)
+            fig.hide()
         h_layout.addWidget(self.score)
         h_layout.addStretch(1)
         h_layout.setSpacing(0)
@@ -583,18 +596,28 @@ class TakenFigures(QFrame):
         self.setLayout(h_layout)
     
     def update_taken_fig(self, figures, score):
-        for fig in self.buttons:
-            fig_n = self.translate[fig.objectName()[1]]
+        for fig in self.figures:
+            fig_n = fig.get_type() % 10
             if (fig_n in figures and figures[fig_n]):
                 fig.show()
                 figures[fig_n] -= 1
             else:
                 fig.hide()
-        
         if score:
             self.score.setText("+{}".format(score))
         else:
             self.score.setText("")
+    
+    def set_color(self, color):
+        if color != self.color:
+            self.color = color
+            for fig in self.figures:
+                fig.set_type(color * 10 + fig.get_type() % 10)
+        
+    def hide_all(self):
+        for fig in self.figures:
+            fig.hide()
+        self.score.setText("")
 
 
 
@@ -652,12 +675,12 @@ class MainGame(QFrame):
         v_layout = QVBoxLayout()
         v_layout.setSpacing(0)
         v_layout.setContentsMargins(0, 0, 0, 0)
-        up_taken = TakenFigures(comm, start_color, board_size)
-        down_taken = TakenFigures(comm, 3 - start_color, board_size)
-        self.board = GuiBoard(api, comm, start_color, (up_taken, down_taken))
-        v_layout.addWidget(up_taken)
+        self.up_taken = TakenFigures(comm, start_color, board_size)
+        self.down_taken = TakenFigures(comm, 3 - start_color, board_size)
+        self.board = GuiBoard(api, comm, start_color, (self.up_taken, self.down_taken))
+        v_layout.addWidget(self.up_taken)
         v_layout.addWidget(self.board)
-        v_layout.addWidget(down_taken)
+        v_layout.addWidget(self.down_taken)
         self.bottom_menu = BottomMenu(comm)
         v_layout.addWidget(self.bottom_menu)
 
@@ -676,7 +699,6 @@ class PromotionButton(QPushButton):
     def __init__(self, *args):
         super().__init__()
         self.setObjectName(args[0])
-        # button_size = args[1].width() // 8
         button_size = args[1] // 8
         self.setText("")
         self.setMinimumSize(button_size, button_size)
@@ -773,8 +795,13 @@ class Main_Window(QWidget):
         """
         def start_game():
             self.api.start_new_game(difficulty + 1)
+            self.game.board.color = self.start_color
             if self.start_color == 2:
                 self.api.flip_board()
+            self.game.up_taken.set_color(self.start_color)
+            self.game.down_taken.set_color(3 - self.start_color)
+            self.game.up_taken.hide_all()
+            self.game.down_taken.hide_all()
             self.game.board.upd_whole_board()
             self.game.board.upd_possible_moves(self.start_color)
             self.tabs.setCurrentIndex(self.tab_names["game_board"])

@@ -79,8 +79,11 @@ class Figure(QFrame):
         :return: "P", "N", "B", "R", "K" or "Q"  depending on figure type
         :rtype: str
         """
-        return self.fig_translation[self.figure_type % 10]
-        
+        if self.figure_type % 10 in self.fig_translation:
+            return self.fig_translation[self.figure_type % 10]
+        else:
+            return 0
+
     def get_figure_name(self):
         """Converts full numeric type to text
 
@@ -169,6 +172,7 @@ class Cell(QFrame):
         :type event: QEvent
         """
         position = event.pos()
+        print(self.figure.figure_type)
         if self.check_move(self.x, self.y):
             self.comm.figureMoved.emit(self.x, self.y)
         event.accept()

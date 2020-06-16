@@ -153,7 +153,7 @@ class Cell(QFrame):
         :type event: QEvent
         """
         position = event.pos()
-        if self.check_move(self.x, self.y):
+        if self.check_move(self.x, self.y) and self.figure.figure_type:
             self.comm.figureMoved.emit(self.x, self.y)
         event.accept()
 

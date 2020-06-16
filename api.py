@@ -167,6 +167,8 @@ class Api:
 
     def start_new_game(self, difficulty):
         self.board = Board(self.data)
+        self.logic.turn_history = list()
+        self.turn_index = 0
         self.logic.debuts = self.debuts
         self.logic.flag = True
         self.difficulty = difficulty

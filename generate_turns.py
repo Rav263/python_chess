@@ -458,7 +458,11 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
     # check castling
 
     positions = [1, 2, 3]
-    diff = 7 if color == board.white and not board.flipped else 0
+    diff = 7
+    if color == board.white and board.flipped:
+        diff = 0
+    if color == board.black and not board.flipped:
+        diff = 0
     
     if (pos[0] != diff and color == board.white) or (pos[0] != diff and color == board.black):
         return None

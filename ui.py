@@ -631,14 +631,22 @@ class MainMenu(QFrame):
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
 
-        self.start_game = MenuButton("Start Game")
+        self.start_game = MenuButton("New game")
         self.resume = MenuButton("Resume")
+        self.computer = MenuButton("Computer")
+        self.human = MenuButton("Human")
+
+        self.computer.hide()
+        self.human.hide()
+        
         self.resume.hide()
         self.difficulties = [MenuButton(str(i)) for i in range(1, 5)]
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(self.start_game)
         vbox.addWidget(self.resume)
+        vbox.addWidget(self.computer)
+        vbox.addWidget(self.human)
         for difficulty in self.difficulties:
             vbox.addWidget(difficulty)
             difficulty.hide()
@@ -662,11 +670,20 @@ class MainMenu(QFrame):
         hbox.addStretch(1)
         self.setLayout(hbox)
 
-        self.start_game.clicked.connect(self.choose_difficulty)
+        self.computer.clicked.connect(self.choose_difficulty)
+        self.start_game.clicked.connect(self.choose_mode)
+
+    def choose_mode(self):
+        self.start_game.hide()
+        self.resume.hide()
+        self.computer.show()
+        self.human.show()
 
     def choose_difficulty(self):
         """Shows difficulty buttons
         """
+        self.computer.hide()
+        self.human.hide()
         self.start_game.hide()
         self.resume.hide()
         for difficulty in self.difficulties:
@@ -792,6 +809,8 @@ class Main_Window(QWidget):
             difficulty.hide()
         self.menu.black.hide()
         self.menu.white.hide()
+        self.menu.computer.hide()
+        self.menu.human.hide()
         self.menu.start_game.show()
         if not self.game.board.game_over:
             self.menu.resume.show()

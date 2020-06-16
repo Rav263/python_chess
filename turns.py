@@ -47,6 +47,10 @@ class Turn:
         return hash((self.start_pos, self.end_pos,
                      self.color, self.pawn, self.castling, self.passant))
 
+    def rotate(self):
+        self.start_pos = (7 - self.start_pos[0], self.start_pos[1])
+        self.end_pos = (7 - self.end_pos[0], self.end_pos[1])
+
 
 class Node:
     def __init__(self):

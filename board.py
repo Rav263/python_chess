@@ -40,9 +40,12 @@ class Board:
 
     def rotate_board(self):
         self.flipped = not self.flipped
+        tmp = list([0 for x in range(8)] for y in range(8))
 
-        for now in range(4):
-            self.board[7 - now], self.board[now] = self.board[now], self.board[7 - now]
+        for pos in product(range(self.board_size), repeat=2):
+            tmp[7 - pos[0]][7 - pos[1]] = self.get_map(pos)
+
+        self.board = tmp
 
     def get_king_pos(self, color):
         """get_king_pos(self, color) -> tuple

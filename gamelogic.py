@@ -155,6 +155,8 @@ class Logic:
         elif last_turn == self.NULL_TURN and len(self.debuts.next_turns) != 0:
             best_turn = self.debuts.sorted_turns[0][0]
             self.debuts = self.debuts.next_turns[best_turn]
+            if board.flipped:
+                best_turn.rotate()
             return (best_turn, 0)
         else:
             self.flag = False
@@ -163,6 +165,8 @@ class Logic:
         elif self.flag:
             best_turn = self.debuts.sorted_turns[0][0]
             self.debuts = self.debuts.next_turns[best_turn]
+            if board.flipped:
+                best_turn.rotate()
             return (best_turn, 0)
 
         manager = Manager()

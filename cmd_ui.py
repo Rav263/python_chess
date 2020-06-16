@@ -12,6 +12,8 @@ class CmdUi:
 
         Main game cycle in text mode
         """
+        if self.color == 2:
+            self.api.flip_board()
         while True:
             color = 1 
             while True:
@@ -26,6 +28,8 @@ class CmdUi:
             
                     color = 3 - color
                 else:
+                    print_board(self.api.board.board, self.api.data)
+                    print(color)
                     now_turn = self.api.ai_turn(color)[0]
 
                     if now_turn == self.api.logic.NULL_TURN:

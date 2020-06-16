@@ -8,7 +8,6 @@ from itertools import product
 from multiprocessing import Process
 from multiprocessing import Manager
 
-
 import generate_turns as gt
 from board import Board
 from turns import Turn
@@ -193,6 +192,7 @@ class Logic:
 
         for thread in threads:
             thread.join()
+
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, last_turn, alpha=MIN_COST, beta=MAX_COST):

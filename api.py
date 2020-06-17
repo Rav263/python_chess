@@ -122,18 +122,24 @@ class Api:
         for now in white_figs:
             all_figs[now] = white_figs[now] - black_figs[now]
         
-        black_figs = list()
-        white_figs = list()
+        black_figs = dict()
+        white_figs = dict()
         black_score = 0
         white_score = 0
 
         for now in all_figs:
             if all_figs[now] < 0:
-                black_figs.append((now, abs(all_figs[now])))
+                black_figs[now] = abs(all_figs[now])
                 black_score += self.data.data["FIGURES_COST"][10 + now] * all_figs[now] 
             elif all_figs[now] > 0:
-                white_figs.append((now, abs(all_figs[now])))
+                white_figs[now] = abs(all_figs[now])
                 white_score -= self.data.data["FIGURES_COST"][10 + now] * all_figs[now] 
+        if white_score > black_score:
+            white_score = white_score - black_score
+            black_score = 0
+        else:
+            black_score = black_score - white_score
+            white_score = 0
         return (white_figs, black_figs, white_score, black_score)
 
     def do_turn(self, start, end, pawn=0):
@@ -201,13 +207,15 @@ class Api:
         self.turn_index += 1
         return (now_turn, now_turn.passant or now_turn.castling or now_turn.pawn != 0)
 
-    def start_new_game(self, difficulty):
+    def start_new_game(self, difficulty = 2):
         """Starts new game with difficulty
 
-        :param difficulty: game difficulty
-        :type difficulty: int
+        :param difficulty: game difficulty, defaults to 2
+        :type difficulty: int, optional
         """
         self.board = Board(self.data)
+        self.logic.turn_history = list()
+        self.turn_index = 0
         self.logic.debuts = self.debuts
         self.logic.flag = True
         self.difficulty = difficulty

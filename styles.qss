@@ -8,10 +8,23 @@ MenuButton {
 }
 
 MenuButton:pressed {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
+    background-color: #aa562b;
 }
 
+MenuButton[pushed="yes"] {
+    background-color: #aa562b;
+}
+
+QProgressBar{
+    border: 2px solid grey;
+    border-radius: 0px;
+    text-align: center;
+    background-color: black;
+}
+
+QProgressBar::chunk {
+    background-color: white;
+}
 
 PromotionButton#wN{
     border-image: url(images/merida/wN.png) 0 0 0 0 stretch stretch;
@@ -26,6 +39,10 @@ PromotionButton#wR{
     border-image: url(images/merida/wR.png) 0 0 0 0 stretch stretch;
 }
 
+PromotionButton#wP{
+    border-image: url(images/merida/wP.png) 0 0 0 0 stretch stretch;
+}
+
 PromotionButton#bN{
     border-image: url(images/merida/bN.png) 0 0 0 0 stretch stretch;
 }
@@ -36,7 +53,10 @@ PromotionButton#bB{
     border-image: url(images/merida/bB.png) 0 0 0 0 stretch stretch;
 }
 PromotionButton#bR{
-    border-image: url(images/merida/wR.png) 0 0 0 0 stretch stretch;
+    border-image: url(images/merida/bR.png) 0 0 0 0 stretch stretch;
+}
+PromotionButton#bP{
+    border-image: url(images/merida/bP.png) 0 0 0 0 stretch stretch;
 }
 
 ControllButton{

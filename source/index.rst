@@ -16,6 +16,9 @@ Welcome to PythonChess's documentation!
 .. automodule:: api
    :members:
 
+.. automodule:: board
+   :members:
+
 Indices and tables
 ==================
 

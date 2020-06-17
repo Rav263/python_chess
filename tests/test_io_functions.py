@@ -25,9 +25,9 @@ class Test_Data:
         assert self.data.data["BOARD"] == test_board
 
     def test_readed_figures_cost(self):
-        test_costs = {0: 0.0, 11: -10.0, 12: -30.0, 13: -30.0,
-                      14: -50.0, 15: -900.0, 16: -90.0, 21: 10.0,
-                      22: 30.0, 23: 30.0, 24: 50.0, 25: 900.0, 26: 90.0, 'sum': 0.0}
+        test_costs = {0: 0.0, 11: -1.0, 12: -3.0, 13: -3.0,
+                      14: -5.0, 15: -900.0, 16: -9.0, 21: 1.0,
+                      22: 3.0, 23: 3.0, 24: 5.0, 25: 900.0, 26: 9.0, 'sum': 0.0}
 
         assert self.data.data["FIGURES_COST"] == test_costs
 

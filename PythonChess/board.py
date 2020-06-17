@@ -14,8 +14,9 @@ class Board:
     white = 1
     black = 2
 
-    white_pawn_start = 6
-    black_pawn_start = 1
+    flipped = False
+
+    pawn_start = ["костыль", 1, 6]
 
     king_movement = ["костыль", False, False]
     rook_movement = ["костыль", [False, False], [False, False]]
@@ -36,6 +37,38 @@ class Board:
         return (f"king flags: {self.king_movement}\n" +
                 f"rook flags: {self.rook_movement}\n" +
                 f"castling flags: {self.castling}")
+
+    def rotate_board(self):
+        self.flipped = not self.flipped
+        tmp = list([0 for x in range(8)] for y in range(8))
+
+        for pos in product(range(self.board_size), repeat=2):
+            tmp[7 - pos[0]][7 - pos[1]] = self.get_map(pos)
+
+        self.board = tmp
+
+    def get_figures(self, flag=True):
+        figures = ("костыль", {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0})
+
+        for pos in product(range(self.board_size), repeat=2):
+            now_type = self.get_type_map(pos) 
+            if now_type == self.queen:
+                figures[self.get_color_map(pos)][5] += 1
+                continue
+            elif now_type == self.empty_map:
+                continue
+            figures[self.get_color_map(pos)][now_type] += 1
+        black_figs = list()
+        white_figs = list()
+
+        for now in figures[2]:
+            black_figs.append((now, figures[2][now]))
+        for now in figures[1]:
+            white_figs.append((now, figures[1][now]))
+        if flag:
+            return ((*white_figs), (*black_figs))
+        else:
+            return figures
 
     def get_king_pos(self, color):
         """get_king_pos(self, color) -> tuple

@@ -7,7 +7,7 @@ from itertools import product
 class Evaluate:
     def __init__(self, data_file_name):
         data_file = open(data_file_name, "r")
-
+        self.hash_table = dict()
         for line in data_file:
             if line.strip() == "FIGURE_PRICE_MG":
                 self.figure_price_mg = eval(data_file.readline())
@@ -29,14 +29,31 @@ class Evaluate:
             
             if line.strip() == "IMB_QT":
                 self.imb_qt = eval(data_file.readline())
-
+            
+            if line.strip() == "IMB_DICT":
+                self.imb_dict = eval(data_file.readline())
         data_file.close()
+    
+    def hash_board(self, board):
+        hsh = 0
+        for a in board.board:
+            for sq in a:
+                hsh <<= 5
+                hsh += sq
+        return hsh
 
     def evaluate_board_mg(self, board, color):
-        value = 0
+        hsh = self.hash_board(board)
         imb_val = 0
         bishops = [0, 0, 0]
+        value = 0
+
+        if hsh in self.hash_table:
+            value = self.hash_table[hsh]
+            return value[0] if color == value[1] else -value[0]
         for pos in product(range(board.board_size), repeat=2):
+            if board.get_type_map(pos) == board.empty_map:
+                continue
             if board.get_type_map(pos) == board.bishop:
                 bishops[board.get_color_map(pos)] += 1
             value += (self.piece_value_mg(board, color, pos) -
@@ -44,13 +61,17 @@ class Evaluate:
 
             value += (self.psqt_mg(board, color, pos) -
                       self.psqt_mg(board, 3 - color, pos))
-            
+
             imb_val += (self.imbalance_mg(board, color, pos) -
                         self.imbalance_mg(board, 3 - color, pos))
-       
-        # imb_val += ((bishops[color] // 2) - (bishops[3 - color] // 2)) * 1438
 
-        return value + (imb_val // 16)
+        imb_val += ((bishops[color] // 2) - (bishops[3 - color] // 2)) * 1438
+
+        value += (imb_val // 16)
+
+        self.hash_table[hsh] = [value, color]
+
+        return value
 
     def piece_value_mg(self, board, color, pos):
         if board.get_color_map(pos) == color:
@@ -60,7 +81,7 @@ class Evaluate:
     def psqt_mg(self, board, color, pos):
         if board.get_color_map(pos) == color:
             map_type = board.get_type_map(pos)
-            
+
             if map_type == board.pawn:
                 return self.ppsqt_price_mg[7 - pos[0]][pos[1]]
             return self.psqt_price_mg[map_type - 2][7 - pos[0]][min(pos[1], 7 - pos[1])]

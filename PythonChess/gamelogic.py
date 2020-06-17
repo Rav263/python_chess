@@ -8,7 +8,6 @@ from itertools import product
 from multiprocessing import Process
 from multiprocessing import Manager
 
-
 import PythonChess.generate_turns as gt
 from .board import Board
 from .turns import Turn
@@ -36,7 +35,7 @@ class Logic:
     def get_turn_from_history(self, index):
         """returns turn from history"""
         return self.turn_history[index]
-    
+
     def generate_turns(self, board, color, last_turn):
         possible_turns = self.generate_all_possible_turns(board, color, last_turn)
         turns = list()
@@ -55,7 +54,7 @@ class Logic:
                 turns.append(now_turn)
 
         return turns
-    
+
     def generate_all_possible_turns(self, board, color, last_turn, check_check=True):
         """generate_all_possible_turns(self, board, color) -> dict
 
@@ -81,7 +80,7 @@ class Logic:
         for pos in product(range(board.board_size), repeat=2):
             if board.get_color_map(pos) == color:
                 if board.get_type_map(pos) == board.pawn:
-                    gt.generate_turns_pawn(pos, board, possible_turns, turns_for_king)
+                    gt.generate_turns_pawn(pos, board, possible_turns, color, turns_for_king)
 
                 if board.get_type_map(pos) == board.knight:
                     gt.generate_turns_knight(pos, board, possible_turns, color, turns_for_king)
@@ -155,6 +154,8 @@ class Logic:
         elif last_turn == self.NULL_TURN and len(self.debuts.next_turns) != 0:
             best_turn = self.debuts.sorted_turns[0][0]
             self.debuts = self.debuts.next_turns[best_turn]
+            if board.flipped:
+                best_turn.rotate()
             return (best_turn, 0)
         else:
             self.flag = False
@@ -163,6 +164,8 @@ class Logic:
         elif self.flag:
             best_turn = self.debuts.sorted_turns[0][0]
             self.debuts = self.debuts.next_turns[best_turn]
+            if board.flipped:
+                best_turn.rotate()
             return (best_turn, 0)
 
         manager = Manager()
@@ -170,7 +173,6 @@ class Logic:
 
         turns = self.generate_turns(board, color, last_turn)
         threads = []
-
         num_of_turns = len(turns) // self.av_threads + 1
         num_of_threads = len(turns) // num_of_turns + 1
         if len(turns) < self.av_threads:
@@ -190,6 +192,7 @@ class Logic:
 
         for thread in threads:
             thread.join()
+
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, last_turn, alpha=MIN_COST, beta=MAX_COST):
@@ -221,7 +224,7 @@ class Logic:
             if now_cost >= best_cost:
                 best_cost = now_cost
                 best_turn = now_turn
-           
+
             if color == board.black:
                 alpha = max(alpha, best_cost)
             else:
@@ -229,5 +232,5 @@ class Logic:
 
             if beta <= alpha:
                 return (best_turn, best_cost)
-        
+
         return (best_turn, best_cost)

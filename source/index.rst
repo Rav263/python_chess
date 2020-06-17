@@ -13,7 +13,8 @@ Welcome to PythonChess's documentation!
 .. automodule:: ui
    :members:
 
-
+.. automodule:: api
+   :members:
 
 Indices and tables
 ==================

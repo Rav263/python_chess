@@ -31,6 +31,9 @@ Welcome to PythonChess's documentation!
 .. automodule:: generate_turns
    :members:
 
+.. automodule:: io_functions
+   :members:
+
 Indices and tables
 ==================
 

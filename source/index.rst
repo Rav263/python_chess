@@ -19,6 +19,35 @@ Welcome to PythonChess's documentation!
 .. automodule:: board
    :members:
 
+.. automodule:: cmd_ui
+   :members:
+
+.. automodule:: evaluate
+   :members:
+
+.. automodule:: gamelogic
+   :members:
+
+.. automodule:: generate_turns
+   :members:
+
+.. automodule:: io_functions
+   :members:
+
+.. automodule:: turns
+   :members:
+
+.. automodule:: main
+   :members:
+
+.. automodule:: math_functions
+   :members:
+
+.. automodule:: other_engines
+   :members:
+
+.. automodule:: stockfish
+   :members:
 Indices and tables
 ==================
 

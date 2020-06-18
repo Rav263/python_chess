@@ -12,6 +12,11 @@ import stockfish
 
 
 def parse_args():
+    """Parses comand line arguments
+
+    :return: args list
+    :rtype: dict(int)
+    """
     parsed_args = dict()
     parsed_args["DEBUTS"] = True
     parsed_args["DIFFICULTY"] = 4
@@ -33,6 +38,8 @@ def parse_args():
 
 
 def print_help():
+    """Prints help message
+    """
     print("------ HELP MESSAGE ------")
     print(" --mode (GUI, CMD)        GUI default, to run in GUI. CMD - to run in text mode")
     print(" --difficulty (2 - 5)     Set AI difficulty. default 4")

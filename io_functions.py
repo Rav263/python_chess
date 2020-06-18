@@ -66,18 +66,29 @@ class Data:
         file.close()
 
     def get_figures_costs(self):
-        """get_figures_costs(self) -> dict"""
+        """Geta figures cost
+
+        :return: figures costs
+        :rtype: dict()
+        """
         return self.data["FIGURES_COST"]
 
     def get_board_size(self):
-        """get_board_size(self) -> Int"""
+        """Gets board size
+
+        :return: board size
+        :rtype: int
+        """
         return self.data["BOARD_SIZE"]
 
 
 def print_board(board, data):
-    """print_board(board, data) -> None
+    """ Prints boards in console
 
-    prints boards in console
+    :param board: board object
+    :type board: class board object
+    :param data: data file
+    :type data: class Data object
     """
     print()
     for i in range(data.board_size):
@@ -97,6 +108,11 @@ def print_board(board, data):
 
 
 def get_color():
+    """Gets color
+
+    :return: color
+    :rtype: 1 for white 2 for black
+    """
     while True:
         color = input("Please enter your color (white\\black): ").strip().lower()
         if color in ("white", "black"):
@@ -105,6 +121,11 @@ def get_color():
 
 
 def new_game():
+    """Starts new game
+
+    :return: y/n depending on whether a user wants a new game
+    :rtype: str
+    """
     while True:
         game = input("Do you whant another game (y\\n):").strip().lower()
         if game in ("y", "n"):
@@ -114,6 +135,11 @@ def new_game():
 
 
 def get_difficulty():
+    """Gets game difficulty
+
+    :return: difficulty
+    :rtype: int
+    """
     while True:
         diff = input("Please enter difficulty (2-5): ")
         if not diff.isnumeric():
@@ -127,9 +153,14 @@ def get_difficulty():
 
 
 def get_turn(color, api):
-    """get_turn(logic, color, board) -> Turn
+    """ Get turn from user
 
-    Get turn from user
+    :param color: color
+    :type color: int
+    :param api: API module
+    :type api: class Api object
+    :return: requested turn (start pos, end pos, figure)
+    :rtype: ((int, int), (int, int), int)
     """
     possible_turns = api.get_possible_turns(color)
 

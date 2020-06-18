@@ -2,27 +2,42 @@
 
 
 def difference(tuple_1, tuple_2):
-    """difference(tuple_1, tuple_2) -> tuple
+    """Calculates tuple difference
 
-    returns tuple difference
+    :param tuple_1: first tuple
+    :type tuple_1: (int, int)
+    :param tuple_2: second tuple
+    :type tuple_2: (int, int)
+    :return: tuple_1 - tuple_2
+    :rtype: (int, int)
     """
 
     return (tuple_1[0] - tuple_2[0], tuple_1[1] - tuple_2[1])
 
 
 def tuple_sum(tuple_1, tuple_2):
-    """tuple_sum(tuple_1, tuple_2) -> tuple
+    """Calculates tuple sum
 
-    returns tuple sum
+    :param tuple_1: first tuple
+    :type tuple_1: (int, int)
+    :param tuple_2: second tuple
+    :type tuple_2: (int, int)
+    :return: tuple_1 + tuple_2
+    :rtype: (int, int)
     """
 
     return (tuple_1[0] + tuple_2[0], tuple_1[1] + tuple_2[1])
 
 
 def mul(tuple_1, num):
-    """mul(tuple_1, num) -> tuple
+    """Calculates tuple multiplication
 
-    returns tuple mull with num
+    :param tuple_1: first tuple
+    :type tuple_1: (int, int)
+    :param tuple_2: second tuple
+    :type tuple_2: (int, int)
+    :return: tuple_1 x tuple_2
+    :rtype: (int, int)
     """
 
     return (tuple_1[0] * num, tuple_1[1] * num)

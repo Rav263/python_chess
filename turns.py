@@ -12,11 +12,16 @@ class Turn:
         self.passant = passant
 
     def print(self):
-        """print(self) -> None: prints Turn information"""
+        """Prints self"""
         print("start pos: ({0}, {1})".format(*self.start_pos))
         print("end pos:   ({0}, {1})".format(*self.end_pos))
 
     def __str__(self):
+        """Turn self to str
+
+        :return: string representation
+        :rtype: str
+        """
         start_pos = chr(self.start_pos[1] + ord('a')) + str(8 - self.start_pos[0])
         end_pos = chr(self.end_pos[1] + ord('a')) + str(8 - self.end_pos[0])
 
@@ -35,12 +40,25 @@ class Turn:
                 "end pos:   ({0}, {1})\n".format(*self.end_pos) +
                 f"color:      {self.color}")
         """
+        
     def __eq__(self, second):
+        """Checks turns for equalitu
+
+        :param second: second turn
+        :type second: class Turn object
+        :return: True if equal
+        :rtype: bool
+        """
         return (self.start_pos == self.start_pos and self.end_pos == second.end_pos and
                 self.color == second.color and self.pawn == second.pawn and
                 self.castling == second.castling)
 
     def __repr__(self):
+        """Returns str representation
+
+        :return: str representation
+        :rtype: bool
+        """
         return str(self)
 
     def __hash__(self):
@@ -48,8 +66,10 @@ class Turn:
                      self.color, self.pawn, self.castling, self.passant))
 
     def rotate(self):
-        self.start_pos = (7 - self.start_pos[0], self.start_pos[1])
-        self.end_pos = (7 - self.end_pos[0], self.end_pos[1])
+        """Rotate turn on the board
+        """
+        self.start_pos = (7 - self.start_pos[0], 7 - self.start_pos[1])
+        self.end_pos = (7 - self.end_pos[0], 7 - self.end_pos[1])
 
 
 class Node:
@@ -60,20 +80,47 @@ class Node:
         self.win_rate = None
 
     def add_turn(self, turn, cost, node=None):
+        """[summary]
+
+        :param turn: turn
+        :type turn: class Turn object
+        :param cost: turns cost
+        :type cost: int
+        :param node: [description], defaults to None
+        :type node: [type], optional
+        """
         self.next_turns[turn] = node
         self.sorted_turns.append((turn, cost))
 
     def sort_turns(self):
+        """Sorts turns
+        """
         if self.turn is None or self.turn.color == 2:
             self.sorted_turns = sorted(self.sorted_turns, key=lambda x: -sum(x[1][:2])/x[1][2])
         else:
             self.sorted_turns = sorted(self.sorted_turns, key=lambda x: -(x[1][2] - x[1][0])/x[1][2])
 
     def get_max_turn(self):
+        """Gets best turn
+
+        :return: best turn
+        :rtype: class Turn object
+        """
         return self.sorted_turns[0][0]
 
 
 def build_tree(nodes, now_index, node, depth):
+    """Build tree for turn keping
+
+    :param nodes: [description]
+    :type nodes: [type]
+    :param now_index: [description]
+    :type now_index: [type]
+    :param node: [description]
+    :type node: [type]
+    :param depth: [description]
+    :type depth: [type]
+    """
     turn, indexes, win_rate = nodes[now_index]
 
     if turn is not None:
@@ -89,6 +136,11 @@ def build_tree(nodes, now_index, node, depth):
 
 
 def read_nodes():
+    """Read debuts
+
+    :return: [description]
+    :rtype: [type]
+    """
     print("Reading debuts, please wait:")
     fil = open("./debuts.dat", "r")
     lines = [line for line in fil]

@@ -8,8 +8,7 @@ class CmdUi:
         self.color = get_color()
     
     def start(self):
-        """start(self, board, data, difficulty) -> None
-
+        """
         Main game cycle in text mode
         """
         if self.color == 2:

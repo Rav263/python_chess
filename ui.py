@@ -123,7 +123,11 @@ class Cell(QFrame):
 
     def set_color(self, color):
         self.color = color
-        text_color = "white" if color == 1 else "black"
+        if self.x == 7 or self.y == 0:
+            text_color = "{}{}{}".format(color, self.x, self.y)
+            print(text_color)
+        else:
+            text_color = "white" if color == 1 else "black"
         self.setProperty("color", text_color)
         self.setStyle(self.style())
 
@@ -302,10 +306,10 @@ class GuiBoard(QFrame):
         :param stop: stop position
         :type stop: (int, int)
         """
-
-        if (start[0] == -1):
+        if (start[0] == -1 and not self.history):
             self.mate(False)
             return
+
         if upd_all:
             self.upd_whole_board()
         else:
@@ -359,7 +363,7 @@ class GuiBoard(QFrame):
         figures.append(PromotionButton(color + "Q", self.get_size()))
 
         prom_dialog = QDialog()
-        prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
+        prom_dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         curr_board = self.size().height() // 2 - figures[0].size().height()
         prom_dialog.move(self.mapToGlobal(QPoint(0, 0)) + QPoint(curr_board, curr_board)) #fix constants
 
@@ -403,7 +407,11 @@ class GuiBoard(QFrame):
         self.upd_possible_moves(self.color)
     
     def upd_whole_board(self):
-        cell_color = self.color
+        for x in range(8):
+            self.cells_arr[x][0].set_color(self.color)
+        for y in range(8):
+            self.cells_arr[7][y].set_color(self.color)
+
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))

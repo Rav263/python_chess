@@ -124,7 +124,8 @@ class Cell(QFrame):
     def set_color(self, color):
         self.color = color
         if self.x == 7 or self.y == 0:
-            text_color = "{}{}".format(self.x, self.y)
+            text_color = "{}{}{}".format(color, self.x, self.y)
+            print(text_color)
         else:
             text_color = "white" if color == 1 else "black"
         self.setProperty("color", text_color)
@@ -406,7 +407,11 @@ class GuiBoard(QFrame):
         self.upd_possible_moves(self.color)
     
     def upd_whole_board(self):
-        cell_color = self.color
+        for x in range(8):
+            self.cells_arr[x][0].set_color(self.color)
+        for y in range(8):
+            self.cells_arr[7][y].set_color(self.color)
+
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))

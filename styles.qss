@@ -143,190 +143,190 @@ Cell[color="white"][type="moved"][pressed="beat"]{
 }
 
 
-Cell[color="70"][pressed="beat"]{
+Cell[color="170"][pressed="beat"]{
     border-image: url(images/beat/black_cell_a.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="71"][pressed="beat"]{
+Cell[color="171"][pressed="beat"]{
     border-image: url(images/beat/white_cell_b.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="72"][pressed="beat"]{
+Cell[color="172"][pressed="beat"]{
     border-image: url(images/beat/black_cell_c.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="73"][pressed="beat"]{
+Cell[color="173"][pressed="beat"]{
     border-image: url(images/beat/white_cell_d.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="74"][pressed="beat"]{
+Cell[color="174"][pressed="beat"]{
     border-image: url(images/beat/black_cell_e.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="75"][pressed="beat"]{
+Cell[color="175"][pressed="beat"]{
     border-image: url(images/beat/white_cell_f.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="76"][pressed="beat"]{
+Cell[color="176"][pressed="beat"]{
     border-image: url(images/beat/black_cell_g.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="77"][pressed="beat"]{
+Cell[color="177"][pressed="beat"]{
     border-image: url(images/beat/white_cell_h.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="10"][pressed="beat"]{
+Cell[color="110"][pressed="beat"]{
     border-image: url(images/beat/black_cell_7.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="00"][pressed="beat"]{
+Cell[color="100"][pressed="beat"]{
     border-image: url(images/beat/white_cell_8.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="30"][pressed="beat"]{
+Cell[color="130"][pressed="beat"]{
     border-image: url(images/beat/black_cell_5.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="20"][pressed="beat"]{
+Cell[color="120"][pressed="beat"]{
     border-image: url(images/beat/white_cell_6.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="50"][pressed="beat"]{
+Cell[color="150"][pressed="beat"]{
     border-image: url(images/beat/black_cell_3.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="40"][pressed="beat"]{
+Cell[color="140"][pressed="beat"]{
     border-image: url(images/beat/white_cell_4.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="60"][pressed="beat"]{
+Cell[color="160"][pressed="beat"]{
     border-image: url(images/beat/white_cell_2.png) 0 0 0 0 stretch stretch;
 }
 
 
 
-Cell[color="70"][pressed="yes"]{
+Cell[color="170"][pressed="yes"]{
     border-image: url(images/pressed/black_cell_a.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="71"][pressed="yes"]{
+Cell[color="171"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_b.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="72"][pressed="yes"]{
+Cell[color="172"][pressed="yes"]{
     border-image: url(images/pressed/black_cell_c.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="73"][pressed="yes"]{
+Cell[color="173"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_d.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="74"][pressed="yes"]{
+Cell[color="174"][pressed="yes"]{
     border-image: url(images/pressed/black_cell_e.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="75"][pressed="yes"]{
+Cell[color="175"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_f.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="76"][pressed="yes"]{
+Cell[color="176"][pressed="yes"]{
     border-image: url(images/pressed/black_cell_g.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="77"][pressed="yes"]{
+Cell[color="177"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_h.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="10"][pressed="yes"]{
+Cell[color="110"][pressed="yes"]{
     border-image: url(images/pressed/black_cell_7.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="00"][pressed="yes"]{
+Cell[color="100"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_8.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="30"][pressed="yes"]{
+Cell[color="130"][pressed="yes"]{
     border-image: url(images/pressed/black_cell_5.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="20"][pressed="yes"]{
+Cell[color="120"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_6.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="50"][pressed="yes"]{
+Cell[color="150"][pressed="yes"]{
     border-image: url(images/pressed/black_cell_3.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="40"][pressed="yes"]{
+Cell[color="140"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_4.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="60"][pressed="yes"]{
+Cell[color="160"][pressed="yes"]{
     border-image: url(images/pressed/white_cell_2.png) 0 0 0 0 stretch stretch;
 }
 
-Cell[color="70"][type="moved"]{
+Cell[color="170"][type="moved"]{
     border-image: url(images/moved/black_cell_a.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="71"][type="moved"]{
+Cell[color="171"][type="moved"]{
     border-image: url(images/moved/white_cell_b.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="72"][type="moved"]{
+Cell[color="172"][type="moved"]{
     border-image: url(images/moved/black_cell_c.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="73"][type="moved"]{
+Cell[color="173"][type="moved"]{
     border-image: url(images/moved/white_cell_d.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="74"][type="moved"]{
+Cell[color="174"][type="moved"]{
     border-image: url(images/moved/black_cell_e.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="75"][type="moved"]{
+Cell[color="175"][type="moved"]{
     border-image: url(images/moved/white_cell_f.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="76"][type="moved"]{
+Cell[color="176"][type="moved"]{
     border-image: url(images/moved/black_cell_g.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="77"][type="moved"]{
+Cell[color="177"][type="moved"]{
     border-image: url(images/moved/white_cell_h.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="10"][type="moved"]{
+Cell[color="110"][type="moved"]{
     border-image: url(images/moved/black_cell_7.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="00"][type="moved"]{
+Cell[color="100"][type="moved"]{
     border-image: url(images/moved/white_cell_8.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="30"][type="moved"]{
+Cell[color="130"][type="moved"]{
     border-image: url(images/moved/black_cell_5.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="20"][type="moved"]{
+Cell[color="120"][type="moved"]{
     border-image: url(images/moved/white_cell_6.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="50"][type="moved"]{
+Cell[color="150"][type="moved"]{
     border-image: url(images/moved/black_cell_3.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="40"][type="moved"]{
+Cell[color="140"][type="moved"]{
     border-image: url(images/moved/white_cell_4.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="60"][type="moved"]{
+Cell[color="160"][type="moved"]{
     border-image: url(images/moved/white_cell_2.png) 0 0 0 0 stretch stretch;
 }
 
 
-Cell[color="70"]{
+Cell[color="170"]{
     border-image: url(images/black_cell_a.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="71"]{
+Cell[color="171"]{
     border-image: url(images/white_cell_b.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="72"]{
+Cell[color="172"]{
     border-image: url(images/black_cell_c.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="73"]{
+Cell[color="173"]{
     border-image: url(images/white_cell_d.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="74"]{
+Cell[color="174"]{
     border-image: url(images/black_cell_e.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="75"]{
+Cell[color="175"]{
     border-image: url(images/white_cell_f.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="76"]{
+Cell[color="176"]{
     border-image: url(images/black_cell_g.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="77"]{
+Cell[color="177"]{
     border-image: url(images/white_cell_h.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="10"]{
+Cell[color="110"]{
     border-image: url(images/black_cell_7.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="00"]{
+Cell[color="100"]{
     border-image: url(images/white_cell_8.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="30"]{
+Cell[color="130"]{
     border-image: url(images/black_cell_5.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="20"]{
+Cell[color="120"]{
     border-image: url(images/white_cell_6.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="50"]{
+Cell[color="150"]{
     border-image: url(images/black_cell_3.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="40"]{
+Cell[color="140"]{
     border-image: url(images/white_cell_4.png) 0 0 0 0 stretch stretch;
 }
-Cell[color="60"]{
+Cell[color="160"]{
     border-image: url(images/white_cell_2.png) 0 0 0 0 stretch stretch;
 }
 

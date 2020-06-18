@@ -19,6 +19,15 @@ Welcome to PythonChess's documentation!
 .. automodule:: board
    :members:
 
+.. automodule:: cmd_ui
+   :members:
+
+.. automodule:: evaluate
+   :members:
+
+.. automodule:: gamelogic
+   :members:
+   
 Indices and tables
 ==================
 

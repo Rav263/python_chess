@@ -35,6 +35,13 @@ class Evaluate:
         data_file.close()
     
     def hash_board(self, board):
+        """[summary]
+
+        :param board: [description]
+        :type board: [type]
+        :return: [description]
+        :rtype: [type]
+        """
         hsh = 0
         for a in board.board:
             for sq in a:
@@ -43,6 +50,15 @@ class Evaluate:
         return hsh
 
     def evaluate_board_mg(self, board, color):
+        """[summary]
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :return: [description]
+        :rtype: [type]
+        """
         hsh = self.hash_board(board)
         imb_val = 0
         bishops = [0, 0, 0]
@@ -74,11 +90,33 @@ class Evaluate:
         return value
 
     def piece_value_mg(self, board, color, pos):
+        """[summary]
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param pos: position
+        :type pos: (int, int)
+        :return: [description]
+        :rtype: [type]
+        """
         if board.get_color_map(pos) == color:
             return self.figure_price_mg[board.get_type_map(pos)]
         return 0
 
     def psqt_mg(self, board, color, pos):
+        """[summary]
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param pos: position
+        :type pos: (int, int)
+        :return: [description]
+        :rtype: [type]
+        """
         if board.get_color_map(pos) == color:
             map_type = board.get_type_map(pos)
 
@@ -88,6 +126,17 @@ class Evaluate:
         return 0
 
     def imbalance_mg(self, board, color, pos):
+        """[summary]
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param pos: position
+        :type pos: (int, int)
+        :return: [description]
+        :rtype: [type]
+        """
         value = 0
         if board.get_color_map(pos) == color:
             map_type = board.get_type_map(pos)

@@ -29,14 +29,36 @@ class Logic:
         self.flag = True
 
     def add_turn_to_history(self, now_turn):
-        """adds turn for history"""
+        """Ddds turn for history
+
+        :param now_turn: turn to add
+        :type now_turn: class Turn object
+        """
+        
         self.turn_history.append(now_turn)
 
     def get_turn_from_history(self, index):
-        """returns turn from history"""
+        """Returns turn from history
+
+        :param index: point in history
+        :type index: int
+        :return: turn at index
+        :rtype: class Turn object
+        """
         return self.turn_history[index]
 
     def generate_turns(self, board, color, last_turn):
+        """Generates possible turns
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param last_turn: previous turn
+        :type last_turn: class Turn object
+        :return: list of possible turns
+        :rtype: list(class Turn object)
+        """
         possible_turns = self.generate_all_possible_turns(board, color, last_turn)
         turns = list()
 
@@ -56,15 +78,18 @@ class Logic:
         return turns
 
     def generate_all_possible_turns(self, board, color, last_turn, check_check=True):
-        """generate_all_possible_turns(self, board, color) -> dict
+        """ Generates all possible turns
 
-        self  -- class Logic object
-        board -- class Board object
-        color -- color of figures
-
-        returns all possible turns in dict
-        dict key   - end turn position
-        dict value - list of start turn positions
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param last_turn: previous turn
+        :type last_turn: class Turn object
+        :param check_check: nessesity to check check, defaults to True
+        :type check_check: bool, optional
+        :return: returns all possible turns in dict
+        :rtype: (dict[class Turn object], class Turn object)
         """
 
         if check_check:
@@ -112,17 +137,20 @@ class Logic:
         return (possible_turns, turns_for_king)
 
     def thread_generate(self, board, color, depth, turns, index, return_dict):
-        """thread_generate(self, board, color, depth, turns, index, return_dict) -> tuple
+        """Makes AI turn depp calculations
 
-        self        -- class Logic object
-        board       -- class Board object
-        color       -- figure color for turn
-        depth       -- recursion depth
-        turns       -- list of turns for this process
-        index       -- process index
-        return_dict -- dict for return value
-
-        returns tuple of best_turn and it cost
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param depth: depth of calculations
+        :type depth: int
+        :param turns: possible turns
+        :type turns: list(class Turn object)
+        :param index: process index
+        :type index: int
+        :param return_dict: tuple of best_turn and it cost
+        :type return_dict: (class Turn object, int)
         """
         best_cost = self.MIN_COST
         best_turn = self.NULL_TURN
@@ -139,7 +167,7 @@ class Logic:
         return_dict[index] = (best_turn, best_cost)
 
     def root_ai_turn(self, board, color, depth, last_turn):
-        """root_ai_turn(self, board, color, depth) -> tuple
+        """Starts AI turn calculation
 
         self  -- class Logic object
         board -- class Board object
@@ -147,6 +175,17 @@ class Logic:
         depth -- recursion depth
 
         return tuple of best_turn and it cost
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param depth: depth of calculations
+        :type depth: int
+        :param last_turn: last turn
+        :type last_turn: class Turn object
+        :return: tuple of best_turn and it cost
+        :rtype: (class Turn object, int)
         """
 
         if last_turn in self.debuts.next_turns and self.flag:
@@ -196,16 +235,22 @@ class Logic:
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, last_turn, alpha=MIN_COST, beta=MAX_COST):
-        """root_ai_turn(self, board, color, depth) -> tuple
+        """
 
-        self  -- class Logic object
-        board -- class Board object
-        color -- color of turn
-        depth -- recursion depth
-        alpha -- optimization varaible
-        beta  -- the same as alpha
-
-        return tuple of best_turn and it cost
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param depth: depth of calculations
+        :type depth: int
+        :param last_turn: last turn
+        :type last_turn: class Turn object
+        :param alpha: alpha, defaults to MIN_COST
+        :type alpha: int, optional
+        :param beta: beta, defaults to MAX_COST
+        :type beta: int, optional
+        :return: tuple of best_turn and it cost
+        :rtype: (class Turn object, int)
         """
         turns = self.generate_turns(board, color, last_turn)
 

@@ -15,7 +15,13 @@ import math_functions as mf
 
 
 def transform_turns_dict(possible_turns):
-    """transform_turns_dict(possible_turns) -> defaultdict"""
+    """Make possible turns dictionary
+
+    :param possible_turns: possible turns
+    :type possible_turns: 
+    :return: possible turns dictionary
+    :rtype: dict()
+    """
     turns = defaultdict(list)
 
     for end_pos in possible_turns:
@@ -27,7 +33,31 @@ def transform_turns_dict(possible_turns):
 
 def process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
                 bad_figs, good_figs, beating_figures, figs):
-    """process_pos(...) -> (bool, fig_pos)"""
+    """
+
+    :param board: [description]
+    :type board: [type]
+    :param turn_end: [description]
+    :type turn_end: [type]
+    :param color: color
+    :type color: int
+    :param fig_pos: [description]
+    :type fig_pos: [type]
+    :param tmp_list: [description]
+    :type tmp_list: [type]
+    :param possible_turns: [description]
+    :type possible_turns: [type]
+    :param bad_figs: [description]
+    :type bad_figs: [type]
+    :param good_figs: [description]
+    :type good_figs: [type]
+    :param beating_figures: [description]
+    :type beating_figures: [type]
+    :param figs: [description]
+    :type figs: [type]
+    :return: ... + figure position
+    :rtype: (bool, (int, int))
+    """
     if not board.check_pos(turn_end):
         return (True, fig_pos)
 
@@ -60,7 +90,19 @@ def process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
 
 
 def check_king_protected(board, king_pos, color, turns):
-    """checks"""
+    """Checks if king can be beaten
+
+    :param board: board object
+    :type board: class board object
+    :param king_pos: king position
+    :type king_pos: (int, int)
+    :param color: color
+    :type color: int
+    :param turns: [description]
+    :type turns: [type]
+    :return: [description]
+    :rtype: [type]
+    """
 
     possible_turns = defaultdict(list)
     bad_figures = list()
@@ -119,7 +161,15 @@ def check_king_protected(board, king_pos, color, turns):
 
 
 def remove_not_important_turns(turns, important_start_positions):
-    """remove_not_important_turns(turns, important_start_positions) -> defaultdict"""
+    """Leaves only important start position in possible turns
+
+    :param turns: possible turns
+    :type turns: list(class Turn object)
+    :param important_start_positions: positions that are to be left
+    :type important_start_positions: list(class Turn object)
+    :return: important start position
+    :rtype: list(class Turn object)
+    """
     important_turns = defaultdict(list)
 
     for start_position in important_start_positions:
@@ -129,9 +179,12 @@ def remove_not_important_turns(turns, important_start_positions):
 
 
 def normalize_tuple(tuple_1):
-    """normalize_tuple(tuple_1) -> tuple
+    """Normalizes tuple
 
-    returns normalized tuple
+    :param tuple_1: tuple to normalize
+    :type tuple_1: (int, int)
+    :return: normalized tuple
+    :rtype: (int, int)
     """
     if tuple_1[0] != 0:
         return ((tuple_1[0] // abs(tuple_1[0]), tuple_1[1] // abs(tuple_1[0])), abs(tuple_1[0]))
@@ -139,7 +192,21 @@ def normalize_tuple(tuple_1):
 
 
 def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
-    """remove_not_possible_turns(board, king_pos, turns, opponent_turns) -> defaultdict(list)"""
+    """Removes impossinle turns
+
+    :param board: board object
+    :type board: class board object
+    :param king_pos: king position
+    :type king_pos: (int, int)
+    :param color: color
+    :type color: int
+    :param turns: [description]
+    :type turns: [type]
+    :param opponent_turns: [description]
+    :type opponent_turns: [type]
+    :return: possible turns
+    :rtype: list(class Turn object)
+    """
     start_turns = transform_turns_dict(turns)
     good_turns, bad_figures, figs = check_king_protected(board, king_pos, color, start_turns)
 
@@ -190,7 +257,17 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
 def check_diff(board, diff, start_map_type):
     """check_diff(board, diff, start_map_type) -> bool
 
-    returns True if diff is possible for this figure type
+    returns 
+
+
+    :param board: board object
+    :type board: class board object
+    :param diff: [description]
+    :type diff: [type]
+    :param start_map_type: [description]
+    :type start_map_type: [type]
+    :return: True if diff is possible for this figure type
+    :rtype: bool
     """
     if start_map_type == board.queen:
         return abs(diff[0]) == abs(diff[1]) or 0 in diff
@@ -205,9 +282,18 @@ def check_diff(board, diff, start_map_type):
 
 
 def check_king_on_fire(board, start_pos, king_pos, now_figure_pos):
-    """check_king_on_fire(board, start_pos, king_pos) -> bool
+    """Checks if king is under attack
 
-    returns True if king on fire
+    :param board: board object
+    :type board: class board object
+    :param start_pos: [description]
+    :type start_pos: (int, int)
+    :param king_pos: king position
+    :type king_pos: (int, int)
+    :param now_figure_pos: [description]
+    :type now_figure_pos: (int, int)
+    :return: if king is on fire
+    :rtype: bool
     """
     start_map_type = board.get_type_map(start_pos)
 
@@ -230,9 +316,16 @@ def check_king_on_fire(board, start_pos, king_pos, now_figure_pos):
 
 
 def positions_for_turns_block(board, list_of_start_pos, king_pos):
-    """positions_for_turns_block(board, list_of_start_pos, king_pos) -> list
+    """Get positions of blocking figures
 
-    returns list of turns for blocking
+    :param board: board object
+    :type board: class board object
+    :param list_of_start_pos: list of starting positions
+    :type list_of_start_pos: list((int, int))
+    :param king_pos: king position
+    :type king_pos: (int, int)
+    :return: list of turns for blocking
+    :rtype: list((int, int))
     """
     start_pos = list_of_start_pos[0]
 
@@ -254,6 +347,17 @@ def positions_for_turns_block(board, list_of_start_pos, king_pos):
 
 
 def add_pawn_transformation(start_pos, end_pos, possible_turns, color):
+    """Pawn transformation 
+
+    :param start_pos: pawn start position
+    :type start_pos: (int, int)
+    :param end_pos: pawn end position
+    :type end_pos: (int, int)
+    :param possible_turns: possible turns
+    :type possible_turns: [type]
+    :param color: pawn color
+    :type color: int
+    """
     possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 2))
     possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 3))
     possible_turns[end_pos].append((start_pos[0], start_pos[1], color * 10 + 4))
@@ -261,6 +365,19 @@ def add_pawn_transformation(start_pos, end_pos, possible_turns, color):
 
 
 def check_de_passant(board, possible_turns, last_turn, color):
+    """Check if pawn can take another en passant
+
+    :param board: board object
+    :type board: class board object
+    :param possible_turns: possible turns
+    :type possible_turns: [type]
+    :param last_turn: previous turn
+    :type last_turn: (int, int)
+    :param color: pawn color
+    :type color: int
+    :return: none if en passent is impossible
+    :rtype: none
+    """
     if board.get_type_map(last_turn.end_pos) != board.pawn:
         return None
 
@@ -280,13 +397,18 @@ def check_de_passant(board, possible_turns, last_turn, color):
 
 
 def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
-    """generate_turns_pawn(pos, board, possible_turns) -> None
+    """ Adds all turns for pawn in dict
 
-    pos   -- figure position
-    board -- class Board object
-    possible_turns -- dict with key - end turn pos, value - list of start turn pos
-
-    Adds all turns for pawn in dict
+    :param pos: figure position
+    :type pos: (int, int)
+    :param board: board object
+    :type board: class board object
+    :param possible_turns: pawn possible turns, dict with key - end turn pos, value - list of start turn pos
+    :type possible_turns: dict(...)
+    :param color: pawn color
+    :type color: int
+    :param turns_for_king: kings possible turns
+    :type turns_for_king: dict(...)
     """
     diff = -1
     if (color == 2 and not board.flipped) or (color == 1 and board.flipped):
@@ -320,14 +442,18 @@ def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
 
     
 def generate_turns_knight(pos, board, possible_turns, color, turns_for_king):
-    """generate_turns_knight(pos, board, possible_turns, color) -> None
+    """ Adds all turns for knight in dict
 
-    pos             -- figure position
-    board           -- class Board object
-    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
-    color           -- figure color
-
-    Adds all turns for pawn in dict
+    :param pos: figure position
+    :type pos: (int, int)
+    :param board: board object
+    :type board: class board object
+    :param possible_turns: kinght possible turns, dict with key - end turn pos, value - list of start turn pos
+    :type possible_turns: dict(...)
+    :param color: knight color
+    :type color: int
+    :param turns_for_king: kings possible turns
+    :type turns_for_king: dict(...)
     """
 
     possible_diffs = [(x, y) for x, y in permutations([1, 2, -1, -2], 2) if abs(x) != abs(y)]
@@ -342,14 +468,19 @@ def generate_turns_knight(pos, board, possible_turns, color, turns_for_king):
 
 
 def generate_turns_rook(pos, board, possible_turns, color, turns_for_king):
-    """generate_turns_rook(pos, board, possible_turns, color) -> None
+    """ Adds all turns for rook in dict
+    
 
-    pos             -- figure position
-    board           -- class Board object
-    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
-    color           -- figure color
-
-    Adds all turns for pawn in dict
+    :param pos: figure position
+    :type pos: (int, int)
+    :param board: board object
+    :type board: class board object
+    :param possible_turns: rook possible turns, dict with key - end turn pos, value - list of start turn pos
+    :type possible_turns: dict(...)
+    :param color: rook color
+    :type color: int
+    :param turns_for_king: kings possible turns
+    :type turns_for_king: dict(...)
     """
 
     possible_diffs = [-1, 1]
@@ -379,14 +510,19 @@ def generate_turns_rook(pos, board, possible_turns, color, turns_for_king):
 
 
 def generate_turns_bishop(pos, board, possible_turns, color, turns_for_king):
-    """generate_turns_bishop(pos, board, possible_turns, color) -> None
+    """ Adds all turns for bishop in dict
+    
 
-    pos             -- figure position
-    board           -- class Board object
-    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
-    color           -- figure color
-
-    Adds all turns for pawn in dict
+    :param pos: figure position
+    :type pos: (int, int)
+    :param board: board object
+    :type board: class board object
+    :param possible_turns: bishop possible turns, dict with key - end turn pos, value - list of start turn pos
+    :type possible_turns: dict(...)
+    :param color: bishop color
+    :type color: int
+    :param turns_for_king: kings possible turns
+    :type turns_for_king: dict(...)
     """
     possible_diffs = product([-1, 1], repeat=2)
 
@@ -408,29 +544,37 @@ def generate_turns_bishop(pos, board, possible_turns, color, turns_for_king):
 
 
 def generate_turns_queen(pos, board, possible_turns, color, turns_for_king):
-    """generate_turns_queen(pos, board, possible_turns, color) -> None
+    """ Adds all turns for queen in dict
+    
 
-    pos             -- figure position
-    board           -- class Board object
-    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
-    color           -- figure color
-
-    Adds all turns for pawn in dict
+    :param pos: figure position
+    :type pos: (int, int)
+    :param board: board object
+    :type board: class board object
+    :param possible_turns: queen possible turns, dict with key - end turn pos, value - list of start turn pos
+    :type possible_turns: dict(...)
+    :param color: queen color
+    :type color: int
+    :param turns_for_king: kings possible turns
+    :type turns_for_king: dict(...)
     """
     generate_turns_rook(pos, board, possible_turns, color, turns_for_king)
     generate_turns_bishop(pos, board, possible_turns, color, turns_for_king)
 
 
 def generate_turns_king(pos, board, possible_turns, color, opponent_turns, opponent_turns_for_king):
-    """generate_turns_king(pos, board, possible_turns, color) -> None
-
-    pos             -- figure position
-    board           -- class Board object
-    possible_turns  -- dict with key - end turn pos, value - list of start turn pos
-    color           -- figure color
-    opponent_turns  -- opponent possible turns
-
-    Adds all turns for pawn in dict
+    """ Adds all turns for king in dict
+    
+    :param pos: figure position
+    :type pos: (int, int)
+    :param board: board object
+    :type board: class board object
+    :param possible_turns: queen possible turns, dict with key - end turn pos, value - list of start turn pos
+    :type possible_turns: dict(...)
+    :param color: queen color
+    :type color: int
+    :param turns_for_king: kings possible turns
+    :type turns_for_king: dict(...)
     """
 
     possible_diffs = product([1, -1, 0], repeat=2)

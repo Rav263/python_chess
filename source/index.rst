@@ -27,7 +27,10 @@ Welcome to PythonChess's documentation!
 
 .. automodule:: gamelogic
    :members:
-   
+
+.. automodule:: generate_turns
+   :members:
+
 Indices and tables
 ==================
 

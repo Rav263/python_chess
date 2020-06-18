@@ -225,7 +225,7 @@ class GuiBoard(QFrame):
         self.cells_arr[self.after_st[0]][self.after_st[1]].set_type("moved")
         self.cells_arr[self.after_fn[0]][self.after_fn[1]].set_type("moved")
         self.api.flip_board()
-        self.upd_whole_board(self.color)
+        self.upd_whole_board()
 
     def cell_released(self, x, y):
         """Alows II to make a move
@@ -402,16 +402,11 @@ class GuiBoard(QFrame):
             self.change_color()
         self.upd_possible_moves(self.color)
     
-    def upd_whole_board(self, ch_color = 0):
+    def upd_whole_board(self):
         cell_color = self.color
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
-                if ch_color:
-                    self.cells_arr[x][y].set_color(cell_color)
-                    cell_color = 3 - cell_color
-            if ch_color:
-                cell_color = 3 - cell_color
     
     def upd_possible_moves(self, color):
         """Gets all possible turns of a specific color from API
@@ -855,7 +850,7 @@ class Main_Window(QWidget):
         self.game.down_taken.hide_all()
 
         self.game.board.color = self.start_color
-        self.game.board.upd_whole_board(self.start_color)
+        self.game.board.upd_whole_board()
         self.game.board.clear_afterturn()
         self.game.board.upd_possible_moves(self.start_color)
         self.tabs.setCurrentIndex(self.tab_names["game_board"])

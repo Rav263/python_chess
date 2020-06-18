@@ -226,7 +226,17 @@ class Api:
         :return: evaluation of a current situation
         :rtype: int
         """
-        return self.evaluate.evaluate_board_mg(self.board, self.board.white)
+        evaluation = self.evaluate.evaluate_board_mg(self.board, self.board.white) // 200
+        abs_eval = abs(evaluation)
+        crit_diff = 0 if abs_eval < 45 else 1
+        sign = 1 if evaluation > 0 else -1
+        if abs_eval * 5 < 30:
+            return 5 * evaluation + 50
+        elif (abs_eval * 5 - 30) * 3 < 15:
+            return (abs_eval * 5 + sign * 30) * 3 + 50
+        else:
+            return 45 * sign + crit_diff * (abs_eval - 45) * sign + 50
+
 
     def previous_turn(self):
         """Returns previous turn and undoes it on board if it is possible

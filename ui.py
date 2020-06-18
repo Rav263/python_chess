@@ -504,7 +504,6 @@ class GuiBoard(QFrame):
         :type event: QEvent
         """
         new_size = min(event.size().height(), event.size().width())
-        # print(new_size)
         self.resize(new_size, new_size)
     
     def get_size(self):
@@ -713,8 +712,7 @@ class MainGame(QFrame):
         self.setLayout(h_layout)
 
     def upd_progress(self, val):
-        print(val)
-        self.pbar.setValue(val * 100)
+        self.pbar.setValue(val)
 
 class MenuButton(QPushButton):
     def __init__(self, *args):

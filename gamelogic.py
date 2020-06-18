@@ -169,13 +169,6 @@ class Logic:
     def root_ai_turn(self, board, color, depth, last_turn):
         """Starts AI turn calculation
 
-        self  -- class Logic object
-        board -- class Board object
-        color -- color of turn
-        depth -- recursion depth
-
-        return tuple of best_turn and it cost
-
         :param board: board object
         :type board: class board object
         :param color: color

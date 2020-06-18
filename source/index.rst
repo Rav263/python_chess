@@ -36,6 +36,18 @@ Welcome to PythonChess's documentation!
 
 .. automodule:: turns
    :members:
+
+.. automodule:: main
+   :members:
+
+.. automodule:: math_functions
+   :members:
+
+.. automodule:: other_engines
+   :members:
+
+.. automodule:: stockfish
+   :members:
 Indices and tables
 ==================
 

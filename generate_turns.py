@@ -174,8 +174,12 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
     possible_turns = defaultdict(list)
 
     for end_turn in start_turns[king_pos]:
-        if end_turn not in bad_positions and end_turn not in opponent_turns:
-            possible_turns[end_turn].append(king_pos)
+        if end_turn not in bad_positions:
+            if end_turn not in opponent_turns:
+                possible_turns[end_turn].append(king_pos)
+            elif len(opponent_turns[end_turn]) == 1:
+                if board.get_type_map(opponent_turns[end_turn][0]) == board.pawn:
+                    possible_turns[end_turn].append(king_pos)
 
     positions_for_block = positions_for_turns_block(board, [*important_turns], king_pos)
 

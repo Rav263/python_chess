@@ -92,33 +92,12 @@ class Figure(QFrame):
         """
         return self.get_color() + self.get_named_type()
 
-    def mouseMoveEvent(self, event):
-        """Proccess figure moving
-
-        :param event: movement event
-        :type event: QEvent
-        """
-        if (self.get_type() == 0):
-            return
-        mime_data = QMimeData()
-        mime_data.setText(str(self.figure_type))
-        drag = QDrag(self)
-        drag.setMimeData(mime_data)
-        pic = QPixmap("images/merida/{}.png".format(self.get_figure_name()))
-        drag.setPixmap(pic.scaled(self.size()))
-        center_coord = self.rect().bottomRight().x() // 2
-        drag.setHotSpot(QPoint(center_coord, center_coord))
-        dropAction = drag.exec_(Qt.MoveAction)
-
 class TakenFigure(Figure):
     def __init__(self, figure_type, comm):
         super().__init__(figure_type, comm)
         self.comm = comm
         self.set_type(figure_type)
         self.setMinimumSize(board_size // 17, board_size // 17)
-    
-    def mouseMoveEvent(self, event):
-        pass
     
 class Cell(QFrame):
     def __init__(self, x, y, figure_type, comm, color, check_move):
@@ -156,26 +135,6 @@ class Cell(QFrame):
         """
         self.setProperty("type", str(cell_type))
         self.setStyle(self.style())
-    
-    def dragEnterEvent(self, event):
-        """Allows drag and drop
-
-        :param event: drag event
-        :type event: QEvent
-        """
-        event.accept()
-
-    def dropEvent(self, event):
-        """Process drop event
-
-        :param event: drop event
-        :type event: QEvent
-        """
-        position = event.pos()
-        print(self.figure.figure_type)
-        if self.check_move(self.x, self.y):
-            self.comm.figureMoved.emit(self.x, self.y)
-        event.accept()
 
     def mousePressEvent(self, event):
         """Process cell press event
@@ -233,7 +192,6 @@ class GuiBoard(QFrame):
         self.comm = comm
         self.comm.cellPressed.connect(self.cell_pressed)
         self.comm.cellReleased.connect(self.cell_released)
-        self.comm.figureMoved.connect(self.figure_moved)
         self.comm.nextMove.connect(self.next_move)
         self.comm.prevMove.connect(self.prev_move)
         self.comm.toStart.connect(self.to_start)
@@ -284,16 +242,6 @@ class GuiBoard(QFrame):
         if self.change_human:
             self.upd_board()
             self.change_human = False
-        
-    def figure_moved(self, x, y):
-        """Proccess event when user drags a figure
-
-        :param x: x coordinate
-        :type x: int
-        :param y: y coordinate
-        :type y: int
-        """
-        self.process_move(x, y, "drag")
 
     def cell_pressed(self, x, y):
         """Processes event when user presses a field
@@ -314,17 +262,15 @@ class GuiBoard(QFrame):
                     else:
                         self.cells_arr[field[0]][field[1]].beat()
             else:
-                self.process_move(x, y, "press")
+                self.process_move(x, y)
     
-    def process_move(self, x, y, method):
+    def process_move(self, x, y):
         """Processes a piece move, and displays it on the board
 
         :param x: x coordinate
         :type x: int
         :param y: y coordinate
         :type y: int
-        :param method: type of movement
-        :type method: string
         """
         self.cells_arr[self.start[0]][self.start[1]].release()
         self.making_a_move = False
@@ -343,13 +289,10 @@ class GuiBoard(QFrame):
             else:    
                 self.make_turn(self.start, (x, y), self.api.do_turn(self.start, (x, y)))
             self.change_color()
-            if method == "press":
-                if self.game_human:
-                    self.change_human = True
-                else:
-                    self.ai_do_turn = True
-            elif method == "drag":
-                self.upd_board()
+            if self.game_human:
+                self.change_human = True
+            else:
+                self.ai_do_turn = True
 
     def make_turn(self, start, stop, upd_all = False):
         """Display move on the board

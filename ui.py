@@ -425,6 +425,7 @@ class GuiBoard(QFrame):
         
     def mate(self, user_lost):
         
+        pate = self.api.check_check(self.color)
         finish = QDialog()
         finish.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
         finish.resize(3 * 52, 3 * 52)
@@ -432,7 +433,14 @@ class GuiBoard(QFrame):
         ok_button = MenuButton("OK")
         ok_button.clicked.connect(finish.accept)
         
-        result = QLabel("Game over! \nYou lost.") if user_lost else QLabel("Game over! \nYou won.") 
+        result_str = "Game over! \n"
+        if pate:
+            result_str += "It is a draw."
+        elif user_lost:
+            result_str += "You lost."
+        else:
+            result_str += "You won!"
+        result = QLabel(result_str)
         result.setAlignment(Qt.AlignCenter)
 
         v_layout = QVBoxLayout()

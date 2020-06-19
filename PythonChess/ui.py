@@ -663,7 +663,7 @@ class MainMenu(QFrame):
         hbox.addStretch(1)
         self.setLayout(hbox)
 
-        self.computer.clicked.connect(self.choose_difficulty)
+        
         self.start_game.clicked.connect(self.choose_mode)
 
     def choose_mode(self):
@@ -671,18 +671,6 @@ class MainMenu(QFrame):
         self.resume.hide()
         self.computer.show()
         self.human.show()
-
-    def choose_difficulty(self):
-        """Shows difficulty buttons
-        """
-        self.computer.hide()
-        self.human.hide()
-        self.start_game.hide()
-        self.resume.hide()
-        for difficulty in self.difficulties:
-            difficulty.show()
-        self.white.show()
-        self.black.show()
         
 class MainGame(QFrame):
     def __init__(self, api, comm, start_color):
@@ -782,8 +770,26 @@ class Main_Window(QWidget):
         self.menu.white.clicked.connect(self.white_start)
         self.menu.black.clicked.connect(self.black_start)
         self.menu.human.clicked.connect(self.game_with_human)
+        self.menu.computer.clicked.connect(self.choose_difficulty)
+
         self.setWindowTitle('Chess')
         self.show()
+
+    def choose_difficulty(self):
+        """Shows difficulty buttons
+        """
+        self.menu.computer.hide()
+        self.menu.human.hide()
+        self.menu.start_game.hide()
+        self.menu.resume.hide()
+        for difficulty in self.menu.difficulties:
+            difficulty.show()
+        self.menu.white.show()
+        self.menu.black.show()
+        if self.start_color == self.api.board.white:
+            self.white_start()
+        else:
+            self.black_start()
 
     def game_with_human(self):
         self.api.start_new_game()
@@ -800,7 +806,6 @@ class Main_Window(QWidget):
         self.menu.black.setProperty("pushed", "no")
         self.menu.black.setStyle(self.style())
         self.menu.white.setStyle(self.style())
-        print("B", self.start_color)
 
     def black_start(self):
         self.start_color = self.api.board.black
@@ -808,7 +813,6 @@ class Main_Window(QWidget):
         self.menu.white.setProperty("pushed", "no")
         self.menu.black.setStyle(self.style())
         self.menu.white.setStyle(self.style())
-        print("B", self.start_color)
 
     def resizeEvent(self, event):
         """Process resize event
@@ -844,7 +848,6 @@ class Main_Window(QWidget):
         :type difficulty: int
         """
         def start_game():
-            print(self.start_color)
             self.game.board.game_human = False
             self.api.start_new_game(difficulty + 1)
             if self.start_color == self.api.board.black:

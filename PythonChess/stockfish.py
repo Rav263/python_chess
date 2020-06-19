@@ -4,7 +4,13 @@ import PythonChess.io_functions as io_functions
 
 
 def main(api, num_threads):
-    """main loop"""
+    """Adds stockfish in the game
+
+    :param api: Api module
+    :type api: class Api object
+    :param num_threads: number of threads
+    :type num_threads: int
+    """
     difficulty = int(input("Enter stockfish level: "))
     color_ai = int(input("Enter color AI: "))
     stockfish = Stockfish(num_threads, difficulty)

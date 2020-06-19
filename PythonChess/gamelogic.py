@@ -29,14 +29,36 @@ class Logic:
         self.flag = True
 
     def add_turn_to_history(self, now_turn):
-        """adds turn for history"""
+        """Ddds turn for history
+
+        :param now_turn: turn to add
+        :type now_turn: class Turn object
+        """
+        
         self.turn_history.append(now_turn)
 
     def get_turn_from_history(self, index):
-        """returns turn from history"""
+        """Returns turn from history
+
+        :param index: point in history
+        :type index: int
+        :return: turn at index
+        :rtype: class Turn object
+        """
         return self.turn_history[index]
 
     def generate_turns(self, board, color, last_turn):
+        """Generates possible turns
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param last_turn: previous turn
+        :type last_turn: class Turn object
+        :return: list of possible turns
+        :rtype: list(class Turn object)
+        """
         possible_turns = self.generate_all_possible_turns(board, color, last_turn)
         turns = list()
 
@@ -56,15 +78,18 @@ class Logic:
         return turns
 
     def generate_all_possible_turns(self, board, color, last_turn, check_check=True):
-        """generate_all_possible_turns(self, board, color) -> dict
+        """ Generates all possible turns
 
-        self  -- class Logic object
-        board -- class Board object
-        color -- color of figures
-
-        returns all possible turns in dict
-        dict key   - end turn position
-        dict value - list of start turn positions
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param last_turn: previous turn
+        :type last_turn: class Turn object
+        :param check_check: nessesity to check check, defaults to True
+        :type check_check: bool, optional
+        :return: returns all possible turns in dict
+        :rtype: (dict[class Turn object], class Turn object)
         """
 
         if check_check:
@@ -112,41 +137,59 @@ class Logic:
         return (possible_turns, turns_for_king)
 
     def thread_generate(self, board, color, depth, turns, index, return_dict):
-        """thread_generate(self, board, color, depth, turns, index, return_dict) -> tuple
+        """Makes AI turn depp calculations
 
-        self        -- class Logic object
-        board       -- class Board object
-        color       -- figure color for turn
-        depth       -- recursion depth
-        turns       -- list of turns for this process
-        index       -- process index
-        return_dict -- dict for return value
-
-        returns tuple of best_turn and it cost
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param depth: depth of calculations
+        :type depth: int
+        :param turns: possible turns
+        :type turns: list(class Turn object)
+        :param index: process index
+        :type index: int
+        :param return_dict: tuple of best_turn and it cost
+        :type return_dict: (class Turn object, int)
         """
+        print(f"thread-{index}: {turns}")
         best_cost = self.MIN_COST
         best_turn = self.NULL_TURN
+        alpha = self.MIN_COST
+        beta = self.MAX_COST
         for now_turn in turns:
             tmp, flags = board.do_turn(now_turn)
 
-            now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn)[1]
+            now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn, [beta], [alpha])[1]
 
             board.un_do_turn(now_turn, tmp, flags)
             if now_cost >= best_cost:
                 best_cost = now_cost
                 best_turn = now_turn
+            
+            if color == board.black:
+                alpha = max(alpha, best_cost)
+            else:
+                beta = min(beta, best_cost)
 
+            if beta <= alpha:
+                break
+            
         return_dict[index] = (best_turn, best_cost)
 
     def root_ai_turn(self, board, color, depth, last_turn):
-        """root_ai_turn(self, board, color, depth) -> tuple
+        """Starts AI turn calculation
 
-        self  -- class Logic object
-        board -- class Board object
-        color -- color of turn
-        depth -- recursion depth
-
-        return tuple of best_turn and it cost
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param depth: depth of calculations
+        :type depth: int
+        :param last_turn: last turn
+        :type last_turn: class Turn object
+        :return: tuple of best_turn and it cost
+        :rtype: (class Turn object, int)
         """
 
         if last_turn in self.debuts.next_turns and self.flag:
@@ -173,40 +216,51 @@ class Logic:
 
         turns = self.generate_turns(board, color, last_turn)
         threads = []
-        num_of_turns = len(turns) // self.av_threads + 1
-        num_of_threads = len(turns) // num_of_turns + 1
-        if len(turns) < self.av_threads:
-            num_of_threads = 1
+        num_of_threads = self.av_threads
+        if len(turns) // self.av_threads == 0:
+            num_of_threads = len(turns)
+
+        all_turns = list()
+        for i in range(num_of_threads):
+            tmp_turns = list()
+            for now in turns[i::num_of_threads]:
+                tmp_turns.append(now)
+            all_turns.append(tmp_turns)
+
         for i in range(num_of_threads):
             now_board = Board(None, board)
-            start = i * num_of_turns
-
-            end = (i + 1) * num_of_turns
-            end = end if end < len(turns) else len(turns) - 1
 
             threads.append(Process(target=self.thread_generate, name=len(threads),
                                    args=(now_board, color, depth,
-                                         turns[start:end + 1], i, return_dict)))
+                                         all_turns[i], i, return_dict)))
 
             threads[len(threads) - 1].start()
 
         for thread in threads:
             thread.join()
-
+        print(sorted(return_dict.values(), key=lambda x: -x[1]))
         return max(return_dict.values(), key=lambda x: x[1])
 
-    def ai_turn(self, board, color, depth, last_turn, alpha=MIN_COST, beta=MAX_COST):
-        """root_ai_turn(self, board, color, depth) -> tuple
-
-        self  -- class Logic object
-        board -- class Board object
-        color -- color of turn
-        depth -- recursion depth
-        alpha -- optimization varaible
-        beta  -- the same as alpha
-
-        return tuple of best_turn and it cost
+    def ai_turn(self, board, color, depth, last_turn, alpha, beta):
         """
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :param depth: depth of calculations
+        :type depth: int
+        :param last_turn: last turn
+        :type last_turn: class Turn object
+        :param alpha: alpha, defaults to MIN_COST
+        :type alpha: int, optional
+        :param beta: beta, defaults to MAX_COST
+        :type beta: int, optional
+        :return: tuple of best_turn and it cost
+        :rtype: (class Turn object, int)
+        """
+        alpha[0] = -alpha[0]
+        beta[0] = -beta[0]
         turns = self.generate_turns(board, color, last_turn)
 
         best_cost = self.MIN_COST
@@ -218,7 +272,7 @@ class Logic:
             if depth == 1:
                 now_cost = self.evaluation.evaluate_board_mg(board, color)
             else:
-                now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn, alpha, beta)[1]
+                now_cost = -self.ai_turn(board, 3 - color, depth - 1, now_turn, beta, alpha)[1]
 
             board.un_do_turn(now_turn, tmp, flags)
             if now_cost >= best_cost:
@@ -226,11 +280,13 @@ class Logic:
                 best_turn = now_turn
 
             if color == board.black:
-                alpha = max(alpha, best_cost)
+                alpha[0] = max(alpha[0], best_cost)
             else:
-                beta = min(beta, best_cost)
+                beta[0] = min(beta[0], best_cost)
 
-            if beta <= alpha:
-                return (best_turn, best_cost)
-
+            if beta[0] <= alpha[0]:
+                break
+        
+        alpha[0] = -alpha[0]
+        beta[0] = -beta[0]
         return (best_turn, best_cost)

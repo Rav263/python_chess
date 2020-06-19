@@ -26,7 +26,7 @@ class Stockfish:
         self.do_command("setoption name Skill Level value " + str(difficulty))
 
     def read_output(self):
-        """reading output from external process"""
+        """Reads output from external process"""
         while True:
             now_line = self.process.stdout.readline()
             decoded_line = now_line.decode("utf-8")
@@ -44,11 +44,19 @@ class Stockfish:
                     break
 
     def end_game(self):
+        """Ends game
+        """
         del(self.process_queu)
         self.stockfish_thread.join()
 
     def do_turn(self, turn, board_size):
-        """do_turn(self, turn, board_size) -> None"""
+        """Does turn on a board
+
+        :param turn: turn
+        :type turn: class Turn object
+        :param board_size: board size
+        :type board_size: int
+        """
         start_pos = chr(turn.start_pos[1] + ord('a')) + str(board_size - turn.start_pos[0])
         end_pos = chr(turn.end_pos[1] + ord('a')) + str(board_size - turn.end_pos[0])
         
@@ -66,16 +74,38 @@ class Stockfish:
         self.do_command("position startpos moves " + " ".join(self.history))
 
     def check_diff(self, start_pos, end_pos):
+        """Checks position differences
+
+        :param start_pos: start pos
+        :type start_pos: (int, int)
+        :param end_pos: end pos
+        :type end_pos: (int, int)
+        :return: difference
+        :rtype: int
+        """
         return abs(start_pos[1] - end_pos[1]) > 1
 
     def get_eval(self):
+        """Gets position evaluation
+
+        :return: evaluation
+        :rtype: int
+        """
         self.do_command("eval")
         while self.process_queu.empty():
             pass
         return self.process_queu.get()
 
     def get_turn(self, board, color):
-        """get_turn(self, board, color) -> Turn"""
+        """Gets turn
+
+        :param board: board object
+        :type board: class board object
+        :param color: color
+        :type color: int
+        :return: turn
+        :rtype: class Turn object
+        """
         while self.process_queu.empty():
             pass
 
@@ -120,7 +150,11 @@ class Stockfish:
         return now_turn
 
     def do_command(self, command):
-        """do_command(self, command) -> None"""
+        """Does a specific command
+
+        :param command: command
+        :type command: int
+        """
         self.process.stdin.write(command.strip().encode("utf-8"))
         self.process.stdin.write("\r\n".encode("utf-8"))
         self.process.stdin.flush()

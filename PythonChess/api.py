@@ -32,10 +32,23 @@ class Api:
         # Then we need start game
     
     def print_board(self):
+        """Prints board
+        """
         print_board(self.board.board, self.data)
 
+    def start_cmd(self):
+        """Starts command line UI
+        """
+        self.logic.start(self.board, self.data, self.difficulty)
+
     def get_possible_turns(self, color):
-        """returns possible turns from backend"""
+        """Returns possible turns from backend
+
+        :param color: color of a current side
+        :type color: int
+        :return: possible turns for a current side
+        :rtype: dict(class Turn)
+        """
         if self.turn_index != 0:
             last_turn = self.logic.turn_history[self.turn_index - 1][0]
         else:
@@ -51,23 +64,34 @@ class Api:
         return turns
 
     def flip_board(self):
+        """Rotate board
+        """
         self.board.rotate_board()
 
     def get_field(self, pos):
-        """returns cell value on board"""
+        """Returns cell value on board
+        """
         if self.board.check_pos(pos):
             return self.board.get_map(pos)
 
         return -1
 
     def set_field(self, pos, value):
-        """set cell value on board"""
+        """Sets cell value on board
+        """
         if self.board.check_pos(pos):
             return self.board.set_map(pos, value)
 
         return -1
 
     def check_check(self, color):
+        """Checks if a king is under check
+
+        :param color: color of a current side
+        :type color: int
+        :return: True if king is under check
+        :rtype: bool
+        """
         if self.turn_index != 0:
             last_turn = self.logic.turn_history[self.turn_index - 1][0]
         else:
@@ -79,6 +103,11 @@ class Api:
         return king_pos in possible_turns
 
     def get_taken_figures(self):
+        """Returns taken figures and score
+
+        :return: taken figures by both sides, and a score of a winning side
+        :rtype: taken figures - two lists of int, score two ints, one is 0
+        """
         white_figs = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
         black_figs = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
         
@@ -114,10 +143,20 @@ class Api:
         return (white_figs, black_figs, white_score, black_score)
 
     def do_turn(self, start, end, pawn=0):
-        """doing User turn
-        start    -- start position
-        end      -- end position
-        pawn     -- figure type if pawn get transformation
+        """Makes users turn on a board
+        start    -- 
+        end      -- 
+        pawn     -- 
+        
+
+        :param start: start position
+        :type start: (int, int)
+        :param end: end position
+        :type end: (int, int)
+        :param pawn: figure type if pawn get transformation, defaults to 0
+        :type pawn: int, optional
+        :return: True if turn is passant castling or pawn promotion
+        :rtype: bool
         """
 
         color = self.board.get_color_map(start)
@@ -146,8 +185,14 @@ class Api:
         return now_turn.passant or now_turn.castling or now_turn.pawn != 0
 
     def ai_turn(self, color):
-        """ai do turn with color"""
-        
+        """Allows ai to make a turn
+
+        :param color: color of a current side
+        :type color: int
+        :return: True if turn is passant castling or pawn promotion
+        :rtype: bool
+        """
+         
         if self.turn_index != 0:
             last_turn = self.logic.turn_history[self.turn_index - 1][0]
         else:
@@ -162,6 +207,11 @@ class Api:
         return (now_turn, now_turn.passant or now_turn.castling or now_turn.pawn != 0)
 
     def start_new_game(self, difficulty = 2):
+        """Starts new game with difficulty
+
+        :param difficulty: game difficulty, defaults to 2
+        :type difficulty: int, optional
+        """
         self.board = Board(self.data)
         self.logic.turn_history = list()
         self.turn_index = 0
@@ -170,10 +220,29 @@ class Api:
         self.difficulty = difficulty
  
     def get_board_eval(self):
-        return self.evaluate.evaluate_board_mg(self.board, self.board.white)
+        """Returns evaluation of a current situation
+
+        :return: evaluation of a current situation
+        :rtype: int
+        """
+        evaluation = self.evaluate.evaluate_board_mg(self.board, self.board.white) // 200
+        abs_eval = abs(evaluation)
+        crit_diff = 0 if abs_eval < 45 else 1
+        sign = 1 if evaluation > 0 else -1
+        if abs_eval * 5 < 30:
+            return 5 * evaluation + 50
+        elif (abs_eval * 5 - 30) * 3 < 15:
+            return (abs_eval * 5 + sign * 30) * 3 + 50
+        else:
+            return 45 * sign + crit_diff * (abs_eval - 45) * sign + 50
+
 
     def previous_turn(self):
-        """returns previous turn and un do it on board"""
+        """Returns previous turn and undoes it on board if it is possible
+
+        :return: previous turn
+        :rtype: class Turn
+        """
         if self.turn_index == 0:
             return None
 
@@ -185,7 +254,11 @@ class Api:
         return turn[:2]
 
     def next_turn(self):
-        """do next turn from history"""
+        """Does next turn from history if it is possible
+
+        :return: next turn
+        :rtype: class Turn
+        """
         if self.turn_index >= len(self.logic.turn_history):
             return None
 

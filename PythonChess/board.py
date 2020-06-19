@@ -39,6 +39,8 @@ class Board:
                 f"castling flags: {self.castling}")
 
     def rotate_board(self):
+        """Rotates board
+        """
         self.flipped = not self.flipped
         tmp = list([0 for x in range(8)] for y in range(8))
 
@@ -48,6 +50,13 @@ class Board:
         self.board = tmp
 
     def get_figures(self, flag=True):
+        """[summary]
+
+        :param flag: [description], defaults to True
+        :type flag: bool, optional
+        :return: [description]
+        :rtype: [type]
+        """
         figures = ("костыль", {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0})
 
         for pos in product(range(self.board_size), repeat=2):
@@ -71,9 +80,12 @@ class Board:
             return figures
 
     def get_king_pos(self, color):
-        """get_king_pos(self, color) -> tuple
+        """Returns king's position with the same color
 
-        Returns king position with the same color
+        :param color: color 
+        :type color: int
+        :return: king's position
+        :rtype: (int, int)
         """
 
         for pos in product(range(self.board_size), repeat=2):
@@ -82,6 +94,13 @@ class Board:
         return (-1, -1)
 
     def set_movement_flags(self, start_pos):
+        """[summary]
+
+        :param start_pos: [description]
+        :type start_pos: [type]
+        :return: [description]
+        :rtype: [type]
+        """
         color = self.get_color_map(start_pos)
         fig_type = self.get_type_map(start_pos)
 
@@ -101,6 +120,11 @@ class Board:
         return flags
 
     def un_set_movement_flags(self, flags):
+        """[summary]
+
+        :param flags: [description]
+        :type flags: [type]
+        """
         for flag in flags:
             if flag == "king":
                 self.king_movement[flags[flag]] = False
@@ -110,13 +134,14 @@ class Board:
                 self.rook_movement[flags[flag]][1] = False
 
     def do_turn(self, turn, fig=0):
-        """do_turn(self, turn, fig) -> figure
+        """Returns figure from turn end position
 
-        self -- class Board object
-        turn -- class Turn object
-        fig  -- figure to set on start pos
-
-        returns figure from turn end position
+        :param turn: current turn
+        :type turn: class Turn 
+        :param fig: [description], defaults to 0
+        :type fig: int, optional
+        :return: figure + flags
+        :rtype: int
         """
         # print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
         # move figure
@@ -140,6 +165,15 @@ class Board:
         return (tmp, flags)
 
     def un_do_turn(self, turn, fig, flags):
+        """Undoes a turn
+
+        :param turn: turn to undo
+        :type turn: class Truen
+        :param fig: figure type
+        :type fig: int
+        :param flags: flags
+        :type flags: list(int)
+        """
         if turn.castling:
             self.castling[turn.color] = False
             self.set_map(turn.start_pos[:2], self.get_map(turn.end_pos))
@@ -160,47 +194,53 @@ class Board:
             self.set_map(turn.end_pos, fig)
 
     def copy(self):
-        """copy(self) -> copyed Board object"""
+        """Copies a board
+
+        :return: copyed Board
+        :rtype: class Board object
+        """
         return Board(None, self)
 
     def load_board(self, data):
-        """load_board(self, data) -> set self.board object from data file"""
+        """Load positions from data file
+
+        :param data: data file
+        :type data: class Data object
+        """
         self.board = []
         for line in data.data["BOARD"]:
             new_line = [x for x in line]
             self.board.append(new_line)
 
     def get_map(self, pos):
-        """get_map(self, pos) -> figure
+        """Gets figure on position
 
-        self -- class Board object
-        pos  -- position
-
-        returns figure on position
+        :param pos: coordinates
+        :type pos: (int, int)
+        :return: figure 
+        :rtype: int
         """
         return self.board[pos[0]][pos[1]]
 
     def get_type_map(self, pos):
-        """get_type_map(self, pos) -> Int(type of figure on this position
+        """Gets figure type on position
 
-        self -- class Board object
-        pos  -- position
-
-
-        returns figure type on this position or -1 if position not on board
+        :param pos: coordinates
+        :type pos: (int, int)
+        :return: figure type on this position or -1 if position not on board
+        :rtype: int
         """
-
         if not self.check_pos(pos):
             return -1
         return self.get_map(pos) % 10
 
     def get_color_map(self, pos):
-        """get_color_map(self, pos) -> Int(figure color)
+        """Gets figure color on position
 
-        self -- class Board object
-        pos  -- position
-
-        returns figure color on this position or -1 if position not on board
+        :param pos: coordinates
+        :type pos: (int, int)
+        :return: figure color on this position or -1 if position not on board
+        :rtype: int
         """
 
         if not self.check_pos(pos):
@@ -208,7 +248,13 @@ class Board:
         return self.get_map(pos) // 10
 
     def check_pos(self, pos):
-        """chech_pos(self, pos) -> bool"""
+        """Checks if position is on board
+
+        :param pos: position
+        :type pos: (int, int)
+        :return: False if pos is out of board Flase otherwise 
+        :rtype: bool
+        """
         if pos[0] >= self.board_size or pos[0] < 0:
             return False
 
@@ -218,12 +264,31 @@ class Board:
         return True
 
     def set_map(self, pos, value, pawn=0):
+        """[summary]
+
+        :param pos: position
+        :type pos: (int, int)
+        :param value: figure
+        :type value: int
+        :param pawn: pawn promotion, defaults to 0
+        :type pawn: int, optional
+        :return: new value
+        :rtype: int
+        """
+
         """set_map(self, pos, value) -> Int(figure on position)"""
         tmp = self.board[pos[0]][pos[1]]
         self.board[pos[0]][pos[1]] = pawn if pawn else value
         return tmp
 
     def generate_fen(self, fen_dict):
+        """[summary]
+
+        :param fen_dict: [description]
+        :type fen_dict: [type]
+        :return: [description]
+        :rtype: [type]
+        """
         fen = ""
         for index, now_line in enumerate(self.board):
             counter = 0
@@ -242,15 +307,21 @@ class Board:
         return fen
 
     def calculate_board_cost(self, figures_cost):
-        """calculate_board_cost(self, color, figures_cost) - Int(sum of figures)"""
+        """Returns sum of figures on the board
+
+        :param figures_cost: cost array
+        :type figures_cost: dict
+        :return: sum of figures
+        :rtype: int
+        """
         summ = 0  # figures_cost["sum"]
         for pos in product(range(self.board_size), repeat=2):
             summ += figures_cost[self.get_map(pos)]
 
         return summ
-
         """
         fen = self.generate_fen(self.data.data["FEN"])
 
         return -float(subprocess.getoutput("./stockfish " + fen + " eval").split()[-3])
         """
+        

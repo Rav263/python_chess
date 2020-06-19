@@ -30,7 +30,48 @@
 - Макет игрового процесса
 ![Game process](maket/game.jpg "Макет игрового процесса")​
 ## Сборка и использование
-На данный момент запуск осуществляется командой:
+### Установка зависимостей
+
 ```
-./main.py
+pip install -r requirements.txt
+```
+
+### Документация
+
+```
+python3 -m venv venv
+. ./venv/bin/activate
+python3 setup.py build
+export PYTHONPATH=`pwd`/build/lib
+make html
+```
+
+### Тестирование
+
+```
+python3 -m venv venv
+. ./venv/bin/activate
+python3 setup.py build
+export PYTHONPATH=`pwd`/build/lib
+pytest
+```
+
+### Сборка колеса
+
+```
+python3 -m venv venv
+. ./venv/bin/activate
+python3 setup.py bdist_wheel
+```
+
+### Запуск
+
+```
+python3 -m PythonChess
+```
+
+Для вывода доступных аргуметов командной строки используйте 
+
+```
+python3 -m PythonChess --help
 ```

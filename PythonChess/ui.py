@@ -221,6 +221,7 @@ class GuiBoard(QFrame):
             cell_color = 3 - cell_color
         self.setLayout(cells)
 
+
     def flip_board(self):
         self.clear_afterturn()
         self.after_st = (7 - self.after_st[0], 7 - self.after_st[1])
@@ -239,11 +240,11 @@ class GuiBoard(QFrame):
         :type y: int
         """
         if self.ai_do_turn:
-            self.upd_board()
+            self.pass_turn()
             self.ai_do_turn = False
 
         if self.change_human:
-            self.upd_board()
+            self.pass_turn()
             self.change_human = False
 
     def cell_pressed(self, x, y):
@@ -394,7 +395,7 @@ class GuiBoard(QFrame):
             dialog.done(figure)
         return answer
 
-    def upd_board(self):
+    def pass_turn(self):
         """Updates board after AI turn
         """
         if self.game_human:
@@ -429,7 +430,7 @@ class GuiBoard(QFrame):
         
         pate = self.api.check_check(self.color)
         finish = QDialog()
-        finish.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog);
+        finish.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         finish.resize(3 * 52, 3 * 52)
         
         ok_button = MenuButton("OK")
@@ -799,6 +800,7 @@ class Main_Window(QWidget):
         self.menu.black.setProperty("pushed", "no")
         self.menu.black.setStyle(self.style())
         self.menu.white.setStyle(self.style())
+        print("B", self.start_color)
 
     def black_start(self):
         self.start_color = self.api.board.black
@@ -806,6 +808,7 @@ class Main_Window(QWidget):
         self.menu.white.setProperty("pushed", "no")
         self.menu.black.setStyle(self.style())
         self.menu.white.setStyle(self.style())
+        print("B", self.start_color)
 
     def resizeEvent(self, event):
         """Process resize event
@@ -841,9 +844,10 @@ class Main_Window(QWidget):
         :type difficulty: int
         """
         def start_game():
+            print(self.start_color)
             self.game.board.game_human = False
             self.api.start_new_game(difficulty + 1)
-            if self.start_color == 2:
+            if self.start_color == self.api.board.black:
                 self.game.board.flip_board()
             self.start_new_game()
         return start_game
@@ -854,8 +858,12 @@ class Main_Window(QWidget):
         self.game.up_taken.hide_all()
         self.game.down_taken.hide_all()
 
-        self.game.board.color = self.start_color
+        self.game.board.color = self.api.board.white
+        if self.start_color == self.api.board.black:
+            self.game.board.pass_turn()
+        else:
+            self.game.board.clear_afterturn()
+
         self.game.board.upd_whole_board()
-        self.game.board.clear_afterturn()
         self.game.board.upd_possible_moves(self.start_color)
         self.tabs.setCurrentIndex(self.tab_names["game_board"])

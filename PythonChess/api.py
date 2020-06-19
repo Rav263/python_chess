@@ -52,7 +52,7 @@ class Api:
         :param color: color of a current side
         :type color: int
         :return: possible turns for a current side
-        :rtype: dict(class Turn)
+        :rtype: dict(tuple: {dict(tuple: {list()})})
         """
         if self.turn_index != 0:
             last_turn = self.logic.turn_history[self.turn_index - 1][0]
@@ -149,10 +149,6 @@ class Api:
 
     def do_turn(self, start, end, pawn=0):
         """Makes users turn on a board
-        start    -- 
-        end      -- 
-        pawn     -- 
-        
 
         :param start: start position
         :type start: (int, int)

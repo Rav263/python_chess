@@ -50,12 +50,12 @@ class Board:
         self.board = tmp
 
     def get_figures(self, flag=True):
-        """[summary]
+        """return figures
 
-        :param flag: [description], defaults to True
+        :param flag: flag to return tuple or dict, defaults to True
         :type flag: bool, optional
-        :return: [description]
-        :rtype: [type]
+        :return: figures
+        :rtype: tuple or dict
         """
         figures = ("костыль", {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0})
 
@@ -82,7 +82,7 @@ class Board:
     def get_king_pos(self, color):
         """Returns king's position with the same color
 
-        :param color: color 
+        :param color: color
         :type color: int
         :return: king's position
         :rtype: (int, int)
@@ -94,12 +94,12 @@ class Board:
         return (-1, -1)
 
     def set_movement_flags(self, start_pos):
-        """[summary]
+        """set castling flags depending start porition
 
-        :param start_pos: [description]
-        :type start_pos: [type]
-        :return: [description]
-        :rtype: [type]
+        :param start_pos: start position
+        :type start_pos: tuple
+        :return: movement flags
+        :rtype: dict
         """
         color = self.get_color_map(start_pos)
         fig_type = self.get_type_map(start_pos)
@@ -120,10 +120,10 @@ class Board:
         return flags
 
     def un_set_movement_flags(self, flags):
-        """[summary]
+        """set previous flags
 
-        :param flags: [description]
-        :type flags: [type]
+        :param flags: previous flags
+        :type flags: dict
         """
         for flag in flags:
             if flag == "king":
@@ -137,11 +137,11 @@ class Board:
         """Returns figure from turn end position
 
         :param turn: current turn
-        :type turn: class Turn 
-        :param fig: [description], defaults to 0
+        :type turn: class Turn
+        :param fig: figure to set, defaults to 0
         :type fig: int, optional
         :return: figure + flags
-        :rtype: int
+        :rtype: (int, dict)
         """
         # print("Doing turn from {0} to {1}".format(turn.start_pos, turn.end_pos))
         # move figure
@@ -172,7 +172,7 @@ class Board:
         :param fig: figure type
         :type fig: int
         :param flags: flags
-        :type flags: list(int)
+        :type flags: dict
         """
         if turn.castling:
             self.castling[turn.color] = False
@@ -217,7 +217,7 @@ class Board:
 
         :param pos: coordinates
         :type pos: (int, int)
-        :return: figure 
+        :return: figure
         :rtype: int
         """
         return self.board[pos[0]][pos[1]]
@@ -252,7 +252,7 @@ class Board:
 
         :param pos: position
         :type pos: (int, int)
-        :return: False if pos is out of board Flase otherwise 
+        :return: False if pos is out of board True otherwise
         :rtype: bool
         """
         if pos[0] >= self.board_size or pos[0] < 0:
@@ -284,10 +284,10 @@ class Board:
     def generate_fen(self, fen_dict):
         """[summary]
 
-        :param fen_dict: [description]
-        :type fen_dict: [type]
-        :return: [description]
-        :rtype: [type]
+        :param fen_dict: dict of figures
+        :type fen_dict: dict
+        :return: fen board view
+        :rtype: str
         """
         fen = ""
         for index, now_line in enumerate(self.board):
@@ -319,9 +319,3 @@ class Board:
             summ += figures_cost[self.get_map(pos)]
 
         return summ
-        """
-        fen = self.generate_fen(self.data.data["FEN"])
-
-        return -float(subprocess.getoutput("./stockfish " + fen + " eval").split()[-3])
-        """
-        

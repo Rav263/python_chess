@@ -121,10 +121,10 @@ def get_color():
 
 
 def new_game():
-    """Starts new game
+    """Accept new game
 
     :return: y/n depending on whether a user wants a new game
-    :rtype: str
+    :rtype: bool
     """
     while True:
         game = input(_("Do you whant another game (y\\n):")).strip().lower()

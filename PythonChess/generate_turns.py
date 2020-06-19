@@ -34,28 +34,29 @@ def transform_turns_dict(possible_turns):
 def process_pos(board, turn_end, color, fig_pos, tmp_list, possible_turns,
                 bad_figs, good_figs, beating_figures, figs):
     """
+    Process positions from king
 
-    :param board: [description]
-    :type board: [type]
-    :param turn_end: [description]
-    :type turn_end: [type]
+    :param board: game board
+    :type board: class Board
+    :param turn_end: position to process
+    :type turn_end: (int, int)
     :param color: color
     :type color: int
-    :param fig_pos: [description]
-    :type fig_pos: [type]
-    :param tmp_list: [description]
-    :type tmp_list: [type]
-    :param possible_turns: [description]
-    :type possible_turns: [type]
-    :param bad_figs: [description]
-    :type bad_figs: [type]
-    :param good_figs: [description]
-    :type good_figs: [type]
-    :param beating_figures: [description]
-    :type beating_figures: [type]
-    :param figs: [description]
-    :type figs: [type]
-    :return: ... + figure position
+    :param fig_pos: figure position
+    :type fig_pos: (int, int)
+    :param tmp_list: list of positions
+    :type tmp_list: list((int, int))
+    :param possible_turns: possible turns
+    :type possible_turns: dict(tuple: {dict(tuple: {list()})})
+    :param bad_figs: bad figures, that can't block check
+    :type bad_figs: list
+    :param good_figs: good figures for check
+    :type good_figs: list
+    :param beating_figures: beating figures
+    :type beating_figures: list
+    :param figs: figures
+    :type figs: list
+    :return: break flag + figure position
     :rtype: (bool, (int, int))
     """
     if not board.check_pos(turn_end):
@@ -98,10 +99,10 @@ def check_king_protected(board, king_pos, color, turns):
     :type king_pos: (int, int)
     :param color: color
     :type color: int
-    :param turns: [description]
-    :type turns: [type]
-    :return: [description]
-    :rtype: [type]
+    :param turns: possible turns
+    :type turns: dict(tuple: {dict(tuple: {list()})})
+    :return: possible turns, bad figures, figures in check
+    :rtype: tuple
     """
 
     possible_turns = defaultdict(list)
@@ -166,9 +167,9 @@ def remove_not_important_turns(turns, important_start_positions):
     :param turns: possible turns
     :type turns: list(class Turn object)
     :param important_start_positions: positions that are to be left
-    :type important_start_positions: list(class Turn object)
+    :type important_start_positions: list((int, int))
     :return: important start position
-    :rtype: list(class Turn object)
+    :rtype: dict(tuple: {dict(tuple: {list()})})
     """
     important_turns = defaultdict(list)
 
@@ -260,9 +261,6 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
 
 def check_diff(board, diff, start_map_type):
     """check_diff(board, diff, start_map_type) -> bool
-
-    returns 
-
 
     :param board: board object
     :type board: class board object

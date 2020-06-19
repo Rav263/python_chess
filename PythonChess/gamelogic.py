@@ -89,7 +89,7 @@ class Logic:
         :param check_check: nessesity to check check, defaults to True
         :type check_check: bool, optional
         :return: returns all possible turns in dict
-        :rtype: (dict[class Turn object], class Turn object)
+        :rtype: dict(tuple: {dict(tuple: {list()})})
         """
 
         if check_check:

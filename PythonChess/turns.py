@@ -83,14 +83,14 @@ class Node:
         self.win_rate = None
 
     def add_turn(self, turn, cost, node=None):
-        """[summary]
+        """Add turn to Node
 
         :param turn: turn
         :type turn: class Turn object
         :param cost: turns cost
         :type cost: int
-        :param node: [description], defaults to None
-        :type node: [type], optional
+        :param node: new node, defaults to None
+        :type node: class Node, optional
         """
         self.next_turns[turn] = node
         self.sorted_turns.append((turn, cost))
@@ -115,14 +115,14 @@ class Node:
 def build_tree(nodes, now_index, node, depth):
     """Build tree for turn keping
 
-    :param nodes: [description]
-    :type nodes: [type]
-    :param now_index: [description]
-    :type now_index: [type]
-    :param node: [description]
-    :type node: [type]
-    :param depth: [description]
-    :type depth: [type]
+    :param nodes: list of tree nodes
+    :type nodes: list
+    :param now_index: now node index
+    :type now_index: int
+    :param node: now node
+    :type node: class Node
+    :param depth: recursion depth
+    :type depth: int
     """
     turn, indexes, win_rate = nodes[now_index]
 
@@ -141,8 +141,8 @@ def build_tree(nodes, now_index, node, depth):
 def read_nodes():
     """Read debuts
 
-    :return: [description]
-    :rtype: [type]
+    :return: list of nodes
+    :rtype: list
     """
     print(_("Reading debuts, please wait (It can take from 15 sec to 1 min, depends your comuter):"))
     fil = open("./debuts.dat", "r")

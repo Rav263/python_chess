@@ -184,6 +184,9 @@ class Api:
             now_turn.pawn = 10 * color + pawn
 
         tmp, flags = self.board.do_turn(now_turn)
+        
+        if self.board.flipped:
+            now_turn.flipped = True
 
         self.logic.add_turn_to_history((now_turn, tmp, flags))
         self.turn_index += 1
@@ -205,6 +208,9 @@ class Api:
 
         now_turn = self.logic.root_ai_turn(self.board, color, self.difficulty, last_turn)[0]
         tmp, flags = self.board.do_turn(now_turn)
+        
+        if self.board.flipped:
+            now_turn.flipped = True
 
         self.logic.add_turn_to_history((now_turn, tmp, flags))
 
@@ -241,7 +247,6 @@ class Api:
         else:
             return 45 * sign + crit_diff * (abs_eval - 45) * sign + 50
 
-
     def previous_turn(self):
         """Returns previous turn and undoes it on board if it is possible
 
@@ -254,6 +259,12 @@ class Api:
         self.turn_index -= 1
 
         turn = self.logic.get_turn_from_history(self.turn_index)
+        if turn[0].flipped and not self.board.flipped:
+            print("FIRST:", turn[0])
+            turn[0].rotate()
+        if not turn[0].flipped and self.board.flipped:
+            print("SECOND:", turn[0])
+            turn[0].rotate()
 
         self.board.un_do_turn(*turn)
         return turn[:2]
@@ -268,7 +279,7 @@ class Api:
             return None
 
         turn = self.logic.get_turn_from_history(self.turn_index)
-
+        
         self.board.do_turn(turn[0])
         self.turn_index += 1
 

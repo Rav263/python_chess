@@ -3,6 +3,8 @@ from tqdm import tqdm
 
 class Turn:
     """Turn class for store chess turn"""
+    flipped = False
+
     def __init__(self, start_pos, end_pos, color, pawn=0, castling=False, passant=False):
         self.start_pos = start_pos
         self.end_pos = end_pos
@@ -68,6 +70,7 @@ class Turn:
     def rotate(self):
         """Rotate turn on the board
         """
+        self.flipped = not self.flipped
         self.start_pos = (7 - self.start_pos[0], 7 - self.start_pos[1])
         self.end_pos = (7 - self.end_pos[0], 7 - self.end_pos[1])
 

@@ -125,7 +125,6 @@ class Cell(QFrame):
         self.color = color
         if self.x == 7 or self.y == 0:
             text_color = "{}{}{}".format(color, self.x, self.y)
-            print(text_color)
         else:
             text_color = "white" if color == 1 else "black"
         self.setProperty("color", text_color)

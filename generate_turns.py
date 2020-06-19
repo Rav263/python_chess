@@ -622,7 +622,7 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
     positions = [1, 2, 3]
     if board.flipped:
         positions = [1, 2]
-
+    
     if not board.king_movement[color] and not board.rook_movement[color][0]:
         if (board.get_type_map(left_rook) == board.rook and
                 board.get_color_map(left_rook) == color):

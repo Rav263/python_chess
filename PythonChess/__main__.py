@@ -4,6 +4,8 @@
 
 from multiprocessing import cpu_count
 import sys
+import gettext
+import os
 
 from PythonChess.api import Api
 from PythonChess.cmd_ui import CmdUi
@@ -78,5 +80,6 @@ def main():
 
 
 if __name__ == "__main__":
+    gettext.install("locale", os.path.dirname(sys.argv[0]), names=("ngettext",))
     print("Hello, this is python chess game")
     main()

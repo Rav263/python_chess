@@ -522,7 +522,7 @@ class BottomMenu(QFrame):
         super().__init__()
         self.comm = comm
         buttons = []
-        buttons.append(ControllButton("Back"))
+        buttons.append(ControllButton(_("Back")))
         buttons.append(ControllButton("Undo"))
         buttons.append(ControllButton("Redo"))
         buttons.append(ControllButton("Skip"))
@@ -624,10 +624,10 @@ class MainMenu(QFrame):
         sizePol.setHeightForWidth(True)
         self.setSizePolicy(sizePol)
 
-        self.start_game = MenuButton("New game")
-        self.resume = MenuButton("Resume")
-        self.computer = MenuButton("Computer")
-        self.human = MenuButton("Human")
+        self.start_game = MenuButton(_("New game"))
+        self.resume = MenuButton(_("Resume"))
+        self.computer = MenuButton(_("Computer"))
+        self.human = MenuButton(_("Human"))
 
         self.computer.hide()
         self.human.hide()
@@ -645,9 +645,9 @@ class MainMenu(QFrame):
             difficulty.hide()
 
         h_col_lay = QHBoxLayout()
-        self.white = MenuButton("white")
+        self.white = MenuButton(_("white"))
         self.white.setProperty("pushed", "yes")
-        self.black = MenuButton("black")
+        self.black = MenuButton(_("black"))
         self.black.setProperty("pushed", "no")
         self.white.hide()
         self.black.hide()

@@ -12,7 +12,7 @@ class Data:
         try:
             file = open(file_name, "r")
         except FileNotFoundError:
-            print("ERROR:: data file not found")
+            print(_("ERROR:: data file not found"))
             sys.exit(1)
 
         for i in file:
@@ -114,7 +114,7 @@ def get_color():
     :rtype: 1 for white 2 for black
     """
     while True:
-        color = input("Please enter your color (white\\black): ").strip().lower()
+        color = input(_("Please enter your color (white\\black): ")).strip().lower()
         if color in ("white", "black"):
             break
     return 1 if color == "white" else 2
@@ -127,7 +127,7 @@ def new_game():
     :rtype: str
     """
     while True:
-        game = input("Do you whant another game (y\\n):").strip().lower()
+        game = input(_("Do you whant another game (y\\n):")).strip().lower()
         if game in ("y", "n"):
             break
         print("Please, try again")
@@ -141,12 +141,12 @@ def get_difficulty():
     :rtype: int
     """
     while True:
-        diff = input("Please enter difficulty (2-5): ")
+        diff = input(_("Please enter difficulty (2-4): "))
         if not diff.isnumeric():
-            print("This is not num")
+            print(_("This is not num"))
             continue
-        if int(diff) < 2 or int(diff) > 5:
-            print("This is wrong difficulty")
+        if int(diff) < 2 or int(diff) > 4:
+            print(_("This is wrong difficulty"))
             continue
         break
     return int(diff)
@@ -168,21 +168,21 @@ def get_turn(color, api):
         return ((-1, -1), (-1, -1), -1)
 
     while True:
-        line = input("Please enter your turn: ").strip()
+        line = input(_("Please enter your turn: ")).strip()
         if len(line) not in (4, 5):
-            print("Wrong format")
+            print(_("Wrong format"))
             continue
         if ord(line[0]) < ord("a") or ord(line[0]) > ord("h"):
-            print("Wrong format")
+            print(_("Wrong format"))
             continue
         if ord(line[2]) < ord("a") or ord(line[2]) > ord("h"):
-            print("Wrong format")
+            print(_("Wrong format"))
             continue
         if ord(line[1]) < ord("1") or ord(line[1]) > ord("8"):
-            print("Wrong format")
+            print(_("Wrong format"))
             continue
         if ord(line[3]) < ord("1") or ord(line[3]) > ord("8"):
-            print("Wrong format")
+            print(_("Wrong format"))
             continue
 
         start_pos = (api.board.board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
@@ -200,13 +200,13 @@ def get_turn(color, api):
             elif figure == "B":
                 fig_num = api.board.bishop
             else:
-                print("Undefined promotion figure")
+                print(_("Undefined promotion figure"))
                 continue
         if start_pos in possible_turns:
             if end_pos in possible_turns[start_pos]:
                 break
             else:
-                print("Not possible turn")
+                print(_("Not possible turn"))
         else:
-            print("Not possible turn")
+            print(_("Not possible turn"))
     return (start_pos, end_pos, fig_num)

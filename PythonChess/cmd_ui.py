@@ -20,7 +20,7 @@ class CmdUi:
                     print_board(self.api.board.board, self.api.data)
                     now_turn = get_turn(color, self.api)
                     if now_turn[0][0] == -1:
-                        print("CHECK MATE! YOU LOSE!")
+                        print(_("CHECK MATE! YOU LOSE!"))
                         break
 
                     self.api.do_turn(*now_turn)
@@ -32,7 +32,7 @@ class CmdUi:
                     now_turn = self.api.ai_turn(color)[0]
 
                     if now_turn == self.api.logic.NULL_TURN:
-                        print("CHECK MATE! YOU WIN!")
+                        print(_("CHECK MATE! YOU WIN!"))
                         break
                     print(now_turn)
 

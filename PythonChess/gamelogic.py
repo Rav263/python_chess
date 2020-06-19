@@ -152,7 +152,6 @@ class Logic:
         :param return_dict: tuple of best_turn and it cost
         :type return_dict: (class Turn object, int)
         """
-        print(f"thread-{index}: {turns}")
         best_cost = self.MIN_COST
         best_turn = self.NULL_TURN
         alpha = self.MIN_COST
@@ -238,7 +237,6 @@ class Logic:
 
         for thread in threads:
             thread.join()
-        print(sorted(return_dict.values(), key=lambda x: -x[1]))
         return max(return_dict.values(), key=lambda x: x[1])
 
     def ai_turn(self, board, color, depth, last_turn, alpha, beta):

@@ -260,10 +260,8 @@ class Api:
 
         turn = self.logic.get_turn_from_history(self.turn_index)
         if turn[0].flipped and not self.board.flipped:
-            print("FIRST:", turn[0])
             turn[0].rotate()
         if not turn[0].flipped and self.board.flipped:
-            print("SECOND:", turn[0])
             turn[0].rotate()
 
         self.board.un_do_turn(*turn)

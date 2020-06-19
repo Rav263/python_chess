@@ -7,47 +7,23 @@ Welcome to PythonChess's documentation!
 =======================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 3
+    :caption: Contents:
 
-.. automodule:: ui
-   :members:
+    ui.rst
+    api.rst
+    board.rst
+    cmd_ui.rst
+    evaluate.rst
+    gamelogic.rst
+    generate_turns.rst
+    io_functions.rst
+    turns.rst
+    main.rst
+    math_functions.rst
+    other_eng.rst
+    stockfish.rst
 
-.. automodule:: api
-   :members:
-
-.. automodule:: board
-   :members:
-
-.. automodule:: cmd_ui
-   :members:
-
-.. automodule:: evaluate
-   :members:
-
-.. automodule:: gamelogic
-   :members:
-
-.. automodule:: generate_turns
-   :members:
-
-.. automodule:: io_functions
-   :members:
-
-.. automodule:: turns
-   :members:
-
-.. automodule:: main
-   :members:
-
-.. automodule:: math_functions
-   :members:
-
-.. automodule:: other_engines
-   :members:
-
-.. automodule:: stockfish
-   :members:
 Indices and tables
 ==================
 

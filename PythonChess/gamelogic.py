@@ -21,7 +21,7 @@ class Logic:
     turn_history = list()
 
     def __init__(self, data, num_threads, evaluation, debuts):
-        print("Init game logic class")
+        print(_("Init game logic class"))
         self.figures_cost = data.data["FIGURES_COST"]
         self.av_threads = num_threads
         self.evaluation = evaluation

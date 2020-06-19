@@ -42,12 +42,12 @@ def parse_args():
 def print_help():
     """Prints help message
     """
-    print("------ HELP MESSAGE ------")
-    print(" --mode (GUI, CMD)        GUI default, to run in GUI. CMD - to run in text mode")
-    print(" --difficulty (2 - 5)     Set AI difficulty. default 4")
-    print(" --threads (num)          Set num of threads. default max")
-    print(" --no_debuts              Do not load debuts")
-    print(" --help                   Print this message")
+    print(_("------ HELP MESSAGE ------"))
+    print(_(" --mode (GUI, CMD)        GUI default, to run in GUI. CMD - to run in text mode"))
+    print(_(" --difficulty (2 - 5)     Set AI difficulty. default 4"))
+    print(_(" --threads (num)          Set num of threads. default max"))
+    print(_(" --no_debuts              Do not load debuts"))
+    print(_(" --help                   Print this message"))
 
 
 def main():
@@ -66,12 +66,12 @@ def main():
         elif parsed_args["MODE"] == "AI":
             PythonChess.stockfish.main(api, parsed_args["THREADS"])
         else:
-            print("Starting GUI")
+            print(_("Starting GUI"))
             # GUI START CODE HERE
             gui = Gui(api)
             gui.start()
     else:
-        print("Starting GUI")
+        print(_("Starting GUI"))
         # GUI START CODE HERE
         gui = Gui(api)
         gui.start()
@@ -81,5 +81,5 @@ def main():
 
 if __name__ == "__main__":
     gettext.install("locale", os.path.dirname(sys.argv[0]), names=("ngettext",))
-    print("Hello, this is python chess game")
+    print(_("Hello, this is python chess game"))
     main()

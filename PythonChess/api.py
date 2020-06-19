@@ -31,8 +31,8 @@ class Api:
         self.turn_index = 0
 
         print(self.evaluate.evaluate_board_mg(self.board, 1))
-        print("difficulty:", difficulty)
-        print("threads:   ", threads)
+        print(_("difficulty:"), difficulty)
+        print(_("threads:   "), threads)
 
         # Then we need start game
     

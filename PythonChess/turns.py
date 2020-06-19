@@ -57,7 +57,7 @@ class Turn:
         """Returns str representation
 
         :return: str representation
-        :rtype: bool
+        :rtype: str
         """
         return str(self)
 
@@ -141,7 +141,7 @@ def read_nodes():
     :return: [description]
     :rtype: [type]
     """
-    print("Reading debuts, please wait:")
+    print(_("Reading debuts, please wait (It can take from 15 sec to 1 min, depends your comuter):"))
     fil = open("./debuts.dat", "r")
     lines = [line for line in fil]
     fil.close()

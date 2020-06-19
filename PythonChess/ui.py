@@ -522,12 +522,12 @@ class BottomMenu(QFrame):
         super().__init__()
         self.comm = comm
         buttons = []
-        buttons.append(ControllButton(_("Back")))
+        buttons.append(ControllButton("Back"))
         buttons.append(ControllButton("Undo"))
         buttons.append(ControllButton("Redo"))
         buttons.append(ControllButton("Skip"))
         
-        back_button = MenuButton("Back")
+        back_button = MenuButton(_("Back"))
 
         buttons[0].clicked.connect(self.to_game_start)
         buttons[1].clicked.connect(self.previous)

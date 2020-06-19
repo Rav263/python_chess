@@ -168,7 +168,7 @@ def get_turn(color, api):
         return ((-1, -1), (-1, -1), -1)
 
     while True:
-        line = input(_("Please enter your turn: ")).strip()
+        line = input(_("Please enter your turn: (e2e4)")).strip()
         if len(line) not in (4, 5):
             print(_("Wrong format"))
             continue

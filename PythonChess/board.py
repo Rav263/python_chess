@@ -24,7 +24,7 @@ class Board:
 
     def __init__(self, data, copy=None):
         if copy is None:
-            print("Init board class")
+            print(_("Init board class"))
             self.load_board(data)
             self.board_size = data.board_size
             self.data = data

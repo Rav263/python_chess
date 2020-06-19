@@ -867,6 +867,7 @@ class Main_Window(QWidget):
         else:
             self.game.board.clear_afterturn()
 
+        self.game.board.history = 0
         self.game.board.upd_whole_board()
         self.game.board.upd_possible_moves(self.start_color)
         self.tabs.setCurrentIndex(self.tab_names["game_board"])

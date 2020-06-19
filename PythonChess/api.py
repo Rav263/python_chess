@@ -9,14 +9,19 @@ from .evaluate import Evaluate
 from .turns import read_nodes, Node
 
 
+import os
+import sys
+
+
 class Api:
     """backend api class to ui"""
 
     def __init__(self, difficulty, threads, deb):
         # Here we need to init Field and Game logic
-        self.data = Data("data.dat")
+        os.chdir(os.path.dirname(sys.argv[0]))
+        self.data = Data("./data.dat")
         self.board = Board(self.data)
-        self.evaluate = Evaluate("eval_coofs.dat")
+        self.evaluate = Evaluate("./eval_coofs.dat")
         if deb:
             self.debuts = read_nodes()
         else:

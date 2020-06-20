@@ -215,11 +215,15 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns, tur
     for now_fig in figs:
         if board.get_type_map(now_fig) in (board.rook, board.queen):
             if now_fig[0] == king_pos[0]:
-                bad_positions.append((king_pos[0], king_pos[1] + 1))
-                bad_positions.append((king_pos[0], king_pos[1] - 1))
+                if (king_pos[0], king_pos[1] + 1) != now_fig:
+                    bad_positions.append((king_pos[0], king_pos[1] + 1))
+                if (king_pos[0], king_pos[1] - 1) != now_fig:
+                    bad_positions.append((king_pos[0], king_pos[1] - 1))
             elif now_fig[1] == king_pos[1]:
-                bad_positions.append((king_pos[0] + 1, king_pos[1]))
-                bad_positions.append((king_pos[0] - 1, king_pos[1]))
+                if (king_pos[0] + 1, king_pos[1]) != now_fig:
+                    bad_positions.append((king_pos[0] + 1, king_pos[1])) 
+                if (king_pos[0] - 1, king_pos[1]) != now_fig:
+                    bad_positions.append((king_pos[0] - 1, king_pos[1]))
         if board.get_type_map(now_fig) in (board.bishop, board.queen):
             now = normalize_tuple(mf.difference(king_pos, now_fig))[0]
             bad_positions.append(mf.tuple_sum(king_pos, now))
@@ -588,7 +592,8 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
     for diff in possible_diffs:
         turn_end = mf.tuple_sum(pos, diff)
         if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color):
-            possible_turns[turn_end].append(pos)
+            if turn_end not in opponent_turns_for_king:
+                possible_turns[turn_end].append(pos)
         """
         if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color and
                 turn_end not in opponent_turns):

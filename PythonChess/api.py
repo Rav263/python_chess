@@ -1,4 +1,8 @@
 """module to connect backend ang gui"""
+# pylint: disable=undefined-variable
+
+import os
+import sys
 
 from collections import defaultdict
 from itertools import product
@@ -7,10 +11,6 @@ from .gamelogic import Logic
 from .io_functions import Data, print_board
 from .evaluate import Evaluate
 from .turns import read_nodes, Node
-
-
-import os
-import sys
 
 
 class Api:
@@ -39,16 +39,11 @@ class Api:
         print(_("threads:   "), threads)
 
         # Then we need start game
-    
+
     def print_board(self):
         """Prints board
         """
         print_board(self.board.board, self.data)
-
-    def start_cmd(self):
-        """Starts command line UI
-        """
-        self.logic.start(self.board, self.data, self.difficulty)
 
     def get_possible_turns(self, color):
         """Returns possible turns from backend
@@ -106,7 +101,7 @@ class Api:
         else:
             last_turn = self.logic.NULL_TURN
         possible_turns = self.logic.generate_all_possible_turns(self.board, 3 - color, last_turn)
-        
+
         king_pos = self.board.get_king_pos(color)
 
         return king_pos in possible_turns
@@ -119,18 +114,18 @@ class Api:
         """
         white_figs = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
         black_figs = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
-        
+
         for pos in product(range(self.board.board_size), repeat=2):
             if self.board.get_color_map(pos) == self.board.white:
                 white_figs[self.board.get_type_map(pos)] += 1
             if self.board.get_color_map(pos) == self.board.black:
                 black_figs[self.board.get_type_map(pos)] += 1
-        
+
         all_figs = dict()
 
         for now in white_figs:
             all_figs[now] = white_figs[now] - black_figs[now]
-        
+
         black_figs = dict()
         white_figs = dict()
         black_score = 0
@@ -139,10 +134,10 @@ class Api:
         for now in all_figs:
             if all_figs[now] < 0:
                 black_figs[now] = abs(all_figs[now])
-                black_score += self.data.data["FIGURES_COST"][10 + now] * all_figs[now] 
+                black_score += self.data.data["FIGURES_COST"][10 + now] * all_figs[now]
             elif all_figs[now] > 0:
                 white_figs[now] = abs(all_figs[now])
-                white_score -= self.data.data["FIGURES_COST"][10 + now] * all_figs[now] 
+                white_score -= self.data.data["FIGURES_COST"][10 + now] * all_figs[now]
         if white_score > black_score:
             white_score = white_score - black_score
             black_score = 0
@@ -172,7 +167,7 @@ class Api:
         last_turn = self.logic.NULL_TURN
         if self.turn_index != 0:
             last_turn = self.logic.turn_history[self.turn_index - 1][0]
-        
+
         all_turns = self.logic.generate_turns(self.board, color, last_turn)
 
         for tmp_turn in all_turns:
@@ -184,7 +179,7 @@ class Api:
             now_turn.pawn = 10 * color + pawn
 
         tmp, flags = self.board.do_turn(now_turn)
-        
+
         if self.board.flipped:
             now_turn.flipped = True
 
@@ -200,7 +195,7 @@ class Api:
         :return: True if turn is passant castling or pawn promotion
         :rtype: bool
         """
-         
+
         if self.turn_index != 0:
             last_turn = self.logic.turn_history[self.turn_index - 1][0]
         else:
@@ -208,7 +203,7 @@ class Api:
 
         now_turn = self.logic.root_ai_turn(self.board, color, self.difficulty, last_turn)[0]
         tmp, flags = self.board.do_turn(now_turn)
-        
+
         if self.board.flipped:
             now_turn.flipped = True
 
@@ -217,7 +212,7 @@ class Api:
         self.turn_index += 1
         return (now_turn, now_turn.passant or now_turn.castling or now_turn.pawn != 0)
 
-    def start_new_game(self, difficulty = 2):
+    def start_new_game(self, difficulty=2):
         """Starts new game with difficulty
 
         :param difficulty: game difficulty, defaults to 2
@@ -229,7 +224,7 @@ class Api:
         self.logic.debuts = self.debuts
         self.logic.flag = True
         self.difficulty = difficulty
- 
+
     def get_board_eval(self):
         """Returns evaluation of a current situation
 
@@ -242,10 +237,9 @@ class Api:
         sign = 1 if evaluation > 0 else -1
         if abs_eval * 5 < 30:
             return 5 * evaluation + 50
-        elif (abs_eval * 5 - 30) * 3 < 15:
+        if (abs_eval * 5 - 30) * 3 < 15:
             return (abs_eval * 5 + sign * 30) * 3 + 50
-        else:
-            return 45 * sign + crit_diff * (abs_eval - 45) * sign + 50
+        return 45 * sign + crit_diff * (abs_eval - 45) * sign + 50
 
     def previous_turn(self):
         """Returns previous turn and undoes it on board if it is possible
@@ -277,7 +271,7 @@ class Api:
             return None
 
         turn = self.logic.get_turn_from_history(self.turn_index)
-        
+
         self.board.do_turn(turn[0])
         self.turn_index += 1
 

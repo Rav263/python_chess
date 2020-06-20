@@ -1,4 +1,8 @@
+"""Turns module for chess game"""
 from tqdm import tqdm
+# pylint: disable=undefined-variable
+# pylint: disable=too-many-arguments
+# pylint: disable=eval-used
 
 
 class Turn:
@@ -37,12 +41,7 @@ class Turn:
             end_pos += "q"
 
         return start_pos + end_pos
-        """
-        return ("start pos: ({0}, {1})\n".format(*self.start_pos) +
-                "end pos:   ({0}, {1})\n".format(*self.end_pos) +
-                f"color:      {self.color}")
-        """
-        
+
     def __eq__(self, second):
         """Checks turns for equalitu
 
@@ -76,6 +75,7 @@ class Turn:
 
 
 class Node:
+    """Debut Tree Node"""
     def __init__(self):
         self.turn = None
         self.next_turns = dict()
@@ -130,7 +130,7 @@ def build_tree(nodes, now_index, node, depth):
         node.turn = Turn(turn[0], turn[1], depth % 2 + 1)
 
     node.win_rate = win_rate
-    
+
     for index in indexes:
         now_node = Node()
         build_tree(nodes, index, now_node, depth + 1)
@@ -151,7 +151,7 @@ def read_nodes():
     nodes = list()
     for line in tqdm(lines):
         nodes.extend(eval(line))
-    
+
     root = Node()
     build_tree(nodes, 0, root, -1)
 

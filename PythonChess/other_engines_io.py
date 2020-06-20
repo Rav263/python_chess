@@ -3,7 +3,6 @@
 import threading
 import subprocess
 from queue import Queue
-
 from .turns import Turn
 
 
@@ -59,7 +58,7 @@ class Stockfish:
         """
         start_pos = chr(turn.start_pos[1] + ord('a')) + str(board_size - turn.start_pos[0])
         end_pos = chr(turn.end_pos[1] + ord('a')) + str(board_size - turn.end_pos[0])
-        
+
         if turn.pawn % 10 == 2:
             end_pos += "n"
         elif turn.pawn % 10 == 3:
@@ -117,7 +116,7 @@ class Stockfish:
 
         start_pos = (board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
         end_pos = (board_size - int(line[3]), abs(ord(line[2]) - ord("a")))
-        
+
         if len(line) == 5:
             figure = line[4]
             fig_num = 0
@@ -142,7 +141,9 @@ class Stockfish:
                     start_pos = (*start_pos, (start_pos[0], 7), (start_pos[0], 5))
 
                 now_turn = Turn(start_pos, end_pos, color, castling=True)
-            elif board.get_type_map(start_pos) == board.pawn and board.get_type_map(end_pos) == board.empty_map and abs(start_pos[1] - end_pos[1]) == 1:
+            elif (board.get_type_map(start_pos) == board.pawn and
+                  board.get_type_map(end_pos) == board.empty_map and
+                  abs(start_pos[1] - end_pos[1]) == 1):
                 now_turn = Turn(start_pos, end_pos, color, passant=True)
             else:
                 now_turn = Turn(start_pos, end_pos, color)

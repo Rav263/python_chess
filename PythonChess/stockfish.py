@@ -1,6 +1,6 @@
 """Stockfish vs ai play"""
-from .other_engines_io import Stockfish
 import PythonChess.io_functions as io_functions
+from .other_engines_io import Stockfish
 
 
 def main(api, num_threads):
@@ -16,7 +16,7 @@ def main(api, num_threads):
     stockfish = Stockfish(num_threads, difficulty)
 
     io_functions.print_board(api.board.board, api.data)
- 
+
     color = 1
     last_turn = api.logic.NULL_TURN
 

@@ -1,6 +1,9 @@
 """Modeue for IO functions"""
+# pylint: disable=undefined-variable
+# pylint: disable=too-many-branches
 import sys
 import os
+
 
 class Data:
     """Class Data for load config file and get info from it"""
@@ -206,8 +209,7 @@ def get_turn(color, api):
         if start_pos in possible_turns:
             if end_pos in possible_turns[start_pos]:
                 break
-            else:
-                print(_("Not possible turn"))
+            print(_("Not possible turn"))
         else:
             print(_("Not possible turn"))
     return (start_pos, end_pos, fig_num)

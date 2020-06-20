@@ -1,10 +1,10 @@
+"""Board position evaluation module"""
 from itertools import product
-
-
 # pylint: disable=eval-used
 
 
 class Evaluate:
+    """Evaluate class"""
     def __init__(self, data_file_name):
         data_file = open(data_file_name, "r")
         self.hash_table = dict()
@@ -26,14 +26,14 @@ class Evaluate:
 
             if line.strip() == "IMB_QO":
                 self.imb_qo = eval(data_file.readline())
-            
+
             if line.strip() == "IMB_QT":
                 self.imb_qt = eval(data_file.readline())
-            
+
             if line.strip() == "IMB_DICT":
                 self.imb_dict = eval(data_file.readline())
         data_file.close()
-    
+
     def hash_board(self, board):
         """Hash game board
 
@@ -43,10 +43,10 @@ class Evaluate:
         :rtype: int
         """
         hsh = 0
-        for a in board.board:
-            for sq in a:
+        for line in board.board:
+            for now_fig in line:
                 hsh <<= 5
-                hsh += sq
+                hsh += now_fig
         return hsh
 
     def evaluate_board_mg(self, board, color):
@@ -162,8 +162,8 @@ class Evaluate:
                 else:
                     value += self.imb_qt[map_type][now_map_type]
 
-            if (bishop[1] > 1):
+            if bishop[1] > 1:
                 value += self.imb_qt[map_type][0]
-            if (bishop[2] > 1):
+            if bishop[2] > 1:
                 value += self.imb_qo[map_type][0]
         return value

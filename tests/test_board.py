@@ -1,10 +1,16 @@
 from PythonChess.board import Board
 from PythonChess.api import Api
 from PythonChess.turns import Turn
+import os
+import sys
+import gettext
+
+gettext.install("locale", os.path.abspath(sys.argv[0]), names=("ngettext",))
+
 
 class Test_Board:
     def setup(self):
-        self.api = Api(2, 2, False)
+        self.api = Api(2, 2, False, True)
         self.board = Board(self.api.data)
 
     def test_rotate_board(self):

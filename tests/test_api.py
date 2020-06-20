@@ -1,10 +1,15 @@
 from collections import defaultdict
 from PythonChess.api import Api
+import os
+import sys
+import gettext
+
+gettext.install("locale", os.path.dirname(sys.argv[0]), names=("ngettext",))
 
 
 class Test_Api:
     def setup(self):
-        self.api = Api(2, 2, False)
+        self.api = Api(2, 2, False, True)
 
     def test_get_possible_turn(self):
         start_white_turns = defaultdict(list, {(6, 0): [(4, 0), (5, 0)], (7, 1): [(5, 0), (5, 2)],

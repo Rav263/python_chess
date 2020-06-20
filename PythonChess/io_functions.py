@@ -1,6 +1,6 @@
 """Modeue for IO functions"""
 import sys
-
+import os
 
 class Data:
     """Class Data for load config file and get info from it"""
@@ -12,6 +12,7 @@ class Data:
         try:
             file = open(file_name, "r")
         except FileNotFoundError:
+            print(os.path.abspath(os.getcwd()))
             print(_("ERROR:: data file not found"))
             sys.exit(1)
 

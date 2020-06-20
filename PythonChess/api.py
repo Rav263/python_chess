@@ -16,9 +16,12 @@ import sys
 class Api:
     """backend api class to ui"""
 
-    def __init__(self, difficulty, threads, deb):
+    def __init__(self, difficulty, threads, deb, tests=False):
         # Here we need to init Field and Game logic
-        os.chdir(os.path.dirname(sys.argv[0]))
+        if not tests:
+            os.chdir(os.path.dirname(sys.argv[0]))
+        else:
+            os.chdir("./PythonChess/")
         self.data = Data("./data.dat")
         self.board = Board(self.data)
         self.evaluate = Evaluate("./eval_coofs.dat")
@@ -29,6 +32,8 @@ class Api:
         self.logic = Logic(self.data, threads, self.evaluate, self.debuts)
         self.difficulty = difficulty
         self.turn_index = 0
+        if tests:
+            os.chdir("../")
 
         print(_("difficulty:"), difficulty)
         print(_("threads:   "), threads)

@@ -1,9 +1,15 @@
-import PythonChess.io_functions as io
+from PythonChess.api import Api
+import os
+import sys
+import gettext
+
+gettext.install("locale", os.path.dirname(sys.argv[0]), names=("ngettext",))
 
 
 class Test_Data:
     def setup(self):
-        self.data = io.Data("./data.dat")
+        self.api = Api(2, 2, False, True)
+        self.data = self.api.data
 
     def test_readed_figures(self):
         test_figs = {0: '..', 11: 'Pw', 12: 'Nw', 13: 'Bw',

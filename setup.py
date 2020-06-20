@@ -8,5 +8,5 @@ setup(
     install_requires=["tqdm", "pyqt5"],
     package_data={"PythonChess": ["./*.dat", "./styles.qss", "ru/LC_MESSAGES/*.mo",
                                   "./images/*", "./images/beat/*", "./images/merida/*",
-                                  "./images/moved/*", "./images/pressed/*"]},
+                                  "./images/moved/*", "./images/pressed/*", "./images/default/*"]},
 )

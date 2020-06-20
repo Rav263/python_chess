@@ -1,3 +1,4 @@
 tqdm
 PyQt5
 wheel
+pytest

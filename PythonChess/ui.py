@@ -446,7 +446,7 @@ class GuiBoard(QFrame):
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
-    
+
     def reset_all(self):
         """Resets board sells
         """

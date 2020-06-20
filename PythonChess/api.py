@@ -4,8 +4,6 @@
 import os
 import sys
 
-import os
-import sys
 from collections import defaultdict
 from itertools import product
 from .board import Board

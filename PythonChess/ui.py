@@ -8,6 +8,7 @@
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=no-self-use
 # pylint: disable=import-error
+# pylint: disable=too-many-public-methods
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QPushButton,
                              QHBoxLayout, QVBoxLayout, QStackedLayout,

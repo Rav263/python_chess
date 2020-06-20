@@ -446,6 +446,13 @@ class GuiBoard(QFrame):
         for x in range(8):
             for y in range(8):
                 self.cells_arr[x][y].figure.set_type(self.api.get_field((x, y)))
+    
+    def reset_all(self):
+        """Resets board sells
+        """
+        for x in range(8):
+            for y in range(8):
+                self.cells_arr[x][y].release()
 
     def upd_possible_moves(self, color):
         """Gets all possible turns of a specific color from API
@@ -976,6 +983,7 @@ class MainWindow(QWidget):
             self.game.board.clear_afterturn()
 
         self.game.board.history = 0
+        self.game.board.reset_all()
         self.game.board.upd_whole_board()
         self.game.board.upd_possible_moves(self.start_color)
         self.tabs.setCurrentIndex(self.tab_names["game_board"])

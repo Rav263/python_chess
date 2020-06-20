@@ -1,7 +1,9 @@
 """Board class file"""
 from itertools import product
-
-
+# pylint: disable=undefined-variable
+# pylint: disable=no-else-continue
+# pylint: disable=no-else-return
+# pylint: disable=unnecessary-comprehension
 class Board:
     """Board class for chess game"""
     empty_map = 0
@@ -60,7 +62,7 @@ class Board:
         figures = ("костыль", {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}, {1: 0, 2: 0, 3: 0, 4: 0, 5: 0})
 
         for pos in product(range(self.board_size), repeat=2):
-            now_type = self.get_type_map(pos) 
+            now_type = self.get_type_map(pos)
             if now_type == self.queen:
                 figures[self.get_color_map(pos)][5] += 1
                 continue
@@ -275,8 +277,6 @@ class Board:
         :return: new value
         :rtype: int
         """
-
-        """set_map(self, pos, value) -> Int(figure on position)"""
         tmp = self.board[pos[0]][pos[1]]
         self.board[pos[0]][pos[1]] = pawn if pawn else value
         return tmp

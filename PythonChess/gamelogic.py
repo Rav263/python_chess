@@ -2,6 +2,7 @@
 # pylint: disable=too-many-arguments
 # pylint: disable=too-many-locals
 # pylint: disable=arguments-out-of-order
+# pylint: disable=undefined-variable
 
 from collections import defaultdict
 from itertools import product
@@ -34,7 +35,7 @@ class Logic:
         :param now_turn: turn to add
         :type now_turn: class Turn object
         """
-        
+
         self.turn_history.append(now_turn)
 
     def get_turn_from_history(self, index):
@@ -166,7 +167,7 @@ class Logic:
             if now_cost >= best_cost:
                 best_cost = now_cost
                 best_turn = now_turn
-            
+
             if color == board.black:
                 alpha = max(alpha, best_cost)
             else:
@@ -174,7 +175,7 @@ class Logic:
 
             if beta <= alpha:
                 break
-            
+
         return_dict[index] = (best_turn, best_cost)
 
     def root_ai_turn(self, board, color, depth, last_turn):
@@ -285,7 +286,7 @@ class Logic:
 
             if beta[0] <= alpha[0]:
                 break
-        
+
         alpha[0] = -alpha[0]
         beta[0] = -beta[0]
         return (best_turn, best_cost)

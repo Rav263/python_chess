@@ -1,7 +1,8 @@
 #! /usr/bin/python3
 """Main python_chess module file"""
 # pylint: disable=missing-function-docstring
-
+# pylint: disable=undefined-variable
+# pylint: disable=invalid-name
 from multiprocessing import cpu_count
 import sys
 import gettext

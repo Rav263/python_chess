@@ -1,7 +1,10 @@
 """Modeue for IO functions"""
 import sys
 import os
-
+# pylint: disable=undefined-variable
+# pylint: disable=unused-variable
+# pylint: disable=no-else-break
+# pylint: disable=too-many-branches
 class Data:
     """Class Data for load config file and get info from it"""
     data = dict()

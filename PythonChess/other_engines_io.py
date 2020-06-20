@@ -1,5 +1,7 @@
 """Module for UCI engines io"""
-
+# pylint: disable=line-too-long
+# pylint: disable=too-many-branches
+# pylint: disable=no-self-use
 import threading
 import subprocess
 from queue import Queue
@@ -46,7 +48,7 @@ class Stockfish:
     def end_game(self):
         """Ends game
         """
-        del(self.process_queu)
+        del self.process_queu
         self.stockfish_thread.join()
 
     def do_turn(self, turn, board_size):
@@ -59,7 +61,7 @@ class Stockfish:
         """
         start_pos = chr(turn.start_pos[1] + ord('a')) + str(board_size - turn.start_pos[0])
         end_pos = chr(turn.end_pos[1] + ord('a')) + str(board_size - turn.end_pos[0])
-        
+
         if turn.pawn % 10 == 2:
             end_pos += "n"
         elif turn.pawn % 10 == 3:
@@ -117,7 +119,7 @@ class Stockfish:
 
         start_pos = (board_size - int(line[1]), abs(ord(line[0]) - ord("a")))
         end_pos = (board_size - int(line[3]), abs(ord(line[2]) - ord("a")))
-        
+
         if len(line) == 5:
             figure = line[4]
             fig_num = 0

@@ -52,6 +52,7 @@ def print_help():
 
 
 def main():
+    """Main Python Chess game function"""
     parsed_args = parse_args()
 
     if parsed_args["HELP"]:
@@ -62,8 +63,8 @@ def main():
 
     if "MODE" in parsed_args:
         if parsed_args["MODE"] == "CMD":
-            ui = CmdUi(api)
-            ui.start()
+            gui = CmdUi(api)
+            gui.start()
         elif parsed_args["MODE"] == "AI":
             PythonChess.stockfish.main(api, parsed_args["THREADS"])
         else:

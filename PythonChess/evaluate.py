@@ -1,14 +1,12 @@
+"""Board position evaluation module"""
 from itertools import product
-
-
 # pylint: disable=eval-used
 # pylint: disable=unused-variable
 # pylint: disable=invalid-name
 # pylint: disable=no-self-use
 
 class Evaluate:
-    """Evaluation class
-    """
+    """Evaluate class"""
     def __init__(self, data_file_name):
         data_file = open(data_file_name, "r")
         self.hash_table = dict()
@@ -47,10 +45,10 @@ class Evaluate:
         :rtype: int
         """
         hsh = 0
-        for a in board.board:
-            for sq in a:
+        for line in board.board:
+            for now_fig in line:
                 hsh <<= 5
-                hsh += sq
+                hsh += now_fig
         return hsh
 
     def evaluate_board_mg(self, board, color):

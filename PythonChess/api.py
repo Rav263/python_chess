@@ -1,4 +1,8 @@
 """module to connect backend ang gui"""
+# pylint: disable=undefined-variable
+
+import os
+import sys
 
 import os
 import sys
@@ -11,7 +15,6 @@ from .evaluate import Evaluate
 from .turns import read_nodes, Node
 # pylint: disable=undefined-variable
 # pylint: disable=no-else-return
-
 
 
 class Api:
@@ -239,10 +242,9 @@ class Api:
         sign = 1 if evaluation > 0 else -1
         if abs_eval * 5 < 30:
             return 5 * evaluation + 50
-        elif (abs_eval * 5 - 30) * 3 < 15:
+        if (abs_eval * 5 - 30) * 3 < 15:
             return (abs_eval * 5 + sign * 30) * 3 + 50
-        else:
-            return 45 * sign + crit_diff * (abs_eval - 45) * sign + 50
+        return 45 * sign + crit_diff * (abs_eval - 45) * sign + 50
 
     def previous_turn(self):
         """Returns previous turn and undoes it on board if it is possible

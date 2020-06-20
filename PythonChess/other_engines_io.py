@@ -5,7 +5,6 @@
 import threading
 import subprocess
 from queue import Queue
-
 from .turns import Turn
 
 
@@ -144,7 +143,9 @@ class Stockfish:
                     start_pos = (*start_pos, (start_pos[0], 7), (start_pos[0], 5))
 
                 now_turn = Turn(start_pos, end_pos, color, castling=True)
-            elif board.get_type_map(start_pos) == board.pawn and board.get_type_map(end_pos) == board.empty_map and abs(start_pos[1] - end_pos[1]) == 1:
+            elif (board.get_type_map(start_pos) == board.pawn and
+                  board.get_type_map(end_pos) == board.empty_map and
+                  abs(start_pos[1] - end_pos[1]) == 1):
                 now_turn = Turn(start_pos, end_pos, color, passant=True)
             else:
                 now_turn = Turn(start_pos, end_pos, color)

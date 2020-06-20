@@ -1,4 +1,5 @@
 """Board class file"""
+# pylint: disable=undefined-variable
 from itertools import product
 # pylint: disable=undefined-variable
 # pylint: disable=no-else-continue
@@ -66,7 +67,7 @@ class Board:
             if now_type == self.queen:
                 figures[self.get_color_map(pos)][5] += 1
                 continue
-            elif now_type == self.empty_map:
+            if now_type == self.empty_map:
                 continue
             figures[self.get_color_map(pos)][now_type] += 1
         black_figs = list()
@@ -78,8 +79,7 @@ class Board:
             white_figs.append((now, figures[1][now]))
         if flag:
             return ((*white_figs), (*black_figs))
-        else:
-            return figures
+        return figures
 
     def get_king_pos(self, color):
         """Returns king's position with the same color
@@ -211,7 +211,7 @@ class Board:
         """
         self.board = []
         for line in data.data["BOARD"]:
-            new_line = [x for x in line]
+            new_line = [*line]
             self.board.append(new_line)
 
     def get_map(self, pos):
@@ -266,7 +266,7 @@ class Board:
         return True
 
     def set_map(self, pos, value, pawn=0):
-        """[summary]
+        """set board cell
 
         :param pos: position
         :type pos: (int, int)
@@ -282,7 +282,7 @@ class Board:
         return tmp
 
     def generate_fen(self, fen_dict):
-        """[summary]
+        """generate fen board view
 
         :param fen_dict: dict of figures
         :type fen_dict: dict

@@ -412,6 +412,7 @@ def check_de_passant(board, possible_turns, last_turn, color):
 
     if board.get_type_map(pos_2) == board.pawn and board.get_color_map(pos_2) == color:
         possible_turns[(pos_2[0] + color_diff, pos_2[1] - 1, True)].append(pos_2)
+    return None
 
 
 def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
@@ -436,7 +437,7 @@ def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
             board.get_type_map((pos[0] + 2 * diff, pos[1])) == board.empty_map and
             board.get_type_map((pos[0] + diff, pos[1])) == board.empty_map):
 
-        #turns_for_king[(pos[0] + 2 * diff, pos[1])].append(pos)
+        # turns_for_king[(pos[0] + 2 * diff, pos[1])].append(pos)
         possible_turns[(pos[0] + 2 * diff, pos[1])].append(pos)
 
     if board.get_type_map((pos[0] + diff, pos[1])) == board.empty_map:
@@ -444,7 +445,7 @@ def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
             add_pawn_transformation(pos, (pos[0] + diff, pos[1]), possible_turns, color)
         else:
             possible_turns[(pos[0] + diff, pos[1])].append(pos)
-        #turns_for_king[(pos[0] + diff, pos[1])].append(pos)
+        # turns_for_king[(pos[0] + diff, pos[1])].append(pos)
     diffs = [-1, 1]
     for x_diff in diffs:
         if board.get_type_map((pos[0] + diff, pos[1] + x_diff)) > board.empty_map:
@@ -533,7 +534,6 @@ def generate_turns_rook(pos, board, possible_turns, color, turns_for_king):
 def generate_turns_bishop(pos, board, possible_turns, color, turns_for_king):
     """ Adds all turns for bishop in dict
 
-
     :param pos: figure position
     :type pos: (int, int)
     :param board: board object
@@ -585,7 +585,7 @@ def generate_turns_queen(pos, board, possible_turns, color, turns_for_king):
     generate_turns_bishop(pos, board, possible_turns, color, turns_for_king)
 
 
-def generate_turns_king(pos, board, possible_turns, color, opponent_turns, opponent_turns_for_king):
+def generate_turns_king(pos, board, possible_turns, color, opponent_turns_for_king):
     """ Adds all turns for king in dict
 
     :param pos: figure position
@@ -657,3 +657,5 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
                     possible_turns[(pos[0], 5)].append((*pos, (pos[0], 7), (pos[0], 4)))
                 else:
                     possible_turns[(pos[0], 6)].append((*pos, (pos[0], 7), (pos[0], 5)))
+
+    return None

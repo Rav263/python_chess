@@ -75,8 +75,7 @@ class Turn:
 
 
 class Node:
-    """Class node
-    """
+    """Debut Tree Node"""
     def __init__(self):
         self.turn = None
         self.next_turns = dict()

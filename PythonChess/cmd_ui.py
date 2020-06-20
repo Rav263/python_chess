@@ -1,3 +1,4 @@
+"""CMD User Interface"""
 # pylint: disable=undefined-variable
 # pylint: disable=invalid-name
 # pylint: disable=too-few-public-methods
@@ -6,8 +7,7 @@ from .io_functions import get_difficulty
 
 
 class CmdUi:
-    """Comand line output commands
-    """
+    """Main cycle cmd user interface class"""
     def __init__(self, api):
         self.api = api
         self.color = get_color()

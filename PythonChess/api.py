@@ -30,7 +30,6 @@ class Api:
         self.difficulty = difficulty
         self.turn_index = 0
 
-        print(self.evaluate.evaluate_board_mg(self.board, 1))
         print(_("difficulty:"), difficulty)
         print(_("threads:   "), threads)
 

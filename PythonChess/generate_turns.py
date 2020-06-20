@@ -192,7 +192,7 @@ def normalize_tuple(tuple_1):
     return ((tuple_1[0] // abs(tuple_1[1]), tuple_1[1] // abs(tuple_1[1])), abs(tuple_1[1]))
 
 
-def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
+def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns, turns_for_king):
     """Removes impossinle turns
 
     :param board: board object
@@ -230,31 +230,35 @@ def remove_not_possible_turns(board, king_pos, color, turns, opponent_turns):
         if start_turn in start_turns:
             start_turns.pop(start_turn)
 
-    turns = transform_turns_dict(start_turns)
-    if king_pos not in opponent_turns:
-        return turns
-
     start_positions = opponent_turns[king_pos]
     opponent_start_turns = transform_turns_dict(opponent_turns)
 
     important_turns = remove_not_important_turns(opponent_start_turns, start_positions)
 
     possible_turns = defaultdict(list)
-
     for end_turn in start_turns[king_pos]:
         if end_turn not in bad_positions:
             if end_turn not in opponent_turns:
                 possible_turns[end_turn].append(king_pos)
-            elif len(opponent_turns[end_turn]) == 1:
-                if board.get_type_map(opponent_turns[end_turn][0]) == board.pawn:
+            elif end_turn not in turns_for_king:
+                for start_pos in opponent_turns:
+                    if board.get_type_map(start_pos) != board.pawn:
+                        break
+                else:
                     possible_turns[end_turn].append(king_pos)
-
+    
+    if king_pos not in opponent_turns or len(opponent_turns[king_pos]) == 0:
+        pos_start_turns = transform_turns_dict(possible_turns)
+        start_turns[king_pos] = pos_start_turns[king_pos]
+        turns = transform_turns_dict(start_turns)
+        return turns
+    
     positions_for_block = positions_for_turns_block(board, [*important_turns], king_pos)
-
     for pos_for_block in positions_for_block:
         if pos_for_block in turns:
             for start_pos in turns[pos_for_block]:
-                possible_turns[pos_for_block].append(start_pos)
+                if board.get_type_map(start_pos) != board.king:
+                    possible_turns[pos_for_block].append(start_pos)
 
     return possible_turns
 
@@ -419,7 +423,7 @@ def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
             board.get_type_map((pos[0] + 2 * diff, pos[1])) == board.empty_map and
             board.get_type_map((pos[0] + diff, pos[1])) == board.empty_map):
 
-        turns_for_king[(pos[0] + 2 * diff, pos[1])].append(pos)
+        #turns_for_king[(pos[0] + 2 * diff, pos[1])].append(pos)
         possible_turns[(pos[0] + 2 * diff, pos[1])].append(pos)
 
     if board.get_type_map((pos[0] + diff, pos[1])) == board.empty_map:
@@ -427,7 +431,7 @@ def generate_turns_pawn(pos, board, possible_turns, color, turns_for_king):
             add_pawn_transformation(pos, (pos[0] + diff, pos[1]), possible_turns, color)
         else:
             possible_turns[(pos[0] + diff, pos[1])].append(pos)
-        turns_for_king[(pos[0] + diff, pos[1])].append(pos)
+        #turns_for_king[(pos[0] + diff, pos[1])].append(pos)
     diffs = [-1, 1]
     for x_diff in diffs:
         if board.get_type_map((pos[0] + diff, pos[1] + x_diff)) > board.empty_map:
@@ -583,6 +587,9 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
 
     for diff in possible_diffs:
         turn_end = mf.tuple_sum(pos, diff)
+        if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color):
+            possible_turns[turn_end].append(pos)
+        """
         if (board.check_pos(turn_end) and board.get_color_map(turn_end) != color and
                 turn_end not in opponent_turns):
 
@@ -591,7 +598,6 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns, oppon
         if turn_end in opponent_turns and turn_end in opponent_turns_for_king:
             possible_turns[turn_end].append(pos)
 
-            """
             if turn_end in start_opponent_turns:
                 for now_pos in start_opponent_turns[turn_end]:
                     if now_pos in opponent_turns:

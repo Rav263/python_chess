@@ -437,12 +437,17 @@ class GuiBoard(QFrame):
         ok_button.clicked.connect(finish.accept)
         
         result_str = "Game over! \n"
-        if pate:
+        if not pate:
             result_str += "It is a draw."
         elif user_lost:
             result_str += "You lost."
         else:
-            result_str += "You won!"
+            pate = self.api.check_check(3 - self.color)
+            if not pate: 
+                result_str += "You won!"
+            else:
+                result_str += "It is a draw."
+
         result = QLabel(result_str)
         result.setAlignment(Qt.AlignCenter)
 

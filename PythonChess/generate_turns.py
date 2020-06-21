@@ -585,7 +585,7 @@ def generate_turns_queen(pos, board, possible_turns, color, turns_for_king):
     generate_turns_bishop(pos, board, possible_turns, color, turns_for_king)
 
 
-def generate_turns_king(pos, board, possible_turns, color, opponent_turns_for_king):
+def generate_turns_king(pos, board, possible_turns, color, opponent_turns, opponent_turns_for_king):
     """ Adds all turns for king in dict
 
     :param pos: figure position
@@ -622,6 +622,8 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns_for_ki
 
     if board.castling[color]:
         return None
+    if pos in opponent_turns:
+        return None
 
     left_rook, right_rook = (pos[0], 0), (pos[0], 7)
 
@@ -634,6 +636,8 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns_for_ki
                 board.get_color_map(left_rook) == color):
             for x_coord in positions:
                 if board.get_type_map((pos[0], x_coord)) != board.empty_map:
+                    break
+                if (pos[0], x_coord) in opponent_turns:
                     break
             else:
                 if board.flipped:
@@ -651,6 +655,8 @@ def generate_turns_king(pos, board, possible_turns, color, opponent_turns_for_ki
 
             for x_coord in positions:
                 if board.get_type_map((pos[0], x_coord)) != board.empty_map:
+                    break
+                if (pos[0], x_coord) in opponent_turns:
                     break
             else:
                 if board.flipped:

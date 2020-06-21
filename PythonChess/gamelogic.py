@@ -123,10 +123,10 @@ class Logic:
                 if board.get_type_map(pos) == board.king:
                     if check_check:
                         gt.generate_turns_king(pos, board, possible_turns, color,
-                                               opponent_turns_for_king)
+                                               opponent_turns, opponent_turns_for_king)
                     else:
                         gt.generate_turns_king(pos, board, possible_turns, color,
-                                               defaultdict(list))
+                                               defaultdict(list), defaultdict(list))
         gt.check_de_passant(board, possible_turns, last_turn, color)
 
         if check_check:
